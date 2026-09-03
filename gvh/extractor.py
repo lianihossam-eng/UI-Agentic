@@ -5,7 +5,7 @@ EXTRACT_JS = r"""
 () => {
   const nodes={};
   const viewport={width: window.innerWidth, height: window.innerHeight};
-  const els=[...document.querySelectorAll('[data-testid]')];
+  const els=[...document.querySelectorAll('[data-testid], h1, h2, h3, p, label, button, a[href]')];
 
   function effectiveBackground(el){
     let n=el;
@@ -19,7 +19,7 @@ EXTRACT_JS = r"""
     return 'rgb(255, 255, 255)';
   }
 
-  for(const el of els.slice(0,120)){
+  for(const el of els.slice(0,240)){
     const rect=el.getBoundingClientRect();
     const rects=[...el.getClientRects()].map(r=>[r.x,r.y,r.width,r.height]);
     const cs=getComputedStyle(el);
@@ -47,13 +47,14 @@ EXTRACT_JS = r"""
       outlineWidth:cs.outlineWidth,
       boxShadow:cs.boxShadow
     };
-    const role=el.getAttribute('role')|| ({BUTTON:'button',A:'link',H1:'heading',H2:'heading'}[el.tagName]||'');
-    const name=el.getAttribute('aria-label')|| el.textContent?.trim().slice(0,80) || '';
+    const role=el.getAttribute('role')|| ({BUTTON:'button',A:'link',H1:'heading',H2:'heading',H3:'heading'}[el.tagName]||'');
+    const name=el.getAttribute('aria-label')|| el.textContent?.trim().slice(0,120) || '';
     const cx=rect.x+rect.width/2, cy=rect.y+rect.height/2;
     const hitEl=visible ? document.elementFromPoint(cx,cy) : null;
     const hitOk = hitEl ? (hitEl===el || el.contains(hitEl) || hitEl.contains(el)) : false;
-    nodes[el.dataset.testid + '_' + el.tagName.toLowerCase() + '_' + els.indexOf(el)] = {
-      tag: el.tagName.toLowerCase(), testid: el.dataset.testid,
+    const key=(el.dataset.testid || el.tagName.toLowerCase()) + '_' + el.tagName.toLowerCase() + '_' + els.indexOf(el);
+    nodes[key] = {
+      tag: el.tagName.toLowerCase(), testid: el.dataset.testid || null,
       box:[rect.x,rect.y,rect.width,rect.height],
       fragments: rects,
       transform: cs.transform,
