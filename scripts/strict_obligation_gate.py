@@ -75,6 +75,11 @@ def main() -> int:
         if scenario != required[sid]:
             fail(f"evidence scenario differs from compiled obligation: {sid}")
         result = record.get("result") or {}
+        if result.get("constraint") != scenario.get("rule"):
+            fail(
+                f"result constraint does not match compiled rule: {sid} -> "
+                f"{result.get('constraint')} != {scenario.get('rule')}"
+            )
         if result.get("status") != "PASS":
             fail(f"required obligation is not PASS: {sid} -> {result.get('status')}")
         if not record.get("evidence_key"):
