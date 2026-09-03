@@ -1,0 +1,13 @@
+{
+  "contract": "visual-v1",
+  "generated_at": "2026-09-03T08:30:00Z",
+  "reference_images": "reports/screenshots/baseline (not versioned in demo)",
+  "report_hash": "568e45771ec9d61d",
+  "report_hash_algo": "sha256:16",
+  "reviewer": "human:Hossam Liani",
+  "rubric": "layout no overflow, modal centered, contrast adequate, no visual regression vs baseline",
+  "snapshot_digest": "visual-snapshot-demo-20260903",
+  "source": "manual review of Playwright screenshots 3 routes * 5 viewports",
+  "status": "PASS",
+  "verdict": "ACCEPTED"
+}

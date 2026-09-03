@@ -1,0 +1,25 @@
+{
+  "assumptions": [],
+  "documented_assumptions": [
+    {
+      "id": "A1",
+      "scope": "supported_domain.viewport_height",
+      "text": "viewport_height fixed 900"
+    },
+    {
+      "id": "A2",
+      "scope": "browsers_platforms",
+      "text": "browser chromium@playwright-managed single DPR1"
+    },
+    {
+      "id": "A3",
+      "scope": "temporal_scenarios",
+      "text": "no hydration async required (static templates)"
+    }
+  ],
+  "generated_at": "2026-09-03T08:30:00Z",
+  "report_hash": "23b4c404d9f58dd0",
+  "report_hash_algo": "sha256:16",
+  "status": "PASS",
+  "unstated_count": 0
+}

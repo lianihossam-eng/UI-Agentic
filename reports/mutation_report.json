@@ -1,0 +1,153 @@
+{
+  "browser": "chromium@149.0.7827.55",
+  "by_layer": {
+    "accessibility": {
+      "detected": 1,
+      "survived": 0,
+      "total": 1
+    },
+    "geometry": {
+      "detected": 2,
+      "survived": 0,
+      "total": 2
+    },
+    "interaction": {
+      "detected": 2,
+      "survived": 0,
+      "total": 2
+    },
+    "paint": {
+      "detected": 1,
+      "survived": 0,
+      "total": 1
+    },
+    "temporal": {
+      "detected": 1,
+      "survived": 0,
+      "total": 1
+    }
+  },
+  "critical_mutants_zero": true,
+  "details": [
+    {
+      "baseline_status": "PASS",
+      "detected": true,
+      "evidence_key": "be5c37190345",
+      "expected_status": "FAIL",
+      "id": "M1-gap-layout",
+      "layer": "geometry",
+      "mutated_status": "FAIL",
+      "owner_expected": "GLOBAL",
+      "revert_ok": true,
+      "revert_status": "PASS",
+      "route": "/orders",
+      "rule_expected": "global.spacing.scale",
+      "survivor": false,
+      "viewport": 1024
+    },
+    {
+      "baseline_status": "PASS",
+      "detected": true,
+      "evidence_key": "c2d7112b0843",
+      "expected_status": "FAIL",
+      "id": "M2-overlay-occlusion",
+      "layer": "interaction",
+      "mutated_status": "FAIL",
+      "owner_expected": "COMPONENT",
+      "revert_ok": true,
+      "revert_status": "PASS",
+      "route": "/orders",
+      "rule_expected": "component.button.hit-target",
+      "survivor": false,
+      "viewport": 1024
+    },
+    {
+      "baseline_status": "PASS",
+      "detected": true,
+      "evidence_key": "ea3980f3232c",
+      "expected_status": "FAIL",
+      "id": "M3-target-size",
+      "layer": "interaction",
+      "mutated_status": "FAIL",
+      "owner_expected": "COMPONENT",
+      "revert_ok": true,
+      "revert_status": "PASS",
+      "route": "/orders",
+      "rule_expected": "component.button.hit-target",
+      "survivor": false,
+      "viewport": 1024
+    },
+    {
+      "baseline_status": "PASS",
+      "detected": true,
+      "evidence_key": "14b2f28f55b0",
+      "expected_status": "FAIL",
+      "id": "M4-focus-outside-modal",
+      "layer": "accessibility",
+      "mutated_status": "FAIL",
+      "owner_expected": "PAGE",
+      "revert_ok": true,
+      "revert_status": "PASS",
+      "route": "/settings",
+      "rule_expected": "MODAL_INTEGRITY",
+      "survivor": false,
+      "viewport": 768
+    },
+    {
+      "baseline_status": "PASS",
+      "detected": true,
+      "evidence_key": "552bea5b5fc6",
+      "expected_status": "FAIL",
+      "id": "M5-contrast-invalid",
+      "layer": "paint",
+      "mutated_status": "FAIL",
+      "owner_expected": "PAGE",
+      "revert_ok": true,
+      "revert_status": "PASS",
+      "route": "/orders",
+      "rule_expected": "paint.contrast.text",
+      "survivor": false,
+      "viewport": 1024
+    },
+    {
+      "baseline_status": "PASS",
+      "detected": true,
+      "evidence_key": "328685a0afce",
+      "expected_status": "UNKNOWN",
+      "id": "M6-async-layout-shift",
+      "layer": "temporal",
+      "mutated_status": "UNKNOWN",
+      "owner_expected": "PAGE",
+      "revert_ok": true,
+      "revert_status": "PASS",
+      "route": "/orders",
+      "rule_expected": "temporal.geometry-stable",
+      "survivor": false,
+      "viewport": 1024
+    },
+    {
+      "baseline_status": "PASS",
+      "detected": true,
+      "evidence_key": "6c98a969032b",
+      "expected_status": "FAIL",
+      "id": "M7-breakpoint-incorrect",
+      "layer": "geometry",
+      "mutated_status": "FAIL",
+      "owner_expected": "PAGE",
+      "revert_ok": true,
+      "revert_status": "PASS",
+      "route": "/orders",
+      "rule_expected": "group.uniform_gap",
+      "survivor": false,
+      "viewport": 375
+    }
+  ],
+  "detected": 7,
+  "generated_at": "2026-09-03T08:35:00Z",
+  "mutants_total": 7,
+  "report_hash": "d6cb7e237c67120a",
+  "report_hash_algo": "sha256:16",
+  "status": "PASS",
+  "survived": 0,
+  "survivors": []
+}

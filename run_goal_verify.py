@@ -205,23 +205,79 @@ def main():
         for item in ledger.results
     )
     transition_complete = bool(transition_results) and all(item.get("status") == "PASS" for item in transition_results)
-    cross_layer_complete = bool(cross_layer_results) and all(item.get("status") == "PASS" for item in cross_layer_results)
+    cross_layer_ledger_complete = bool(cross_layer_results) and all(item.get("status") == "PASS" for item in cross_layer_results)
     readiness_complete = bool(readiness_results) and all(item.get("status") == "PASS" for item in readiness_results)
 
-    # External gates intentionally remain false until independent evidence is supplied.
+    def _validate_report(name):
+        p = BASE / "reports" / f"{name}.json"
+        if not p.exists():
+            return False, f"missing:{name}"
+        try:
+            data = json.loads(p.read_text())
+        except Exception as exc:
+            return False, f"invalid-json:{name}:{exc}"
+        expected = data.get("report_hash")
+        if not expected:
+            return False, f"no-hash:{name}"
+        copy = {k: v for k, v in data.items() if k not in ("report_hash", "report_hash_algo")}
+        computed = hashlib.sha256(json.dumps(copy, sort_keys=True).encode()).hexdigest()[:16]
+        if computed != expected:
+            return False, f"hash-mismatch:{name}"
+        if data.get("status") == "PENDING":
+            return False, f"pending:{name}"
+        return True, data
+
+    # --- artefact-derived gates (fail-closed: absent/invalid/stale => False) ---
+    ok_trace, trace_data = _validate_report("traceability_report")
+    requirement_traceability = (
+        ok_trace
+        and trace_data.get("percentage") == 100
+        and trace_data.get("traced_obligations") == ledger.required
+        and trace_data.get("required_obligations") == ledger.required
+        and trace_data.get("status") == "PASS"
+    )
+
+    ok_mut, mut_data = _validate_report("mutation_report")
+    critical_mutants_zero = (
+        ok_mut
+        and mut_data.get("survived") == 0
+        and mut_data.get("critical_mutants_zero") is True
+        and mut_data.get("status") == "PASS"
+        and mut_data.get("mutants_total") >= 7
+    )
+
+    ok_assump, assump_data = _validate_report("assumptions_report")
+    unstated_assumptions_zero = ok_assump and assump_data.get("unstated_count") == 0 and assump_data.get("status") == "PASS"
+
+    ok_regress, regress_data = _validate_report("regression_report")
+    regression_closed = ok_regress and regress_data.get("closed") is True and regress_data.get("status") == "PASS"
+
+    ok_parent, parent_data = _validate_report("parent_contract_report")
+    parent_contracts_valid = ok_parent and parent_data.get("all_valid") is True and parent_data.get("status") == "PASS"
+
+    ok_cross, cross_data = _validate_report("cross_layer_report")
+    cross_layer_invariants_complete = ok_cross and cross_data.get("complete") is True and cross_data.get("status") == "PASS" and cross_layer_ledger_complete
+
+    ok_visual, visual_data = _validate_report("visual_review")
+    visual_acceptance = ok_visual and visual_data.get("verdict") == "ACCEPTED" and visual_data.get("status") == "PASS"
+
+    # gates that remain ledger-derived (no artefact) but still fail-closed
+    certificate_validation = True  # no BOUNDED/CERTIFIED obligation in current executable demo domain
+    compliance_obligations_complete = not bool(DOMAIN.get("compliance_profiles"))
+
     gate_checks = {
-        "requirement_traceability": True,
+        "requirement_traceability": requirement_traceability,
         "required_proof_levels": all_required_observed,
-        "certificate_validation": True,  # no BOUNDED/CERTIFIED obligation in current executable demo domain
+        "certificate_validation": certificate_validation,
         "measurement_readiness": readiness_complete,
-        "critical_mutants_zero": True,
-        "unstated_assumptions_zero": True,
-        "regression_closed": True,
-        "parent_contracts_valid": True,
+        "critical_mutants_zero": critical_mutants_zero,
+        "unstated_assumptions_zero": unstated_assumptions_zero,
+        "regression_closed": regression_closed,
+        "parent_contracts_valid": parent_contracts_valid,
         "state_transitions_complete": transition_complete,
-        "cross_layer_invariants_complete": True,
-        "compliance_obligations_complete": not bool(DOMAIN.get("compliance_profiles")),
-        "visual_acceptance": True,
+        "cross_layer_invariants_complete": cross_layer_invariants_complete,
+        "compliance_obligations_complete": compliance_obligations_complete,
+        "visual_acceptance": visual_acceptance,
     }
     gate = final_confirmation_gate(ledger, gate_checks)
     report = {

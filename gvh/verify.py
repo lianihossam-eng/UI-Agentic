@@ -80,13 +80,22 @@ def _check_modal_integrity(page):
           };
         }"""
     )
+    # Strict MODAL_INTEGRITY per audit 2026-09-03T08:04: focusInside is mandatory for open state.
+    # If focus observability is missing, emit UNKNOWN rather than lenient PASS.
+    required_keys = ("visible", "fixed", "ariaModal", "focusInside", "centerOwned", "backgroundBlocked")
+    if any(evidence.get(k) is None for k in required_keys):
+        return {
+            "layer": "interaction",
+            "constraint": "MODAL_INTEGRITY",
+            "owner": "PAGE",
+            "status": "UNKNOWN",
+            "reason": "modal-focus-not-observable",
+            "requires_layers": ["geometry", "interaction", "accessibility"],
+            "evidence_bundle": evidence,
+        }
     is_open = evidence.get("visible") is True
     if is_open:
-        # Focus check is lenient: visible+fixed+ariaModal+centerOwned+backgroundBlocked must be True, focusInside is best-effort (close button may not be focusable in test env)
-        passed = all(
-            evidence.get(key) is True
-            for key in ("visible", "fixed", "ariaModal", "centerOwned", "backgroundBlocked")
-        )
+        passed = all(evidence.get(key) is True for key in required_keys)
     else:
         passed = (
             evidence.get("visible") is False
@@ -124,6 +133,9 @@ def verify_all(ir, page=None):
 
     if page is None:
         return findings
+
+    # Modal integrity must be captured before a11y mutates focus (Tab/blur)
+    findings.append(_check_modal_integrity(page))
 
     findings.append(_check_global_spacing(page))
 
@@ -181,5 +193,4 @@ def verify_all(ir, page=None):
     for finding in check_temporal(page):
         findings.append({"layer": "temporal", **finding})
 
-    findings.append(_check_modal_integrity(page))
     return findings

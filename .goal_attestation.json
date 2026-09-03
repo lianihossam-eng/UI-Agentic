@@ -4,7 +4,7 @@
     "contract": "public-audit-contract",
     "rules": "public-audit-rules",
     "scenarios": "5d43a5ee4cc4f8f5",
-    "evidence_root": "9881753e65619f77",
+    "evidence_root": "3de70793411e3277",
     "environment": {
       "browser": "chromium@149.0.7827.55",
       "viewport_height": 900
@@ -37,8 +37,8 @@
       },
       "blocking_gates": []
     },
-    "time": 1788422454
+    "time": 1788423161
   },
-  "digest": "306ff4835d853ecb",
+  "digest": "9e4c55cdfc00c45e",
   "verdict": "LOCKED"
 }

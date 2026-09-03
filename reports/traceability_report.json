@@ -1,0 +1,643 @@
+{
+  "checker": "traceability-checker-v1",
+  "generated_at": "2026-09-03T08:30:00Z",
+  "mapping": [
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-group.uniform_gap",
+      "requirement": "REQ-/orders-default-group.uniform_gap",
+      "rule": "group.uniform_gap",
+      "scenario_id": "/orders@320:group.uniform_gap"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-group.uniform_gap",
+      "requirement": "REQ-/orders-default-group.uniform_gap",
+      "rule": "group.uniform_gap",
+      "scenario_id": "/orders@375:group.uniform_gap"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-group.uniform_gap",
+      "requirement": "REQ-/orders-default-group.uniform_gap",
+      "rule": "group.uniform_gap",
+      "scenario_id": "/orders@768:group.uniform_gap"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-group.uniform_gap",
+      "requirement": "REQ-/orders-default-group.uniform_gap",
+      "rule": "group.uniform_gap",
+      "scenario_id": "/orders@1024:group.uniform_gap"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-group.uniform_gap",
+      "requirement": "REQ-/orders-default-group.uniform_gap",
+      "rule": "group.uniform_gap",
+      "scenario_id": "/orders@1440:group.uniform_gap"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-group.uniform_gap",
+      "requirement": "REQ-/settings-default-group.uniform_gap",
+      "rule": "group.uniform_gap",
+      "scenario_id": "/settings@320:group.uniform_gap"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-group.uniform_gap",
+      "requirement": "REQ-/settings-default-group.uniform_gap",
+      "rule": "group.uniform_gap",
+      "scenario_id": "/settings@375:group.uniform_gap"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-group.uniform_gap",
+      "requirement": "REQ-/settings-default-group.uniform_gap",
+      "rule": "group.uniform_gap",
+      "scenario_id": "/settings@768:group.uniform_gap"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-group.uniform_gap",
+      "requirement": "REQ-/settings-default-group.uniform_gap",
+      "rule": "group.uniform_gap",
+      "scenario_id": "/settings@1024:group.uniform_gap"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-group.uniform_gap",
+      "requirement": "REQ-/settings-default-group.uniform_gap",
+      "rule": "group.uniform_gap",
+      "scenario_id": "/settings@1440:group.uniform_gap"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-group.uniform_gap",
+      "requirement": "REQ-/analytics-default-group.uniform_gap",
+      "rule": "group.uniform_gap",
+      "scenario_id": "/analytics@320:group.uniform_gap"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-group.uniform_gap",
+      "requirement": "REQ-/analytics-default-group.uniform_gap",
+      "rule": "group.uniform_gap",
+      "scenario_id": "/analytics@375:group.uniform_gap"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-group.uniform_gap",
+      "requirement": "REQ-/analytics-default-group.uniform_gap",
+      "rule": "group.uniform_gap",
+      "scenario_id": "/analytics@768:group.uniform_gap"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-group.uniform_gap",
+      "requirement": "REQ-/analytics-default-group.uniform_gap",
+      "rule": "group.uniform_gap",
+      "scenario_id": "/analytics@1024:group.uniform_gap"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-group.uniform_gap",
+      "requirement": "REQ-/analytics-default-group.uniform_gap",
+      "rule": "group.uniform_gap",
+      "scenario_id": "/analytics@1440:group.uniform_gap"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-global.spacing.scale",
+      "requirement": "REQ-/orders-default-global.spacing.scale",
+      "rule": "global.spacing.scale",
+      "scenario_id": "/orders@320:global.spacing.scale"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-global.spacing.scale",
+      "requirement": "REQ-/orders-default-global.spacing.scale",
+      "rule": "global.spacing.scale",
+      "scenario_id": "/orders@375:global.spacing.scale"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-global.spacing.scale",
+      "requirement": "REQ-/orders-default-global.spacing.scale",
+      "rule": "global.spacing.scale",
+      "scenario_id": "/orders@768:global.spacing.scale"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-global.spacing.scale",
+      "requirement": "REQ-/orders-default-global.spacing.scale",
+      "rule": "global.spacing.scale",
+      "scenario_id": "/orders@1024:global.spacing.scale"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-global.spacing.scale",
+      "requirement": "REQ-/orders-default-global.spacing.scale",
+      "rule": "global.spacing.scale",
+      "scenario_id": "/orders@1440:global.spacing.scale"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-global.spacing.scale",
+      "requirement": "REQ-/settings-default-global.spacing.scale",
+      "rule": "global.spacing.scale",
+      "scenario_id": "/settings@320:global.spacing.scale"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-global.spacing.scale",
+      "requirement": "REQ-/settings-default-global.spacing.scale",
+      "rule": "global.spacing.scale",
+      "scenario_id": "/settings@375:global.spacing.scale"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-global.spacing.scale",
+      "requirement": "REQ-/settings-default-global.spacing.scale",
+      "rule": "global.spacing.scale",
+      "scenario_id": "/settings@768:global.spacing.scale"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-global.spacing.scale",
+      "requirement": "REQ-/settings-default-global.spacing.scale",
+      "rule": "global.spacing.scale",
+      "scenario_id": "/settings@1024:global.spacing.scale"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-global.spacing.scale",
+      "requirement": "REQ-/settings-default-global.spacing.scale",
+      "rule": "global.spacing.scale",
+      "scenario_id": "/settings@1440:global.spacing.scale"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-global.spacing.scale",
+      "requirement": "REQ-/analytics-default-global.spacing.scale",
+      "rule": "global.spacing.scale",
+      "scenario_id": "/analytics@320:global.spacing.scale"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-global.spacing.scale",
+      "requirement": "REQ-/analytics-default-global.spacing.scale",
+      "rule": "global.spacing.scale",
+      "scenario_id": "/analytics@375:global.spacing.scale"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-global.spacing.scale",
+      "requirement": "REQ-/analytics-default-global.spacing.scale",
+      "rule": "global.spacing.scale",
+      "scenario_id": "/analytics@768:global.spacing.scale"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-global.spacing.scale",
+      "requirement": "REQ-/analytics-default-global.spacing.scale",
+      "rule": "global.spacing.scale",
+      "scenario_id": "/analytics@1024:global.spacing.scale"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-global.spacing.scale",
+      "requirement": "REQ-/analytics-default-global.spacing.scale",
+      "rule": "global.spacing.scale",
+      "scenario_id": "/analytics@1440:global.spacing.scale"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-paint.contrast.text",
+      "requirement": "REQ-/orders-default-paint.contrast.text",
+      "rule": "paint.contrast.text",
+      "scenario_id": "/orders@768:paint.contrast.text"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-paint.contrast.text",
+      "requirement": "REQ-/settings-default-paint.contrast.text",
+      "rule": "paint.contrast.text",
+      "scenario_id": "/settings@768:paint.contrast.text"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-paint.contrast.text",
+      "requirement": "REQ-/analytics-default-paint.contrast.text",
+      "rule": "paint.contrast.text",
+      "scenario_id": "/analytics@768:paint.contrast.text"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-component.button.hit-target",
+      "requirement": "REQ-/orders-default-component.button.hit-target",
+      "rule": "component.button.hit-target",
+      "scenario_id": "/orders@320:component.button.hit-target"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-component.button.hit-target",
+      "requirement": "REQ-/orders-default-component.button.hit-target",
+      "rule": "component.button.hit-target",
+      "scenario_id": "/orders@375:component.button.hit-target"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-component.button.hit-target",
+      "requirement": "REQ-/orders-default-component.button.hit-target",
+      "rule": "component.button.hit-target",
+      "scenario_id": "/orders@768:component.button.hit-target"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-component.button.hit-target",
+      "requirement": "REQ-/orders-default-component.button.hit-target",
+      "rule": "component.button.hit-target",
+      "scenario_id": "/orders@1024:component.button.hit-target"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-component.button.hit-target",
+      "requirement": "REQ-/orders-default-component.button.hit-target",
+      "rule": "component.button.hit-target",
+      "scenario_id": "/orders@1440:component.button.hit-target"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-component.button.hit-target",
+      "requirement": "REQ-/settings-default-component.button.hit-target",
+      "rule": "component.button.hit-target",
+      "scenario_id": "/settings@320:component.button.hit-target"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-component.button.hit-target",
+      "requirement": "REQ-/settings-default-component.button.hit-target",
+      "rule": "component.button.hit-target",
+      "scenario_id": "/settings@375:component.button.hit-target"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-component.button.hit-target",
+      "requirement": "REQ-/settings-default-component.button.hit-target",
+      "rule": "component.button.hit-target",
+      "scenario_id": "/settings@768:component.button.hit-target"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-component.button.hit-target",
+      "requirement": "REQ-/settings-default-component.button.hit-target",
+      "rule": "component.button.hit-target",
+      "scenario_id": "/settings@1024:component.button.hit-target"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-component.button.hit-target",
+      "requirement": "REQ-/settings-default-component.button.hit-target",
+      "rule": "component.button.hit-target",
+      "scenario_id": "/settings@1440:component.button.hit-target"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-component.button.hit-target",
+      "requirement": "REQ-/analytics-default-component.button.hit-target",
+      "rule": "component.button.hit-target",
+      "scenario_id": "/analytics@320:component.button.hit-target"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-component.button.hit-target",
+      "requirement": "REQ-/analytics-default-component.button.hit-target",
+      "rule": "component.button.hit-target",
+      "scenario_id": "/analytics@375:component.button.hit-target"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-component.button.hit-target",
+      "requirement": "REQ-/analytics-default-component.button.hit-target",
+      "rule": "component.button.hit-target",
+      "scenario_id": "/analytics@768:component.button.hit-target"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-component.button.hit-target",
+      "requirement": "REQ-/analytics-default-component.button.hit-target",
+      "rule": "component.button.hit-target",
+      "scenario_id": "/analytics@1024:component.button.hit-target"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-component.button.hit-target",
+      "requirement": "REQ-/analytics-default-component.button.hit-target",
+      "rule": "component.button.hit-target",
+      "scenario_id": "/analytics@1440:component.button.hit-target"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-TARGET_OPERABLE",
+      "requirement": "REQ-/orders-default-TARGET_OPERABLE",
+      "rule": "TARGET_OPERABLE",
+      "scenario_id": "/orders@320:TARGET_OPERABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-TARGET_OPERABLE",
+      "requirement": "REQ-/orders-default-TARGET_OPERABLE",
+      "rule": "TARGET_OPERABLE",
+      "scenario_id": "/orders@375:TARGET_OPERABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-TARGET_OPERABLE",
+      "requirement": "REQ-/orders-default-TARGET_OPERABLE",
+      "rule": "TARGET_OPERABLE",
+      "scenario_id": "/orders@768:TARGET_OPERABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-TARGET_OPERABLE",
+      "requirement": "REQ-/orders-default-TARGET_OPERABLE",
+      "rule": "TARGET_OPERABLE",
+      "scenario_id": "/orders@1024:TARGET_OPERABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-TARGET_OPERABLE",
+      "requirement": "REQ-/orders-default-TARGET_OPERABLE",
+      "rule": "TARGET_OPERABLE",
+      "scenario_id": "/orders@1440:TARGET_OPERABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-TARGET_OPERABLE",
+      "requirement": "REQ-/settings-default-TARGET_OPERABLE",
+      "rule": "TARGET_OPERABLE",
+      "scenario_id": "/settings@320:TARGET_OPERABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-TARGET_OPERABLE",
+      "requirement": "REQ-/settings-default-TARGET_OPERABLE",
+      "rule": "TARGET_OPERABLE",
+      "scenario_id": "/settings@375:TARGET_OPERABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-TARGET_OPERABLE",
+      "requirement": "REQ-/settings-default-TARGET_OPERABLE",
+      "rule": "TARGET_OPERABLE",
+      "scenario_id": "/settings@768:TARGET_OPERABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-TARGET_OPERABLE",
+      "requirement": "REQ-/settings-default-TARGET_OPERABLE",
+      "rule": "TARGET_OPERABLE",
+      "scenario_id": "/settings@1024:TARGET_OPERABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-TARGET_OPERABLE",
+      "requirement": "REQ-/settings-default-TARGET_OPERABLE",
+      "rule": "TARGET_OPERABLE",
+      "scenario_id": "/settings@1440:TARGET_OPERABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-TARGET_OPERABLE",
+      "requirement": "REQ-/analytics-default-TARGET_OPERABLE",
+      "rule": "TARGET_OPERABLE",
+      "scenario_id": "/analytics@320:TARGET_OPERABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-TARGET_OPERABLE",
+      "requirement": "REQ-/analytics-default-TARGET_OPERABLE",
+      "rule": "TARGET_OPERABLE",
+      "scenario_id": "/analytics@375:TARGET_OPERABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-TARGET_OPERABLE",
+      "requirement": "REQ-/analytics-default-TARGET_OPERABLE",
+      "rule": "TARGET_OPERABLE",
+      "scenario_id": "/analytics@768:TARGET_OPERABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-TARGET_OPERABLE",
+      "requirement": "REQ-/analytics-default-TARGET_OPERABLE",
+      "rule": "TARGET_OPERABLE",
+      "scenario_id": "/analytics@1024:TARGET_OPERABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-TARGET_OPERABLE",
+      "requirement": "REQ-/analytics-default-TARGET_OPERABLE",
+      "rule": "TARGET_OPERABLE",
+      "scenario_id": "/analytics@1440:TARGET_OPERABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-accessibility.focus-order",
+      "requirement": "REQ-/orders-default-accessibility.focus-order",
+      "rule": "accessibility.focus-order",
+      "scenario_id": "/orders@768:accessibility.focus-order"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-accessibility.focus-order",
+      "requirement": "REQ-/settings-default-accessibility.focus-order",
+      "rule": "accessibility.focus-order",
+      "scenario_id": "/settings@768:accessibility.focus-order"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-accessibility.focus-order",
+      "requirement": "REQ-/analytics-default-accessibility.focus-order",
+      "rule": "accessibility.focus-order",
+      "scenario_id": "/analytics@768:accessibility.focus-order"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-FOCUS_USABLE",
+      "requirement": "REQ-/orders-default-FOCUS_USABLE",
+      "rule": "FOCUS_USABLE",
+      "scenario_id": "/orders@768:FOCUS_USABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-FOCUS_USABLE",
+      "requirement": "REQ-/settings-default-FOCUS_USABLE",
+      "rule": "FOCUS_USABLE",
+      "scenario_id": "/settings@768:FOCUS_USABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-FOCUS_USABLE",
+      "requirement": "REQ-/analytics-default-FOCUS_USABLE",
+      "rule": "FOCUS_USABLE",
+      "scenario_id": "/analytics@768:FOCUS_USABLE"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-temporal.geometry-stable",
+      "requirement": "REQ-/orders-default-temporal.geometry-stable",
+      "rule": "temporal.geometry-stable",
+      "scenario_id": "/orders@320:temporal.geometry-stable"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-temporal.geometry-stable",
+      "requirement": "REQ-/orders-default-temporal.geometry-stable",
+      "rule": "temporal.geometry-stable",
+      "scenario_id": "/orders@375:temporal.geometry-stable"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-temporal.geometry-stable",
+      "requirement": "REQ-/orders-default-temporal.geometry-stable",
+      "rule": "temporal.geometry-stable",
+      "scenario_id": "/orders@768:temporal.geometry-stable"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-temporal.geometry-stable",
+      "requirement": "REQ-/orders-default-temporal.geometry-stable",
+      "rule": "temporal.geometry-stable",
+      "scenario_id": "/orders@1024:temporal.geometry-stable"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-temporal.geometry-stable",
+      "requirement": "REQ-/orders-default-temporal.geometry-stable",
+      "rule": "temporal.geometry-stable",
+      "scenario_id": "/orders@1440:temporal.geometry-stable"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-temporal.geometry-stable",
+      "requirement": "REQ-/settings-default-temporal.geometry-stable",
+      "rule": "temporal.geometry-stable",
+      "scenario_id": "/settings@320:temporal.geometry-stable"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-temporal.geometry-stable",
+      "requirement": "REQ-/settings-default-temporal.geometry-stable",
+      "rule": "temporal.geometry-stable",
+      "scenario_id": "/settings@375:temporal.geometry-stable"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-temporal.geometry-stable",
+      "requirement": "REQ-/settings-default-temporal.geometry-stable",
+      "rule": "temporal.geometry-stable",
+      "scenario_id": "/settings@768:temporal.geometry-stable"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-temporal.geometry-stable",
+      "requirement": "REQ-/settings-default-temporal.geometry-stable",
+      "rule": "temporal.geometry-stable",
+      "scenario_id": "/settings@1024:temporal.geometry-stable"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-temporal.geometry-stable",
+      "requirement": "REQ-/settings-default-temporal.geometry-stable",
+      "rule": "temporal.geometry-stable",
+      "scenario_id": "/settings@1440:temporal.geometry-stable"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-temporal.geometry-stable",
+      "requirement": "REQ-/analytics-default-temporal.geometry-stable",
+      "rule": "temporal.geometry-stable",
+      "scenario_id": "/analytics@320:temporal.geometry-stable"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-temporal.geometry-stable",
+      "requirement": "REQ-/analytics-default-temporal.geometry-stable",
+      "rule": "temporal.geometry-stable",
+      "scenario_id": "/analytics@375:temporal.geometry-stable"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-temporal.geometry-stable",
+      "requirement": "REQ-/analytics-default-temporal.geometry-stable",
+      "rule": "temporal.geometry-stable",
+      "scenario_id": "/analytics@768:temporal.geometry-stable"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-temporal.geometry-stable",
+      "requirement": "REQ-/analytics-default-temporal.geometry-stable",
+      "rule": "temporal.geometry-stable",
+      "scenario_id": "/analytics@1024:temporal.geometry-stable"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-temporal.geometry-stable",
+      "requirement": "REQ-/analytics-default-temporal.geometry-stable",
+      "rule": "temporal.geometry-stable",
+      "scenario_id": "/analytics@1440:temporal.geometry-stable"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-transition:settings-modal",
+      "requirement": "REQ-/settings-default-transition:settings-modal",
+      "rule": "transition:settings-modal",
+      "scenario_id": "/settings@768:transition:settings-modal"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-transition:settings-modal",
+      "requirement": "REQ-/settings-default-transition:settings-modal",
+      "rule": "transition:settings-modal",
+      "scenario_id": "/settings@768:transition:settings-modal"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-MODAL_INTEGRITY",
+      "requirement": "REQ-/settings-modal-open-MODAL_INTEGRITY",
+      "rule": "MODAL_INTEGRITY",
+      "scenario_id": "/settings@768:MODAL_INTEGRITY"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-transition:analytics-drilldown",
+      "requirement": "REQ-/analytics-default-transition:analytics-drilldown",
+      "rule": "transition:analytics-drilldown",
+      "scenario_id": "/analytics@768:transition:analytics-drilldown"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-transition:analytics-drilldown",
+      "requirement": "REQ-/analytics-default-transition:analytics-drilldown",
+      "rule": "transition:analytics-drilldown",
+      "scenario_id": "/analytics@768:transition:analytics-drilldown"
+    },
+    {
+      "evidence_type": "observed",
+      "failure_mode": "FM-MODAL_INTEGRITY",
+      "requirement": "REQ-/analytics-modal-open-MODAL_INTEGRITY",
+      "rule": "MODAL_INTEGRITY",
+      "scenario_id": "/analytics@768:MODAL_INTEGRITY"
+    }
+  ],
+  "percentage": 100.0,
+  "report_hash": "83d80f662aa5fd4e",
+  "report_hash_algo": "sha256:16",
+  "required_obligations": 90,
+  "status": "PASS",
+  "supported_domain_digest": "46e883a2bc336d1b",
+  "traced_obligations": 90
+}

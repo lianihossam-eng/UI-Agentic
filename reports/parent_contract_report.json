@@ -1,0 +1,46 @@
+{
+  "all_valid": true,
+  "contracts": [
+    {
+      "id": "global.spacing.scale",
+      "owner": "GLOBAL",
+      "rule": "global.spacing.scale",
+      "valid": true
+    },
+    {
+      "id": "group.uniform_gap",
+      "owner": "PAGE",
+      "rule": "group.uniform_gap",
+      "valid": true
+    },
+    {
+      "id": "component.button.hit-target",
+      "owner": "COMPONENT",
+      "rule": "component.button.hit-target",
+      "valid": true
+    },
+    {
+      "id": "MODAL_INTEGRITY",
+      "owner": "PAGE",
+      "rule": "MODAL_INTEGRITY",
+      "valid": true
+    },
+    {
+      "id": "TARGET_OPERABLE",
+      "owner": "COMPONENT",
+      "rule": "TARGET_OPERABLE",
+      "valid": true
+    },
+    {
+      "id": "FOCUS_USABLE",
+      "owner": "PAGE",
+      "rule": "FOCUS_USABLE",
+      "valid": true
+    }
+  ],
+  "generated_at": "2026-09-03T08:30:00Z",
+  "report_hash": "f59d1fb88c0c563c",
+  "report_hash_algo": "sha256:16",
+  "shell_family_contract": "shell flex column @767 holds without local page patch",
+  "status": "PASS"
+}

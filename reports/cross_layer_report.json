@@ -1,0 +1,86 @@
+{
+  "complete": true,
+  "evidence_bundles": {
+    "FOCUS_USABLE": {
+      "boxShadow": "none",
+      "focusIndicator": true,
+      "focused": true,
+      "notObscured": true,
+      "outlineStyle": "auto",
+      "outlineWidth": "1px",
+      "size": [
+        58.96875,
+        44
+      ],
+      "visible": true
+    },
+    "MODAL_INTEGRITY": {
+      "activeTestId": "close",
+      "ariaModal": true,
+      "backgroundBlocked": true,
+      "centerOwned": true,
+      "fixed": true,
+      "focusInside": true,
+      "isClose": true,
+      "visible": true
+    },
+    "TARGET_OPERABLE": {
+      "hit": true,
+      "size": [
+        58.96875,
+        44
+      ],
+      "visible": true
+    }
+  },
+  "generated_at": "2026-09-03T08:30:00Z",
+  "invariants": [
+    {
+      "bundle_keys": [
+        "geometry:group.uniform_gap",
+        "interaction:component.button.hit-target"
+      ],
+      "id": "TARGET_OPERABLE",
+      "requires_layers": [
+        "geometry",
+        "interaction"
+      ],
+      "verified": true
+    },
+    {
+      "bundle_keys": [
+        "a11y:focus-visible"
+      ],
+      "id": "FOCUS_USABLE",
+      "requires_layers": [
+        "geometry",
+        "accessibility"
+      ],
+      "verified": true
+    },
+    {
+      "bundle_keys": [
+        "geometry:visible",
+        "interaction:centerOwned+backgroundBlocked",
+        "accessibility:focusInside+ariaModal"
+      ],
+      "evidence_snapshot_required": "same scenario/evidence snapshot",
+      "id": "MODAL_INTEGRITY",
+      "requires_layers": [
+        "geometry",
+        "interaction",
+        "accessibility"
+      ],
+      "verified": true
+    }
+  ],
+  "report_hash": "c70b858cd94ff43d",
+  "report_hash_algo": "sha256:16",
+  "snapshot_evidence": {
+    "FOCUS_USABLE_status": "PASS",
+    "MODAL_INTEGRITY_status": "PASS",
+    "TARGET_OPERABLE_status": "PASS",
+    "all_pass": true
+  },
+  "status": "PASS"
+}

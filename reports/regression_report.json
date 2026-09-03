@@ -1,0 +1,10 @@
+{
+  "closed": true,
+  "generated_at": "2026-09-03T08:30:00Z",
+  "invalidated_scenarios_rerun": 90,
+  "regressions": [],
+  "report_hash": "a33ca633e5105c43",
+  "report_hash_algo": "sha256:16",
+  "rerun_status": "all_pass",
+  "status": "PASS"
+}
