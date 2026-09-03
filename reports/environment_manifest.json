@@ -1,10 +1,10 @@
 {
   "checker_digest": "920ae5aaa6401f93",
   "chromium_version": "149.0.7827.55",
-  "commit_sha": "6391f058056c5eae647cb03ed2c1f449403ea36c",
+  "commit_sha": "5b85528e9fcae15787c00f25a72dae62903d9f34",
   "dpr": "1",
   "locale": "fr-LTR",
-  "manifest_digest": "aa49b658f65f4031",
+  "manifest_digest": "58466c920ba94cb4",
   "manifest_hash_algo": "sha256:16",
   "os": "Ubuntu 24.04.4 LTS",
   "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.39",
