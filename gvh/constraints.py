@@ -11,8 +11,8 @@ def check_hard(ir):
     cards = [v for v in nodes.values() if v.get("testid") == "card"]
     vw = ir["viewport"]["width"]
 
-    # Fail closed on applicability. An empty violation set is meaningful only
-    # when at least one adjacent-card gap was actually measurable.
+    # Applicability is explicit: UNKNOWN when no adjacent pair exists; PASS is
+    # emitted only after at least one adjacent-card gap was actually measured.
     if len(cards) < 2:
         findings.append(
             {
@@ -21,32 +21,53 @@ def check_hard(ir):
                 "status": "UNKNOWN",
                 "reason": "fewer-than-two-applicable-cards",
                 "measured_cards": len(cards),
+                "measured_gaps": 0,
                 "viewport": vw,
             }
         )
     else:
+        measured = []
+        violation = None
         for i in range(len(cards) - 1):
             a = cards[i]["box"]
             b = cards[i + 1]["box"]
             same_row = abs(a[1] - b[1]) < 5
-            g = gap(a, b, "x" if same_row else "y")
             axis = "x" if same_row else "y"
+            g = gap(a, b, axis)
             r = abs(g - 24)
+            measured.append({"axis": axis, "actual": g, "residual": r})
             if r > 0.5:
-                findings.append(
-                    {
-                        "constraint": "group.uniform_gap",
-                        "owner": "PAGE",
-                        "expected": 24,
-                        "actual": g,
-                        "residual": r,
-                        "stability_margin": 0.5 - r,
-                        "axis": axis,
-                        "viewport": vw,
-                        "status": "FAIL",
-                    }
-                )
+                violation = measured[-1]
                 break
+        if violation is not None:
+            findings.append(
+                {
+                    "constraint": "group.uniform_gap",
+                    "owner": "PAGE",
+                    "expected": 24,
+                    "actual": violation["actual"],
+                    "residual": violation["residual"],
+                    "stability_margin": 0.5 - violation["residual"],
+                    "axis": violation["axis"],
+                    "viewport": vw,
+                    "measured_cards": len(cards),
+                    "measured_gaps": len(measured),
+                    "status": "FAIL",
+                }
+            )
+        else:
+            findings.append(
+                {
+                    "constraint": "group.uniform_gap",
+                    "owner": "PAGE",
+                    "expected": 24,
+                    "viewport": vw,
+                    "measured_cards": len(cards),
+                    "measured_gaps": len(measured),
+                    "max_residual": max(item["residual"] for item in measured),
+                    "status": "PASS",
+                }
+            )
 
     main = next((v for v in nodes.values() if v.get("testid") == "main"), None)
     if main:
