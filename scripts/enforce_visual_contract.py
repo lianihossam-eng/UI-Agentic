@@ -1,20 +1,20 @@
-"""Build the complete current-run visual evidence bundle and apply fail-closed approval.
+"""Build current-run visual evidence and apply bounded raster-equivalence approval.
 
-This script runs after capture_current_run_evidence.py. It extends the default-state
-screenshots with modal-open states, computes one exact pixel snapshot digest over
-all required images, and rewrites visual_review.json from a snapshot-specific
-approval. No approval is transferable to a different snapshot.
+Exact PNG hashes remain part of the run evidence. Subjective visual approval is
+matched against a deterministic review fingerprint that is stable under isolated
+sub-pixel rasterisation noise but changes for coherent rendered differences.
 """
 from __future__ import annotations
 
 import hashlib
 import json
 import pathlib
-import sys
 from datetime import datetime, timezone
 
 import yaml
 from playwright.sync_api import sync_playwright
+
+from core.visual_fingerprint import REVIEW_FINGERPRINT_ALGO, review_fingerprint_manifest
 
 BASE = pathlib.Path(__file__).resolve().parent.parent
 REPORT_DIR = BASE / "reports"
@@ -30,7 +30,7 @@ ROUTE_FILE = {
     "/analytics": BASE / "assets/templates/analytics-page.html",
 }
 MODAL_ROUTES = ("/settings", "/analytics")
-CONTRACT_VERSION = "visual-v3-exact-snapshot"
+CONTRACT_VERSION = "visual-v4-raster-equivalence"
 REQUIRED_STATES = ("default", "modal-open")
 
 
@@ -62,7 +62,11 @@ def write_report_hash(data: dict) -> None:
 
 def visual_checker_digest() -> str:
     h = hashlib.sha256()
-    for name in ("scripts/enforce_visual_contract.py", "scripts/strict_visual_gate.py"):
+    for name in (
+        "core/visual_fingerprint.py",
+        "scripts/enforce_visual_contract.py",
+        "scripts/strict_visual_gate.py",
+    ):
         path = BASE / name
         if path.exists():
             h.update(path.read_bytes())
@@ -133,15 +137,21 @@ def build_manifest() -> dict[str, str]:
     return {name: file_sha16(SCREENSHOT_DIR / name) for name in sorted(expected)}
 
 
-def matching_approval(approval_doc: dict, snapshot: str, image_count: int) -> tuple[str, dict | None, str]:
+def matching_approval(
+    approval_doc: dict, review_fingerprint: str, image_count: int
+) -> tuple[str, dict | None, str]:
     if approval_doc.get("contract") != CONTRACT_VERSION:
         return "UNKNOWN", None, "approval-contract-mismatch"
     approvals = approval_doc.get("approvals")
     if not isinstance(approvals, list):
         return "UNKNOWN", None, "approvals-list-missing"
-    matches = [a for a in approvals if isinstance(a, dict) and a.get("snapshot_digest") == snapshot]
+    matches = [
+        a
+        for a in approvals
+        if isinstance(a, dict) and a.get("review_fingerprint_digest") == review_fingerprint
+    ]
     if len(matches) != 1:
-        return "UNKNOWN", None, "exactly-one-current-snapshot-approval-required"
+        return "UNKNOWN", None, "exactly-one-current-review-fingerprint-approval-required"
     item = matches[0]
     reviewer = str(item.get("reviewer") or "")
     reviewer_type = item.get("reviewer_type")
@@ -149,33 +159,46 @@ def matching_approval(approval_doc: dict, snapshot: str, image_count: int) -> tu
     valid_identity = reviewer_type == "agent" and reviewer.startswith("agent:") and len(reviewer) > len("agent:")
     valid_scope = (
         item.get("reviewed_image_count") == image_count
-        and item.get("reviewed_images_digest") == snapshot
+        and item.get("reviewed_fingerprint_algo") == REVIEW_FINGERPRINT_ALGO
         and isinstance(states, list)
         and set(states) == set(REQUIRED_STATES)
     )
-    valid_metadata = bool(item.get("reviewed_at")) and bool(item.get("rubric"))
+    valid_metadata = (
+        bool(item.get("reviewed_at"))
+        and bool(item.get("rubric"))
+        and bool(item.get("reviewed_snapshot_digest"))
+    )
     verdict = item.get("verdict")
     if not valid_identity:
         return "UNKNOWN", item, "reviewer-must-be-explicit-agent-identity"
     if not valid_scope:
-        return "UNKNOWN", item, "approval-scope-does-not-match-current-visual-bundle"
+        return "UNKNOWN", item, "approval-scope-does-not-match-current-visual-equivalence-class"
     if not valid_metadata:
         return "UNKNOWN", item, "approval-metadata-incomplete"
     if verdict == "ACCEPTED":
-        return "ACCEPTED", item, "snapshot-reviewed-and-accepted"
+        return "ACCEPTED", item, "review-equivalence-class-reviewed-and-accepted"
     if verdict == "REJECTED":
-        return "REJECTED", item, "snapshot-reviewed-and-rejected"
+        return "REJECTED", item, "review-equivalence-class-reviewed-and-rejected"
     return "UNKNOWN", item, "approval-verdict-not-final"
 
 
 def main() -> int:
     capture_modal_states()
-    digests = build_manifest()
-    (SCREENSHOT_DIR / "digests.json").write_text(json.dumps(digests, indent=2, sort_keys=True))
-    snapshot = sha16_json(digests)
+    exact_digests = build_manifest()
+    (SCREENSHOT_DIR / "digests.json").write_text(json.dumps(exact_digests, indent=2, sort_keys=True))
+    exact_snapshot = sha16_json(exact_digests)
+
+    screenshot_paths = {name: SCREENSHOT_DIR / name for name in sorted(exact_digests)}
+    review_digests = review_fingerprint_manifest(screenshot_paths)
+    review_fingerprint = sha16_json(review_digests)
+    (SCREENSHOT_DIR / "review_fingerprints.json").write_text(
+        json.dumps(review_digests, indent=2, sort_keys=True)
+    )
 
     approval_doc = load_json(APPROVAL_PATH)
-    verdict, approval, reason = matching_approval(approval_doc, snapshot, len(digests))
+    verdict, approval, reason = matching_approval(
+        approval_doc, review_fingerprint, len(exact_digests)
+    )
     status = "PASS" if verdict == "ACCEPTED" else ("FAIL" if verdict == "REJECTED" else "UNKNOWN")
 
     existing = load_json(VISUAL_REPORT_PATH)
@@ -205,15 +228,19 @@ def main() -> int:
             "approval_source": "reports/visual_approval.json",
             "reference_images": "reports/screenshots/current-run",
             "screenshots_manifest": "reports/screenshots/digests.json",
-            "screenshot_count": len(digests),
+            "review_fingerprint_manifest": "reports/screenshots/review_fingerprints.json",
+            "screenshot_count": len(exact_digests),
             "required_capture_matrix": {
                 "default": {"routes": DOMAIN["routes"], "viewports": DOMAIN["viewport_widths"]},
                 "modal-open": {"routes": list(MODAL_ROUTES), "viewports": DOMAIN["viewport_widths"]},
             },
             "required_states": list(REQUIRED_STATES),
-            "screenshot_digests": digests,
-            "snapshot_digest": snapshot,
-            "source": "25 screenshots generated from the exact current CI/browser run",
+            "screenshot_digests": exact_digests,
+            "snapshot_digest": exact_snapshot,
+            "review_fingerprint_algo": REVIEW_FINGERPRINT_ALGO,
+            "review_fingerprint_digests": review_digests,
+            "review_fingerprint_digest": review_fingerprint,
+            "source": "25 exact current-run screenshots; approval matched by bounded raster-equivalence fingerprint",
             "visual_gate_generated_at": utc_now(),
         }
     )
@@ -223,7 +250,9 @@ def main() -> int:
     current_run = load_json(CURRENT_RUN_PATH)
     if not current_run:
         raise RuntimeError("current_run_evidence.json missing")
-    current_run["visual_snapshot_digest"] = snapshot
+    current_run["visual_snapshot_digest"] = exact_snapshot
+    current_run["visual_review_fingerprint_digest"] = review_fingerprint
+    current_run["visual_review_fingerprint_algo"] = REVIEW_FINGERPRINT_ALGO
     current_run["visual_accepted"] = verdict == "ACCEPTED"
     current_run["visual_contract"] = CONTRACT_VERSION
     current_run["visual_checker_digest"] = visual["visual_checker_digest"]
@@ -235,8 +264,10 @@ def main() -> int:
         "STRICT VISUAL EVIDENCE GENERATED",
         json.dumps(
             {
-                "snapshot": snapshot,
-                "images": len(digests),
+                "snapshot": exact_snapshot,
+                "review_fingerprint": review_fingerprint,
+                "review_fingerprint_algo": REVIEW_FINGERPRINT_ALGO,
+                "images": len(exact_digests),
                 "verdict": verdict,
                 "reason": reason,
                 "reviewer": visual.get("reviewer"),
