@@ -14,6 +14,7 @@ BASE = pathlib.Path(__file__).resolve().parent.parent
 
 TRUSTED_KERNEL_FILES = (
     "core/trust_kernel.py",
+    "core/measurement_kernel.py",
     "core/runtime_identity.py",
     "core/coverage.py",
     "core/scenario_compiler.py",
