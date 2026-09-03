@@ -13,6 +13,7 @@ import pathlib
 from playwright.sync_api import sync_playwright
 
 from core.coverage import CoverageLedger, EvidenceDAG, measurement_readiness
+from core.measurement_kernel import measurement_kernel_digest
 from gvh.extractor import compute_ir
 from gvh.verify import verify_all
 
@@ -43,6 +44,29 @@ def _result_for(findings: list[dict], rule: str) -> dict:
             "reason": "checker-constraint-mismatch",
         }
     return result
+
+
+def _render_environment(page, domain: dict, state: str) -> dict:
+    observed = page.evaluate(
+        """() => ({
+          width: window.innerWidth,
+          height: window.innerHeight,
+          dpr: window.devicePixelRatio,
+          documentLanguage: document.documentElement.lang || '',
+          documentDirection: getComputedStyle(document.documentElement).direction || document.dir || 'ltr'
+        })"""
+    )
+    return {
+        "viewport_width": observed["width"],
+        "viewport_height": observed["height"],
+        "device_pixel_ratio": observed["dpr"],
+        "document_language": observed["documentLanguage"],
+        "document_direction": observed["documentDirection"],
+        "declared_locale_direction": list(domain.get("locales_directions", [])),
+        "declared_zoom_dpr": list(domain.get("zoom_dpr", [])),
+        "declared_inputs": list(domain.get("input_modalities", [])),
+        "state": state,
+    }
 
 
 def _apply_state(page, state: str) -> tuple[bool, str | None]:
@@ -159,8 +183,15 @@ def replay(
     readiness_results: list[dict] = []
     transition_results: list[dict] = []
     cross_layer_results: list[dict] = []
+    measurement_digest = measurement_kernel_digest()
 
-    def record(scenario: dict, result: dict, browser_version: str, readiness: dict) -> None:
+    def record(
+        scenario: dict,
+        result: dict,
+        browser_version: str,
+        readiness: dict,
+        rendered_environment: dict,
+    ) -> None:
         # Never silently coerce a checker result to a different obligation.
         if result.get("constraint") != scenario.get("rule"):
             result = {
@@ -174,12 +205,11 @@ def replay(
             }
         ledger.record(result)
         route = scenario.get("route", "global")
-        viewport = scenario.get("viewport", 768)
         code_digest = _file_hash(route_files[route]) if route in route_files else "no-route"
         environment = {
+            **rendered_environment,
             "browser": browser_version,
-            "viewport": viewport,
-            "state": scenario.get("state", "transition" if scenario["rule"].startswith("transition:") else "default"),
+            "measurement_kernel_digest": measurement_digest,
             "readiness": readiness.get("checks", {}),
         }
         key = dag.key(
@@ -188,16 +218,27 @@ def replay(
             scenario["rule"],
             scenario,
             browser_version,
-            "checker-public-audit-v1",
+            measurement_digest,
             environment,
         )
-        dag.put(key, {"scenario": scenario, "result": result, "readiness": readiness})
+        dag.put(
+            key,
+            {
+                "scenario": scenario,
+                "result": result,
+                "readiness": readiness,
+                "rendered_environment": rendered_environment,
+                "measurement_kernel_digest": measurement_digest,
+            },
+        )
         records.append(
             {
                 "scenario": scenario,
                 "result": result,
                 "evidence_key": key,
                 "readiness_status": readiness.get("status"),
+                "rendered_environment": rendered_environment,
+                "measurement_kernel_digest": measurement_digest,
             }
         )
 
@@ -233,6 +274,7 @@ def replay(
             page.goto(route_files[route].as_uri())
 
             state_ok, state_reason = _apply_state(page, state)
+            rendered_environment = _render_environment(page, domain, state)
             if not state_ok:
                 readiness = {
                     "status": "UNKNOWN",
@@ -256,6 +298,7 @@ def replay(
                         },
                         browser_version,
                         readiness,
+                        rendered_environment,
                     )
                 context.close()
                 continue
@@ -266,7 +309,13 @@ def replay(
                 result = _result_for(findings, scenario["rule"])
                 if scenario["rule"] in ("TARGET_OPERABLE", "FOCUS_USABLE", "MODAL_INTEGRITY"):
                     cross_layer_results.append({"scenario": scenario, "result": result})
-                record(scenario, result, browser_version, readiness)
+                record(
+                    scenario,
+                    result,
+                    browser_version,
+                    readiness,
+                    rendered_environment,
+                )
 
             if capture_screenshots and state == "default":
                 out = screenshot_dir / f"{route.strip('/')}-{viewport}.png"
@@ -289,6 +338,12 @@ def replay(
             page.goto(route_files[route].as_uri())
 
             for scenario in group:
+                transition = scenario["transition"]
+                rendered_environment = _render_environment(
+                    page,
+                    domain,
+                    transition.get("from", "transition"),
+                )
                 readiness = measurement_readiness(page)
                 readiness_results.append(readiness)
                 if readiness.get("status") != "PASS":
@@ -299,10 +354,16 @@ def replay(
                         "reason": "measurement-readiness-not-satisfied",
                     }
                 else:
-                    result = _execute_transition(page, scenario["transition"])
+                    result = _execute_transition(page, transition)
                     result["constraint"] = scenario["rule"]
                 transition_results.append({"scenario": scenario, "result": result})
-                record(scenario, result, browser_version, readiness)
+                record(
+                    scenario,
+                    result,
+                    browser_version,
+                    readiness,
+                    rendered_environment,
+                )
             context.close()
 
         browser.close()
@@ -311,6 +372,7 @@ def replay(
         "browser": browser_version,
         "coverage": ledger.summary(),
         "evidence_root": dag.root_digest(),
+        "measurement_kernel_digest": measurement_digest,
         "records": records,
         "readiness": readiness_results,
         "transitions": transition_results,
