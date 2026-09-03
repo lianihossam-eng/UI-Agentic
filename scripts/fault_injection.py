@@ -1,7 +1,11 @@
-"""Fault injection 7 mutants — geometry, paint, interaction, a11y, temporal, cross-layer, breakpoint.
-Each mutant is injected via page.evaluate on a cloned template, verified to FAIL/UNKNOWN on expected rule, then removed and re-verified PASS.
-Outputs reports/mutation_report.json with deterministic checker.
+"""Fault-injection suite for verification-rule adequacy.
+
+This script emits semantic mutant results only. It does NOT claim authoritative
+commit/environment/evidence provenance; capture_current_run_evidence.py attaches
+those bindings after the clean A/B replay.
 """
+from __future__ import annotations
+
 import hashlib
 import json
 import pathlib
@@ -10,18 +14,19 @@ import sys
 import yaml
 from playwright.sync_api import sync_playwright
 
-BASE = pathlib.Path(__file__).parent.parent
+BASE = pathlib.Path(__file__).resolve().parent.parent
+if str(BASE) not in sys.path:
+    sys.path.insert(0, str(BASE))
+
+from gvh.extractor import compute_ir
+from gvh.verify import verify_all
+
 DOMAIN = yaml.safe_load((BASE / "supported-domain.yaml").read_text())["supported_domain"]
 ROUTE_FILE = {
     "/orders": BASE / "assets/templates/orders-page.html",
     "/settings": BASE / "assets/templates/settings-page.html",
     "/analytics": BASE / "assets/templates/analytics-page.html",
 }
-# Import verify pipeline
-sys.path.insert(0, str(BASE))
-from gvh.extractor import compute_ir
-from gvh.verify import verify_all
-from core.coverage import measurement_readiness  # not used for mutants but ensure imports
 
 MUTANTS = [
     {
@@ -50,7 +55,7 @@ MUTANTS = [
         "expect_status": "FAIL",
     },
     {
-        "id": "M3-target-size",
+        "id": "M3-first-target-size",
         "layer": "interaction",
         "rule": "component.button.hit-target",
         "owner": "COMPONENT",
@@ -69,30 +74,24 @@ MUTANTS = [
         "owner": "PAGE",
         "route": "/settings",
         "viewport": 768,
+        "open_modal": True,
         "inject": """
-            // Remove focus behavior: after open, blur the closer so focus stays on opener (outside modal)
-            const closer=document.querySelector('[data-testid=\"close\"]');
-            if(closer){ closer.blur(); }
+            document.querySelector('[data-testid=\"close\"]')?.blur();
             document.activeElement?.blur();
-            // keep modal open but focus outside
             document.querySelector('[data-testid=\"open-modal\"]')?.focus();
         """,
-        "open_modal": True,
         "expect_status": "FAIL",
     },
     {
-        "id": "M5-contrast-invalid",
+        "id": "M5-first-contrast-invalid",
         "layer": "paint",
         "rule": "paint.contrast.text",
         "owner": "PAGE",
         "route": "/orders",
         "viewport": 1024,
         "inject": """
-            // Target main and first card — paint checker evaluates main first, so mutate main
             const main=document.querySelector('[data-testid="main"]');
             if(main){ main.style.color='#777777'; main.style.backgroundColor='#888888'; }
-            const card=document.querySelector('[data-testid="card"]');
-            if(card){ card.style.color='#777777'; card.style.backgroundColor='#888888'; }
         """,
         "expect_status": "FAIL",
     },
@@ -107,7 +106,7 @@ MUTANTS = [
             const grid=document.querySelector('[data-testid=\"grid\"]');
             if(grid){
                 let w=0;
-                setInterval(()=>{ grid.style.width = (300 + (w++ % 50)) + 'px'; }, 30);
+                setInterval(()=>{ grid.style.width=(300+(w++%50))+'px'; },30);
             }
         """,
         "expect_status": "UNKNOWN",
@@ -120,174 +119,234 @@ MUTANTS = [
         "route": "/orders",
         "viewport": 375,
         "inject": """
-            // Pure breakpoint policy violation: shell must be column at 375, force row
             const style=document.createElement('style');
-            style.id='mut-bp';
             style.textContent='.shell{flex-direction:row !important}';
             document.head.appendChild(style);
         """,
         "expect_status": "FAIL",
     },
+    {
+        "id": "M8-second-target-size",
+        "layer": "interaction",
+        "rule": "component.button.hit-target",
+        "owner": "COMPONENT",
+        "route": "/orders",
+        "viewport": 1024,
+        "inject": """
+            const b=document.querySelectorAll('[data-testid=\"btn\"]')[1];
+            if(b){ b.style.minWidth='20px'; b.style.minHeight='20px'; b.style.width='20px'; b.style.height='20px'; }
+        """,
+        "expect_status": "FAIL",
+    },
+    {
+        "id": "M9-late-contrast-invalid",
+        "layer": "paint",
+        "rule": "paint.contrast.text",
+        "owner": "PAGE",
+        "route": "/orders",
+        "viewport": 1024,
+        "inject": """
+            const card=document.querySelectorAll('[data-testid=\"card\"]')[1];
+            if(card){ card.style.color='#777777'; card.style.backgroundColor='#888888'; }
+        """,
+        "expect_status": "FAIL",
+    },
+    {
+        "id": "M10-nonfirst-focus-order",
+        "layer": "accessibility",
+        "rule": "accessibility.focus-order",
+        "owner": "PAGE",
+        "route": "/orders",
+        "viewport": 1024,
+        "inject": """
+            const b=document.querySelectorAll('[data-testid=\"btn\"]')[1];
+            if(b){ b.tabIndex=-1; }
+        """,
+        "expect_status": "FAIL",
+    },
+    {
+        "id": "M11-modal-background-not-inert",
+        "layer": "cross-layer",
+        "rule": "MODAL_INTEGRITY",
+        "owner": "PAGE",
+        "route": "/settings",
+        "viewport": 768,
+        "open_modal": True,
+        "inject": "document.querySelector('.shell')?.removeAttribute('inert')",
+        "expect_status": "FAIL",
+    },
+    {
+        "id": "M12-mobile-modal-overflow",
+        "layer": "geometry",
+        "rule": "MODAL_INTEGRITY",
+        "owner": "PAGE",
+        "route": "/settings",
+        "viewport": 320,
+        "open_modal": True,
+        "inject": """
+            const box=document.querySelector('[data-testid=\"modal\"] .box');
+            if(box){ box.style.width='480px'; box.style.maxWidth='none'; }
+        """,
+        "expect_status": "FAIL",
+    },
+    {
+        "id": "M13-mobile-transition-handler-missing",
+        "layer": "interaction",
+        "rule": "transition:settings-modal",
+        "owner": "PAGE",
+        "route": "/settings",
+        "viewport": 320,
+        "mode": "transition-open",
+        "inject": """
+            const old=document.querySelector('[data-testid=\"open-modal\"]');
+            if(old){ old.replaceWith(old.cloneNode(true)); }
+        """,
+        "expect_status": "FAIL",
+    },
 ]
 
+
 def find_result(findings, rule):
-    for f in findings:
-        if f.get("constraint") == rule:
-            return f
-    return None
+    return next((finding for finding in findings if finding.get("constraint") == rule), None)
+
+
+def transition_open_status(page):
+    opener = page.locator('[data-testid="open-modal"]')
+    if opener.count() == 0:
+        return "UNKNOWN"
+    opener.click()
+    evidence = page.evaluate(
+        """() => {
+          const modal=document.querySelector('[data-testid="modal"]');
+          const active=document.activeElement;
+          const visible=!!modal && getComputedStyle(modal).display!=='none' && modal.hasAttribute('open');
+          return {visible, focusInside:!!modal && !!active && modal.contains(active)};
+        }"""
+    )
+    return "PASS" if evidence["visible"] and evidence["focusInside"] else "FAIL"
+
+
+def evaluate(page, mutant):
+    if mutant.get("mode") == "transition-open":
+        return transition_open_status(page)
+    ir = compute_ir(page)
+    finding = find_result(verify_all(ir, page), mutant["rule"])
+    return finding.get("status") if finding else "MISSING"
+
+
+def prepare_state(page, mutant):
+    if mutant.get("open_modal"):
+        opener = page.locator('[data-testid="open-modal"]')
+        if opener.count() == 0:
+            return False
+        opener.click()
+        page.wait_for_timeout(200)
+    return True
+
+
+def fresh_page(browser, mutant):
+    context = browser.new_context(
+        viewport={"width": mutant["viewport"], "height": DOMAIN.get("viewport_height", 900)}
+    )
+    page = context.new_page()
+    page.goto(ROUTE_FILE[mutant["route"]].as_uri())
+    return context, page
+
 
 def run():
     results = []
-    with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=True)
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
         version = browser.version
-        for m in MUTANTS:
-            route = m["route"]
-            vp = m["viewport"]
-            # First verify PASS without mutant (baseline)
-            ctx = browser.new_context(viewport={"width": vp, "height": 900})
-            page = ctx.new_page()
-            page.goto(ROUTE_FILE[route].as_uri())
-            # ensure modal open if needed for baseline
-            if m.get("open_modal"):
-                page.locator('[data-testid="open-modal"]').click()
-                page.wait_for_timeout(400)
-            ir = compute_ir(page)
-            findings = verify_all(ir, page)
-            baseline = find_result(findings, m["rule"])
-            baseline_status = baseline.get("status") if baseline else "MISSING"
-            # Now inject mutant on fresh page
-            ctx2 = browser.new_context(viewport={"width": vp, "height": 900})
-            page2 = ctx2.new_page()
-            page2.goto(ROUTE_FILE[route].as_uri())
-            if m.get("open_modal"):
-                page2.locator('[data-testid="open-modal"]').click()
-                page2.wait_for_timeout(400)
-            page2.evaluate(m["inject"])
-            # small settle
-            page2.wait_for_timeout(150)
-            ir2 = compute_ir(page2)
-            findings2 = verify_all(ir2, page2)
-            mutated = find_result(findings2, m["rule"])
-            mutated_status = mutated.get("status") if mutated else "MISSING"
-            detected = (mutated_status == m["expect_status"]) or (mutated_status in ("FAIL","UNKNOWN") and m["expect_status"] in ("FAIL","UNKNOWN"))
-            # For temporal, UNKNOWN is expected; FAIL also counts as detected since mutant destabilizes
-            if m["id"] == "M6-async-layout-shift":
-                detected = mutated_status in ("UNKNOWN","FAIL")
-            # Verify revert: new clean page should be PASS again
-            ctx3 = browser.new_context(viewport={"width": vp, "height": 900})
-            page3 = ctx3.new_page()
-            page3.goto(ROUTE_FILE[route].as_uri())
-            if m.get("open_modal"):
-                page3.locator('[data-testid="open-modal"]').click()
-                page3.wait_for_timeout(400)
-            ir3 = compute_ir(page3)
-            findings3 = verify_all(ir3, page3)
-            reverted = find_result(findings3, m["rule"])
-            reverted_status = reverted.get("status") if reverted else "MISSING"
-            revert_ok = reverted_status == "PASS"
-            # For M6 baseline is PASS? Check
-            # evidence key = hash of scenario+rule+browser
-            evidence_key = hashlib.sha256(json.dumps([m["id"], m["rule"], vp, route], sort_keys=True).encode()).hexdigest()[:12]
-            results.append({
-                "id": m["id"],
-                "layer": m["layer"],
-                "rule_expected": m["rule"],
-                "owner_expected": m["owner"],
-                "route": route,
-                "viewport": vp,
+        for mutant in MUTANTS:
+            baseline_context, baseline_page = fresh_page(browser, mutant)
+            if not prepare_state(baseline_page, mutant):
+                baseline_status = "UNKNOWN"
+            else:
+                baseline_status = evaluate(baseline_page, mutant)
+
+            mutated_context, mutated_page = fresh_page(browser, mutant)
+            if not prepare_state(mutated_page, mutant):
+                mutated_status = "UNKNOWN"
+            else:
+                mutated_page.evaluate(mutant["inject"])
+                mutated_page.wait_for_timeout(150)
+                mutated_status = evaluate(mutated_page, mutant)
+
+            revert_context, revert_page = fresh_page(browser, mutant)
+            if not prepare_state(revert_page, mutant):
+                revert_status = "UNKNOWN"
+            else:
+                revert_status = evaluate(revert_page, mutant)
+
+            expected = mutant["expect_status"]
+            detected = mutated_status == expected
+            if expected in ("FAIL", "UNKNOWN"):
+                detected = mutated_status in ("FAIL", "UNKNOWN")
+            killed = baseline_status == "PASS" and detected and revert_status == "PASS"
+            evidence_key = hashlib.sha256(
+                json.dumps(
+                    [mutant["id"], mutant["rule"], mutant["viewport"], mutant["route"]],
+                    sort_keys=True,
+                ).encode()
+            ).hexdigest()[:12]
+            result = {
+                "id": mutant["id"],
+                "layer": mutant["layer"],
+                "rule_expected": mutant["rule"],
+                "owner_expected": mutant["owner"],
+                "route": mutant["route"],
+                "viewport": mutant["viewport"],
                 "baseline_status": baseline_status,
                 "mutated_status": mutated_status,
-                "expected_status": m["expect_status"],
+                "expected_status": expected,
                 "detected": bool(detected),
-                "revert_status": reverted_status,
-                "revert_ok": bool(revert_ok),
+                "revert_status": revert_status,
+                "revert_ok": revert_status == "PASS",
                 "evidence_key": evidence_key,
-                "survivor": not bool(detected),
-            })
-            print(f"{m['id']} baseline={baseline_status} mutated={mutated_status} expected={m['expect_status']} detected={detected} revert={reverted_status}")
-            ctx.close()
-            ctx2.close()
-            ctx3.close()
+                "survivor": not killed,
+            }
+            results.append(result)
+            print(
+                f"{mutant['id']} baseline={baseline_status} mutated={mutated_status} "
+                f"expected={expected} detected={detected} revert={revert_status} killed={killed}"
+            )
+            baseline_context.close()
+            mutated_context.close()
+            revert_context.close()
         browser.close()
 
-    # Aggregate by layer
     by_layer = {}
-    for r in results:
-        by_layer.setdefault(r["layer"], {"total":0,"detected":0,"survived":0})
-        by_layer[r["layer"]]["total"] += 1
-        if r["detected"]:
-            by_layer[r["layer"]]["detected"] += 1
-        if r["survivor"]:
-            by_layer[r["layer"]]["survived"] += 1
-    # cross_layer is not explicit but M4 counts as cross_layer
-    # Map M4 to cross_layer as well for reporting
+    for result in results:
+        layer = by_layer.setdefault(result["layer"], {"total": 0, "detected": 0, "survived": 0})
+        layer["total"] += 1
+        if result["detected"]:
+            layer["detected"] += 1
+        if result["survivor"]:
+            layer["survived"] += 1
+
     total = len(results)
-    detected = sum(1 for r in results if r["detected"])
-    survived = total - detected
-    # Provenance bindings — must survive refresh and match strict gate
-    import subprocess as _sp
-    try:
-        _commit = _sp.check_output(["git","rev-parse","HEAD"], cwd=BASE).decode().strip()
-    except Exception:
-        _commit = "unknown"
-    from core.scenario_compiler import compile as _compile
-    _scenarios = _compile(DOMAIN)
-    _scenario_digest = hashlib.sha256(json.dumps(_scenarios, sort_keys=True).encode()).hexdigest()[:16]
-    _rules_seed = ["group.uniform_gap","global.spacing.scale","paint.contrast.text","component.button.hit-target","TARGET_OPERABLE","accessibility.focus-order","FOCUS_USABLE","temporal.geometry-stable","MODAL_INTEGRITY","breakpoint.shell.direction"]
-    _rules_digest = hashlib.sha256((BASE / "supported-domain.yaml").read_bytes() + json.dumps(_rules_seed, sort_keys=True).encode()).hexdigest()[:16]
-    _checker_files = ["gvh/verify.py","gvh/extractor.py","core/coverage.py","core/scenario_compiler.py"]
-    _checker_digest = hashlib.sha256(b"".join((BASE / p).read_bytes() for p in _checker_files)).hexdigest()[:16]
-    # env manifest digest (current on-disk, will be refreshed post-run if needed)
-    _manifest_path = BASE / "reports" / "environment_manifest.json"
-    try:
-        _manifest_data = json.loads(_manifest_path.read_text())
-        _manifest_copy = {k:v for k,v in _manifest_data.items() if k not in ("manifest_digest","manifest_hash_algo")}
-        _env_digest = hashlib.sha256(json.dumps(_manifest_copy, sort_keys=True).encode()).hexdigest()[:16]
-    except Exception:
-        _env_digest = "unknown"
-    # evidence_root from current attestation if available (fallback to unknown, refresh script will fix)
-    _evidence_root = "unknown"
-    try:
-        _att = json.loads((BASE / ".goal_attestation.json").read_text())
-        _evidence_root = _att.get("attestation",{}).get("evidence_root","unknown")
-    except Exception:
-        pass
-    # fallback: compute from DAG if attestation not yet generated
-    if _evidence_root == "unknown":
-        try:
-            from core.coverage import EvidenceDAG
-            _evidence_root = EvidenceDAG().root_digest()  # will be overwritten by refresh; placeholder
-        except Exception:
-            _evidence_root = "unknown"
+    survived = sum(1 for result in results if result["survivor"])
+    detected = total - survived
     payload = {
-        "generated_at": "2026-09-03T08:35:00Z",
+        "raw_mutation_schema": "mutation-semantic-v2",
         "browser": f"chromium@{version}",
         "mutants_total": total,
         "detected": detected,
         "survived": survived,
         "by_layer": by_layer,
         "details": results,
-        "survivors": [r for r in results if r["survivor"]],
+        "survivors": [result for result in results if result["survivor"]],
         "status": "PASS" if survived == 0 else "FAIL",
         "critical_mutants_zero": survived == 0,
-        "commit_sha": _commit,
-        "scenario_digest": _scenario_digest,
-        "rules_digest": _rules_digest,
-        "checker_digest": _checker_digest,
-        "environment_manifest_digest": _env_digest,
-        "evidence_root": _evidence_root,
     }
-    # compute hash
-    raw = json.dumps({k:v for k,v in payload.items() if k!="report_hash"}, sort_keys=True).encode()
-    h = hashlib.sha256(raw).hexdigest()[:16]
-    payload_with_hash = {**payload, "report_hash": h, "report_hash_algo": "sha256:16"}
     out = BASE / "reports" / "mutation_report.json"
-    out.write_text(json.dumps(payload_with_hash, indent=2, sort_keys=True))
-    print(f"Wrote {out} hash={h} total={total} detected={detected} survived={survived}")
-    # also print layer breakdown
-    print(json.dumps(by_layer, indent=2))
-    return 0 if survived==0 else 1
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(payload, indent=2, sort_keys=True))
+    print(f"Wrote raw semantic mutant results: total={total} survived={survived}")
+    print(json.dumps(by_layer, indent=2, sort_keys=True))
+    return 0 if survived == 0 else 1
+
 
 if __name__ == "__main__":
     raise SystemExit(run())
