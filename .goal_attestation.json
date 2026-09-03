@@ -1,0 +1,13 @@
+{
+  "attestation": {
+    "build": "build-v4-e0af6da2",
+    "contract": "contract-v4",
+    "rules": "rules-v4",
+    "scenarios": "c78e81de4caa",
+    "evidence_root": "68525ace9c22",
+    "visual": "ACCEPTED",
+    "time": 1788418728
+  },
+  "digest": "db1a1f55a1bdda6e",
+  "verdict": "LOCKED"
+}

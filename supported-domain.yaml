@@ -1,0 +1,17 @@
+supported_domain:
+  routes: ["/orders", "/settings", "/analytics"]
+  viewport_ranges: { width: [320, 1440], height: [600, 900] }
+  containers: ["main:[720,1152]"]
+  states: [default, hover, focus, loading, empty, error, modal-open]
+  state_transition_models:
+    - {id: order-flow, initial: default, states: [default, loading, success], transitions: ["default --load --> loading","loading --success --> success"]}
+    - {id: settings-modal, initial: default, states: [default, modal-open], transitions: ["default --open --> modal-open","modal-open --close --> default"], invariants: ["MODAL_INTEGRITY"]}
+    - {id: analytics-drilldown, initial: default, states: [default, modal-open], transitions: ["default --drill --> modal-open"], invariants: ["MODAL_INTEGRITY"]}
+  content_extremes: {label: [1, 120], items: [0, 100]}
+  input_modalities: [mouse, keyboard, touch]
+  locales_directions: ["fr-LTR"]
+  browsers_platforms: ["chromium@latest"]
+  zoom_dpr: ["100%", "DPR 1"]
+  temporal_async_scenarios: ["hydration","fonts.ready","chart-render"]
+  opaque_surface_adapters: [{surface: chart, instrumentation: "chart canvas opaque — external box only BOUNDED"}]
+  compliance_profiles: [{standard: WCAG, version: "2.2", level: AA, scope: full-pages}]

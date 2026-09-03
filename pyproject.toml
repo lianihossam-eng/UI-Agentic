@@ -1,0 +1,8 @@
+[project]
+name = "ui-agentic"
+version = "0.1.0"
+description = "UI-Agentic — workflow pyramidal de vérification UI avec preuves"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["playwright", "pyyaml"]
+license = {text = "MIT"}
