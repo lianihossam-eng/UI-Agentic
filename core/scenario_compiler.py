@@ -2,8 +2,8 @@
 
 # In the declared responsive domain every rendered rule can be affected by a
 # media query, geometry or occlusion change. Until independence is formally
-# demonstrated, viewport_width is therefore a dependency for every static UI
-# rule below.
+# demonstrated, viewport_width is therefore a dependency for every UI rule
+# below, including state transitions.
 RULE_SPECS = {
     "group.uniform_gap": {"factors": ["route", "viewport_width"]},
     "global.spacing.scale": {"factors": ["route", "viewport_width"]},
@@ -40,23 +40,23 @@ def compile(domain):
     for model in domain.get("state_transition_models", []):
         route = model.get("route")
 
-        # Transition event semantics are currently executed at the canonical
-        # 768px interaction viewport. They remain a distinct dependency class
-        # from rendered state invariants; no claim of viewport-exhaustive
-        # transition execution is made here.
-        for transition in model.get("transitions", []):
-            scenarios.append(
-                {
-                    "rule": f"transition:{model['id']}",
-                    "model": model["id"],
-                    "route": route,
-                    "viewport": 768,
-                    "transition": transition,
-                }
-            )
+        # Transition semantics are viewport-dependent until independence is
+        # formally demonstrated. Execute the full ordered transition sequence
+        # at every declared discrete viewport.
+        for width in widths:
+            for transition in model.get("transitions", []):
+                scenarios.append(
+                    {
+                        "rule": f"transition:{model['id']}",
+                        "model": model["id"],
+                        "route": route,
+                        "viewport": width,
+                        "transition": transition,
+                    }
+                )
 
-        # Modal geometry/interaction/accessibility is viewport-dependent and
-        # must be observed at every declared discrete viewport.
+        # Modal geometry/interaction/accessibility is likewise observed at
+        # every declared discrete viewport.
         if "MODAL_INTEGRITY" in model.get("invariants", []):
             for width in widths:
                 scenarios.append(
