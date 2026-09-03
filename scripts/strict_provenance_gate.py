@@ -23,7 +23,11 @@ BASE = pathlib.Path(__file__).resolve().parent.parent
 if str(BASE) not in sys.path:
     sys.path.insert(0, str(BASE))
 
-from core.scenario_compiler import compile as compile_scenarios
+from core.measurement_kernel import measurement_kernel_digest
+from core.scenario_compiler import (
+    compile as compile_scenarios,
+    rule_contract_seed,
+)
 
 REPORT_NAMES = [
     "traceability_report",
@@ -42,24 +46,6 @@ REQUIRED_BINDING_FIELDS = (
     "environment_manifest_digest",
     "evidence_root",
 )
-RULES_SEED = [
-    "group.uniform_gap",
-    "global.spacing.scale",
-    "paint.contrast.text",
-    "component.button.hit-target",
-    "TARGET_OPERABLE",
-    "accessibility.focus-order",
-    "FOCUS_USABLE",
-    "temporal.geometry-stable",
-    "MODAL_INTEGRITY",
-    "breakpoint.shell.direction",
-]
-CHECKER_FILES = [
-    "gvh/verify.py",
-    "gvh/extractor.py",
-    "core/coverage.py",
-    "core/scenario_compiler.py",
-]
 
 
 def fail(message: str) -> None:
@@ -98,7 +84,11 @@ def verify_report_hash(name: str, data: dict) -> None:
     expected = data.get("report_hash")
     if not expected:
         fail(f"{name}: missing report_hash")
-    payload = {k: v for k, v in data.items() if k not in ("report_hash", "report_hash_algo")}
+    payload = {
+        key: value
+        for key, value in data.items()
+        if key not in ("report_hash", "report_hash_algo")
+    }
     computed = sha16_json(payload)
     if computed != expected:
         fail(f"{name}: report_hash mismatch {computed} != {expected}")
@@ -141,16 +131,16 @@ def main() -> int:
     scenario_digest = sha16_json(scenarios)
     rules_digest = hashlib.sha256(
         (BASE / "supported-domain.yaml").read_bytes()
-        + json.dumps(RULES_SEED, sort_keys=True).encode()
+        + json.dumps(rule_contract_seed(), sort_keys=True).encode()
     ).hexdigest()[:16]
-    checker_digest = hashlib.sha256(
-        b"".join((BASE / path).read_bytes() for path in CHECKER_FILES)
-    ).hexdigest()[:16]
+    measurement_digest = measurement_kernel_digest()
+    checker_digest = measurement_digest[:16]
 
     manifest = load_json(BASE / "reports" / "environment_manifest.json")
     manifest_payload = {
-        k: v for k, v in manifest.items()
-        if k not in ("manifest_digest", "manifest_hash_algo")
+        key: value
+        for key, value in manifest.items()
+        if key not in ("manifest_digest", "manifest_hash_algo")
     }
     manifest_digest = sha16_json(manifest_payload)
     if manifest.get("manifest_digest") != manifest_digest:
@@ -167,14 +157,23 @@ def main() -> int:
         fail("environment manifest rules digest mismatch")
     if manifest.get("checker_digest") != checker_digest:
         fail("environment manifest checker digest mismatch")
+    if manifest.get("measurement_kernel_digest") != measurement_digest:
+        fail("environment manifest measurement kernel mismatch")
     if manifest.get("python_version") != platform.python_version():
-        fail(f"environment python mismatch {manifest.get('python_version')} != {platform.python_version()}")
+        fail(
+            f"environment python mismatch {manifest.get('python_version')} != {platform.python_version()}"
+        )
     installed_playwright = importlib.metadata.version("playwright")
     if manifest.get("playwright_version") != installed_playwright:
-        fail(f"environment Playwright mismatch {manifest.get('playwright_version')} != {installed_playwright}")
+        fail(
+            "environment Playwright mismatch "
+            f"{manifest.get('playwright_version')} != {installed_playwright}"
+        )
     browser_version = actual_browser_version()
     if manifest.get("chromium_version") != browser_version:
-        fail(f"environment Chromium mismatch {manifest.get('chromium_version')} != {browser_version}")
+        fail(
+            f"environment Chromium mismatch {manifest.get('chromium_version')} != {browser_version}"
+        )
     runner_os = os.environ.get("RUNNER_OS")
     if runner_os and manifest.get("runner_os") != runner_os:
         fail("environment runner_os mismatch")
@@ -191,8 +190,17 @@ def main() -> int:
         fail("current_run_evidence manifest mismatch")
     if current_run.get("evidence_root") != manifest.get("evidence_root"):
         fail("current_run_evidence root mismatch")
+    if current_run.get("measurement_kernel_digest") != measurement_digest:
+        fail("current_run_evidence measurement kernel mismatch")
     if (current_run.get("reproducibility") or {}).get("passed") is not True:
         fail("current_run_evidence A/B reproducibility not proved")
+
+    records = current_run.get("records")
+    if not isinstance(records, list) or not records:
+        fail("current_run_evidence records missing")
+    for record in records:
+        if record.get("measurement_kernel_digest") != measurement_digest:
+            fail("evidence record measurement kernel mismatch")
 
     expected_binding = {
         "commit_sha": commit,
@@ -217,7 +225,10 @@ def main() -> int:
             if field not in data:
                 fail(f"{name}: missing mandatory binding field {field}")
             if data.get(field) != expected_binding[field]:
-                fail(f"{name}: binding mismatch {field}: {data.get(field)} != {expected_binding[field]}")
+                fail(
+                    f"{name}: binding mismatch {field}: "
+                    f"{data.get(field)} != {expected_binding[field]}"
+                )
         report_hashes[name] = data["report_hash"]
 
     visual = reports["visual_review"]
@@ -235,6 +246,8 @@ def main() -> int:
         fail("final_result Final Gate is not closed")
     if final_result.get("evidence_root") != current_run.get("evidence_root"):
         fail("final_result evidence root mismatch")
+    if final_result.get("measurement_kernel_digest") != measurement_digest:
+        fail("final_result measurement kernel mismatch")
     if final_result.get("browser") != manifest.get("browser"):
         fail("final_result browser mismatch")
 
@@ -270,7 +283,16 @@ def main() -> int:
         "source_run_id": str(current_run_id),
     }
     if required_attestation != expected_attestation:
-        fail("attestation binding mismatch: " + json.dumps({"actual": required_attestation, "expected": expected_attestation}, sort_keys=True))
+        fail(
+            "attestation binding mismatch: "
+            + json.dumps(
+                {
+                    "actual": required_attestation,
+                    "expected": expected_attestation,
+                },
+                sort_keys=True,
+            )
+        )
     if (payload.get("final_gate") or {}).get("passed") is not True:
         fail("attestation final gate is not PASS")
 
@@ -283,6 +305,7 @@ def main() -> int:
                 "browser": manifest.get("browser"),
                 "python": manifest.get("python_version"),
                 "playwright": manifest.get("playwright_version"),
+                "measurement_kernel_digest": measurement_digest,
                 "environment_manifest_digest": manifest_digest,
                 "evidence_root": current_run.get("evidence_root"),
                 "reports_root": reports_root,
