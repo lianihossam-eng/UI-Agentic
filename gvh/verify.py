@@ -213,7 +213,8 @@ def verify_all(ir, page=None):
                 "layer": "geometry",
                 "constraint": "group.uniform_gap",
                 "owner": "PAGE",
-                "status": "PASS",
+                "status": "UNKNOWN",
+                "reason": "uniform-gap-checker-produced-no-result",
                 "proof_level": "observed",
             }
         )
