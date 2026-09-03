@@ -246,6 +246,7 @@ def replay(
                 "result": result,
                 "evidence_key": key,
                 "readiness_status": readiness.get("status"),
+                "readiness": readiness,
                 "rendered_environment": rendered_environment,
                 "measurement_kernel_digest": measurement_digest,
             }
