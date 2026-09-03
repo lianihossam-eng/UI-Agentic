@@ -10,7 +10,7 @@ def check_a11y(page, ir):
     focusables = page.evaluate(
         f"""() => [...document.querySelectorAll('{FOCUSABLE_SELECTOR}')].filter(e => {{
           const s=getComputedStyle(e); const r=e.getBoundingClientRect();
-          return s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0;
+          return !e.closest('[inert]') && s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0;
         }}).map((e,index) => ({{
           index,
           key:`${{e.dataset.testid || e.tagName.toLowerCase()}}#${{index}}`
@@ -25,7 +25,7 @@ def check_a11y(page, ir):
             f"""() => {{
               const list=[...document.querySelectorAll('{FOCUSABLE_SELECTOR}')].filter(e => {{
                 const s=getComputedStyle(e); const r=e.getBoundingClientRect();
-                return s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0;
+                return !e.closest('[inert]') && s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0;
               }});
               return list.indexOf(document.activeElement);
             }}"""
@@ -73,13 +73,13 @@ def check_a11y(page, ir):
     evidence_items = []
     for index in range(button_count):
         button = buttons.nth(index)
-        visible = button.evaluate(
+        applicable = button.evaluate(
             """e => {
               const r=e.getBoundingClientRect(); const s=getComputedStyle(e);
-              return s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0;
+              return !e.closest('[inert]') && s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0;
             }"""
         )
-        if not visible:
+        if not applicable:
             continue
         button.focus()
         evidence = button.evaluate(
@@ -91,7 +91,7 @@ def check_a11y(page, ir):
               const shadow=s.boxShadow && s.boxShadow!=='none';
               return {
                 focused: document.activeElement===e,
-                visible: s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0,
+                visible: !e.closest('[inert]') && s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0,
                 notObscured: !!hit && (hit===e || e.contains(hit)),
                 focusIndicator: !!(outline || shadow),
                 size:[r.width,r.height],
@@ -117,7 +117,7 @@ def check_a11y(page, ir):
                 "constraint": "FOCUS_USABLE",
                 "owner": "COMPONENT",
                 "status": "UNKNOWN",
-                "reason": "no-visible-button",
+                "reason": "no-visible-non-inert-button",
                 "requires_layers": ["geometry", "accessibility", "paint"],
             }
         )
