@@ -6,9 +6,12 @@ import json
 import pathlib
 import sys
 
+BASE = pathlib.Path(__file__).resolve().parent.parent
+if str(BASE) not in sys.path:
+    sys.path.insert(0, str(BASE))
+
 from core.visual_fingerprint import REVIEW_FINGERPRINT_ALGO, review_fingerprint_manifest
 
-BASE = pathlib.Path(__file__).resolve().parent.parent
 REPORT_DIR = BASE / "reports"
 SCREENSHOT_DIR = REPORT_DIR / "screenshots"
 CONTRACT_VERSION = "visual-v4-raster-equivalence"
