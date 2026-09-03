@@ -1,5 +1,6 @@
 from .constraints import check_hard
 from .paint import check_paint
+from .interaction import check_interaction
 from .a11y import check_a11y
 from .temporal import check_temporal
 from .wcag import trace
@@ -11,7 +12,11 @@ def _check_global_spacing(page):
     evidence = page.evaluate(
         """() => {
           const selectors='[data-testid], .shell, .grid, .kpi-row, .card, .kpi, button';
-          const props=['gap','rowGap','columnGap','paddingTop','paddingRight','paddingBottom','paddingLeft'];
+          const props=[
+            'gap','rowGap','columnGap',
+            'paddingTop','paddingRight','paddingBottom','paddingLeft',
+            'marginTop','marginRight','marginBottom','marginLeft'
+          ];
           const out=[];
           for(const el of document.querySelectorAll(selectors)){
             const s=getComputedStyle(el);
@@ -80,8 +85,6 @@ def _check_modal_integrity(page):
           };
         }"""
     )
-    # Strict MODAL_INTEGRITY per audit 2026-09-03T08:04: focusInside is mandatory for open state.
-    # If focus observability is missing, emit UNKNOWN rather than lenient PASS.
     required_keys = ("visible", "fixed", "ariaModal", "focusInside", "centerOwned", "backgroundBlocked")
     if any(evidence.get(k) is None for k in required_keys):
         return {
@@ -118,8 +121,11 @@ def _check_modal_integrity(page):
 def _check_breakpoint(page, ir):
     """Breakpoint policy: shell flex direction column <=767 else row."""
     try:
-        vp = ir.get("viewport", {}).get("width", page.viewport_size.get("width", 1024) if hasattr(page, "viewport_size") else 1024)
-    except:
+        vp = ir.get("viewport", {}).get(
+            "width",
+            page.viewport_size.get("width", 1024) if hasattr(page, "viewport_size") else 1024,
+        )
+    except Exception:
         vp = 1024
     evidence = page.evaluate(
         """() => {
@@ -130,15 +136,25 @@ def _check_breakpoint(page, ir):
         }"""
     )
     if not evidence.get("found"):
-        return {"layer":"geometry","constraint":"breakpoint.shell.direction","owner":"FAMILY","status":"UNKNOWN","reason":"shell-not-found","proof_level":"observed"}
+        return {
+            "layer": "geometry",
+            "constraint": "breakpoint.shell.direction",
+            "owner": "FAMILY",
+            "status": "UNKNOWN",
+            "reason": "shell-not-found",
+            "proof_level": "observed",
+        }
     expected = "column" if vp <= 767 else "row"
     actual = evidence.get("flexDirection")
-    passed = actual == expected
     return {
-        "layer":"geometry","constraint":"breakpoint.shell.direction","owner":"FAMILY",
-        "status":"PASS" if passed else "FAIL",
-        "proof_level":"observed",
-        "expected":expected,"actual":actual,"viewport":vp,
+        "layer": "geometry",
+        "constraint": "breakpoint.shell.direction",
+        "owner": "FAMILY",
+        "status": "PASS" if actual == expected else "FAIL",
+        "proof_level": "observed",
+        "expected": expected,
+        "actual": actual,
+        "viewport": vp,
         "evidence_bundle": evidence,
     }
 
@@ -147,72 +163,41 @@ def verify_all(ir, page=None):
     findings = []
 
     geo = check_hard(ir)
-    if geo:
-        for violation in geo:
-            findings.append({"layer": "geometry", "proof_level": "observed", **violation})
-    else:
-        findings.append({
-            "layer": "geometry",
-            "constraint": "group.uniform_gap",
-            "owner": "PAGE",
-            "status": "PASS",
-            "proof_level": "observed",
-        })
+    gap_findings = [item for item in geo if item.get("constraint") == "group.uniform_gap"]
+    if not gap_findings:
+        # check_hard emits UNKNOWN when the rule is not applicable/measurable,
+        # so absence here means >=2 cards were measured with no gap violation.
+        findings.append(
+            {
+                "layer": "geometry",
+                "constraint": "group.uniform_gap",
+                "owner": "PAGE",
+                "status": "PASS",
+                "proof_level": "observed",
+            }
+        )
+    for item in geo:
+        findings.append({"layer": "geometry", "proof_level": "observed", **item})
 
     if page is None:
         return findings
 
-    # Modal integrity must be captured before a11y mutates focus (Tab/blur)
+    # Modal integrity must be captured before a11y mutates focus (Tab/blur).
     findings.append(_check_modal_integrity(page))
-
     findings.append(_check_global_spacing(page))
     findings.append(_check_breakpoint(page, ir))
 
     for finding in check_paint(ir):
-        findings.append({
-            "layer": "paint",
-            "proof_level": "observed",
-            **finding,
-            "wcag": trace(finding["constraint"], finding),
-        })
+        findings.append(
+            {
+                "layer": "paint",
+                "proof_level": "observed",
+                **finding,
+                "wcag": trace(finding["constraint"], finding),
+            }
+        )
 
-    buttons = [
-        value for value in ir["nodes"].values()
-        if value.get("visible") and (value.get("testid") == "btn" or value.get("tag") == "button")
-    ]
-    if buttons:
-        value = buttons[0]
-        hit_ok = value.get("hit", {}).get("hitOk", False)
-        width, height = value["box"][2], value["box"][3]
-        findings.append({
-            "layer": "interaction",
-            "constraint": "component.button.hit-target",
-            "owner": "COMPONENT",
-            "status": "PASS" if (width >= 44 and height >= 44 and hit_ok) else "FAIL",
-            "actual": [width, height],
-            "hit": hit_ok,
-            "proof_level": "observed",
-        })
-        visible = value["visibleRegion"][2] * value["visibleRegion"][3] > 0
-        operable = width >= 44 and height >= 44 and hit_ok and visible
-        findings.append({
-            "layer": "interaction",
-            "constraint": "TARGET_OPERABLE",
-            "owner": "COMPONENT",
-            "status": "PASS" if operable else "FAIL",
-            "requires_layers": ["geometry", "interaction"],
-            "proof_level": "observed",
-            "evidence_bundle": {"hit": hit_ok, "size": [width, height], "visible": visible},
-        })
-    else:
-        for constraint in ("component.button.hit-target", "TARGET_OPERABLE"):
-            findings.append({
-                "layer": "interaction",
-                "constraint": constraint,
-                "owner": "COMPONENT",
-                "status": "UNKNOWN",
-                "reason": "no-visible-button",
-            })
+    findings.extend(check_interaction(ir))
 
     for finding in check_a11y(page, ir):
         payload = {"layer": "accessibility", "proof_level": "observed", **finding}
