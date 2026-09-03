@@ -5,4 +5,4 @@ owner: COMPONENT
 detect: rendered
 required_proof: observed
 severity: high
-pass_condition: hit target width>=44 height>=44 et hit-test reçoit le bouton
+pass_condition: hit target width >= 44 and height >= 44, and browser hit-testing resolves to the intended button
