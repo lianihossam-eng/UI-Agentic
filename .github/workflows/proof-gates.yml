@@ -55,6 +55,8 @@ jobs:
       - name: Check attestation LOCKED
         run: |
           python -c "import json; d=json.load(open('.goal_attestation.json')); assert d['verdict']=='LOCKED', d; assert d['attestation']['final_gate']['passed'] is True; print('LOCKED', d['digest'], d['attestation']['evidence_root'])"
+      - name: Strict current-run provenance gate
+        run: python scripts/strict_provenance_gate.py
       - name: Reproducibility A/B
         run: |
           python run_goal_verify.py > /tmp/a.json
@@ -116,4 +118,5 @@ jobs:
             reports/
             reports/screenshots/
             reports/environment_manifest.json
+          include-hidden-files: true
           retention-days: 30
