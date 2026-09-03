@@ -46,7 +46,7 @@ class VisualFingerprintTests(unittest.TestCase):
         return [[(value, value, value) for _ in range(8)] for _ in range(8)]
 
     def test_algorithm_identifier_is_versioned(self):
-        self.assertEqual(REVIEW_FINGERPRINT_ALGO, "png-blockmean4-v1")
+        self.assertEqual(REVIEW_FINGERPRINT_ALGO, "png-spatialmoments8-v3")
 
     def test_isolated_one_level_raster_noise_does_not_invalidate_review(self):
         base = self.root / "base.png"
@@ -63,13 +63,29 @@ class VisualFingerprintTests(unittest.TestCase):
             screenshot_review_fingerprint(noisy),
         )
 
+    def test_sparse_three_pixel_one_level_raster_noise_does_not_invalidate_review(self):
+        base = self.root / "base.png"
+        noisy = self.root / "noisy.png"
+        base_pixels = self.image(240)
+        noisy_pixels = self.image(240)
+        noisy_pixels[1][1] = (241, 240, 241)
+        noisy_pixels[2][1] = (241, 241, 241)
+        noisy_pixels[3][1] = (241, 241, 241)
+        write_rgb_png(base, 8, 8, base_pixels)
+        write_rgb_png(noisy, 8, 8, noisy_pixels)
+
+        self.assertEqual(
+            screenshot_review_fingerprint(base),
+            screenshot_review_fingerprint(noisy),
+        )
+
     def test_coherent_rendered_change_changes_review_fingerprint(self):
         base = self.root / "base.png"
         changed = self.root / "changed.png"
         base_pixels = self.image()
         changed_pixels = self.image()
-        for y in range(4):
-            for x in range(4):
+        for y in range(8):
+            for x in range(8):
                 changed_pixels[y][x] = (132, 100, 100)
         write_rgb_png(base, 8, 8, base_pixels)
         write_rgb_png(changed, 8, 8, changed_pixels)
@@ -77,6 +93,27 @@ class VisualFingerprintTests(unittest.TestCase):
         self.assertNotEqual(
             screenshot_review_fingerprint(base),
             screenshot_review_fingerprint(changed),
+        )
+
+    def test_same_mean_spatial_rearrangement_changes_review_fingerprint(self):
+        horizontal = self.root / "horizontal.png"
+        vertical = self.root / "vertical.png"
+        horizontal_pixels = self.image()
+        vertical_pixels = self.image()
+
+        for y in range(8):
+            for x in range(8):
+                horizontal_pixels[y][x] = (80 if x < 4 else 120, 100, 100)
+                vertical_pixels[y][x] = (80 if y < 4 else 120, 100, 100)
+
+        write_rgb_png(horizontal, 8, 8, horizontal_pixels)
+        write_rgb_png(vertical, 8, 8, vertical_pixels)
+
+        # Both red planes have exactly mean=100, but their spatial structure
+        # differs. A pure block-mean fingerprint would collide.
+        self.assertNotEqual(
+            screenshot_review_fingerprint(horizontal),
+            screenshot_review_fingerprint(vertical),
         )
 
     def test_corrupt_png_is_fail_closed(self):
