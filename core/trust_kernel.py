@@ -30,6 +30,7 @@ TRUSTED_KERNEL_FILES = (
     "scripts/pre_attestation_gate.py",
     "scripts/finalize_current_run_attestation.py",
     "scripts/strict_provenance_gate.py",
+    "scripts/strict_kernel_attestation_gate.py",
     "scripts/fault_injection.py",
     ".github/workflows/proof-gates.yml",
     "requirements-ci.txt",
