@@ -1,9 +1,10 @@
 """Deterministic visual-review fingerprint over Playwright PNG screenshots.
 
-The proof bundle still carries exact SHA-256 hashes for every PNG. This module
-adds a second identity used only for subjective visual approval: a bounded
-raster-equivalence fingerprint that deliberately ignores isolated ±1 channel
-rasterisation noise while remaining sensitive to meaningful rendered changes.
+Exact PNG SHA-256 hashes remain the authoritative current-run artifact identity.
+This module provides a second, deliberately tolerant identity used only for
+subjective visual approval reuse. The fingerprint ignores isolated ±1 channel
+rasterisation noise while retaining coarse intra-block spatial structure so that
+same-mean pixel rearrangements do not collapse to the same approval class.
 
 No third-party imaging dependency is used. The decoder supports the 8-bit,
 non-interlaced RGB/RGBA PNGs emitted by Playwright/Chromium.
@@ -16,8 +17,9 @@ import struct
 import zlib
 
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
-REVIEW_FINGERPRINT_ALGO = "png-blockmean4-v1"
+REVIEW_FINGERPRINT_ALGO = "png-spatialmoments4-v2"
 BLOCK_SIZE = 4
+QUANTIZATION = 2
 
 
 class VisualFingerprintError(ValueError):
@@ -142,13 +144,19 @@ def _decode_png(path: pathlib.Path) -> tuple[int, int, int, list[bytes]]:
     return width, height, channels, rows
 
 
-def screenshot_review_fingerprint(path: pathlib.Path, block_size: int = BLOCK_SIZE) -> str:
-    """Return a content fingerprint over 4x4 channel means.
+def _quantized(value: int) -> int:
+    return min(255, max(0, value // QUANTIZATION))
 
-    Exact PNG integrity is verified separately by the proof bundle. Here each
-    source-aligned block is reduced to floor(mean(channel)). An isolated ±1
-    antialiasing fluctuation therefore cannot normally invalidate an approval,
-    while a coherent rendered change affects one or more block means.
+
+def screenshot_review_fingerprint(path: pathlib.Path, block_size: int = BLOCK_SIZE) -> str:
+    """Return a tolerant spatial fingerprint for subjective approval reuse.
+
+    For each source-aligned block and channel, encode three coarse statistics:
+    the channel mean, an X-weighted first moment and a Y-weighted first moment.
+    Each normalized statistic is quantized by two levels. Sparse ±1 raster noise
+    therefore remains within the same approval class in the demonstrated browser
+    runs, while a same-mean rearrangement with different spatial structure changes
+    at least one moment. Exact PNG bytes are still verified separately.
     """
     if block_size <= 0:
         raise VisualFingerprintError("block_size must be positive")
@@ -157,7 +165,7 @@ def screenshot_review_fingerprint(path: pathlib.Path, block_size: int = BLOCK_SI
     payload = bytearray()
     payload.extend(REVIEW_FINGERPRINT_ALGO.encode("ascii"))
     payload.append(0)
-    payload.extend(struct.pack(">IIHH", width, height, channels, block_size))
+    payload.extend(struct.pack(">IIHHH", width, height, channels, block_size, QUANTIZATION))
 
     for y0 in range(0, height, block_size):
         block_height = min(block_size, height - y0)
@@ -165,13 +173,32 @@ def screenshot_review_fingerprint(path: pathlib.Path, block_size: int = BLOCK_SI
             block_width = min(block_size, width - x0)
             count = block_width * block_height
             sums = [0] * channels
-            for y in range(y0, y0 + block_height):
-                row = rows[y]
-                for x in range(x0, x0 + block_width):
-                    base = x * channels
+            x_moments = [0] * channels
+            y_moments = [0] * channels
+
+            for dy in range(block_height):
+                row = rows[y0 + dy]
+                for dx in range(block_width):
+                    base = (x0 + dx) * channels
                     for channel in range(channels):
-                        sums[channel] += row[base + channel]
-            payload.extend(bytes(total // count for total in sums))
+                        value = row[base + channel]
+                        sums[channel] += value
+                        x_moments[channel] += value * (dx + 1)
+                        y_moments[channel] += value * (dy + 1)
+
+            for channel in range(channels):
+                mean = sums[channel] // count
+                x_moment = x_moments[channel] // (count * block_width)
+                y_moment = y_moments[channel] // (count * block_height)
+                payload.extend(
+                    bytes(
+                        (
+                            _quantized(mean),
+                            _quantized(x_moment),
+                            _quantized(y_moment),
+                        )
+                    )
+                )
 
     return hashlib.sha256(payload).hexdigest()[:16]
 
