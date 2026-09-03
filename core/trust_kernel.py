@@ -17,6 +17,7 @@ TRUSTED_KERNEL_FILES = (
     "core/runtime_identity.py",
     "core/coverage.py",
     "core/scenario_compiler.py",
+    "core/replay_engine.py",
     "core/attestation.py",
     "gvh/extractor.py",
     "gvh/constraints.py",
