@@ -1,4 +1,4 @@
-"""Interaction verification over all visible instrumented controls."""
+"""Interaction verification over all visible controls in the active scope."""
 
 
 def check_interaction(ir):
@@ -6,6 +6,7 @@ def check_interaction(ir):
         value
         for value in ir["nodes"].values()
         if value.get("visible")
+        and value.get("interactionActive", True)
         and (value.get("tag") == "button" or value.get("testid") in ("btn", "close", "open-modal"))
     ]
 
@@ -13,7 +14,7 @@ def check_interaction(ir):
         unknown = {
             "owner": "COMPONENT",
             "status": "UNKNOWN",
-            "reason": "no-visible-button",
+            "reason": "no-visible-active-button",
             "proof_level": "observed",
         }
         return [
@@ -41,6 +42,7 @@ def check_interaction(ir):
                 "size": [width, height],
                 "hit": hit_ok,
                 "visible_region": visible_region,
+                "interaction_active": value.get("interactionActive", True),
                 "target_ok": target_ok,
                 "operable": operable,
             }
