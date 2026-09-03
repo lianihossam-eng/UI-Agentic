@@ -5,18 +5,35 @@
 .table{width:100%;border-collapse:collapse}.table th,.table td{border:1px solid #e2e8f0;padding:8px;text-align:left}
 button{padding:8px 16px;min-width:44px;min-height:44px}
 .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.4)}.modal[open]{display:grid}.modal .box{background:white;padding:24px;border-radius:12px;width:480px}
-@media (max-width: 767px){.shell{flex-direction:column}.sidebar{width:100%;min-height:auto;padding:12px}.kpi-row{grid-template-columns:1fr 1fr}.chart{height:180px}}
+@media (max-width: 767px){.shell{flex-direction:column}.sidebar{width:100%;min-height:auto;padding:16px}.kpi-row{grid-template-columns:1fr 1fr}.chart{height:180px}}
 </style></head><body>
 <div class="shell"><aside class="sidebar" data-testid="sidebar">Sidebar</aside>
 <main class="main" data-testid="main">
   <h1>Analytics</h1>
+  <button data-testid="open-modal">Open drilldown</button>
   <div class="kpi-row" data-testid="kpi-row">
     <div class="kpi" data-testid="card"><div>Revenue</div><strong>€12.4k</strong><button data-testid="btn">Details</button></div>
     <div class="kpi" data-testid="card"><div>Users</div><strong>1,234</strong><button data-testid="btn">Details</button></div>
     <div class="kpi" data-testid="card"><div>Orders</div><strong>342</strong><button data-testid="btn">Details</button></div>
     <div class="kpi" data-testid="card"><div>Conv</div><strong>3.2%</strong><button data-testid="btn">Details</button></div>
   </div>
-  <div class="chart" data-testid="chart">Chart canvas</div>
+  <div class="chart" data-testid="chart">Chart placeholder</div>
   <table class="table" data-testid="table"><tr><th>Channel</th><th>Value</th></tr><tr><td>Organic</td><td>42%</td></tr></table>
   <div class="modal" data-testid="modal"><div class="box" role="dialog" aria-modal="true"><h2>Drilldown</h2><button data-testid="close">Fermer</button></div></div>
-</main></div></body></html>
+</main></div>
+<script>
+(() => {
+  const modal=document.querySelector('[data-testid="modal"]');
+  const opener=document.querySelector('[data-testid="open-modal"]');
+  const closer=document.querySelector('[data-testid="close"]');
+  opener.addEventListener('click', () => {
+    modal.setAttribute('open','');
+    closer.focus();
+  });
+  closer.addEventListener('click', () => {
+    modal.removeAttribute('open');
+    opener.focus();
+  });
+})();
+</script>
+</body></html>
