@@ -7,7 +7,7 @@ import unittest
 class PackagingTests(unittest.TestCase):
     def test_console_entry_point_and_packages_are_declared(self):
         data = tomllib.loads(pathlib.Path("pyproject.toml").read_text(encoding="utf-8"))
-        self.assertEqual(data["project"]["version"], "0.2.0")
+        self.assertEqual(data["project"]["version"], "0.3.0")
         self.assertEqual(
             data["project"]["scripts"]["ui-agentic"],
             "ui_agentic.cli:main",
