@@ -31,10 +31,16 @@ def contrast(c1, c2):
 
 
 def check_paint(ir):
+    text_tags = {"h1", "h2", "h3", "p", "label", "button", "a"}
     candidates = [
         value
         for value in ir["nodes"].values()
-        if value.get("visible") and value.get("testid") in ("card", "main", "btn")
+        if value.get("visible")
+        and value.get("name")
+        and (
+            value.get("tag") in text_tags
+            or value.get("testid") in ("card", "main", "sidebar", "btn", "close", "open-modal")
+        )
     ]
 
     measured = []
@@ -47,7 +53,9 @@ def check_paint(ir):
             continue
         measured.append(
             {
+                "tag": value.get("tag"),
                 "testid": value.get("testid"),
+                "name": value.get("name", "")[:80],
                 "ratio": round(ratio, 4),
                 "color": color,
                 "background": background,
@@ -76,6 +84,6 @@ def check_paint(ir):
             "measured_count": len(measured),
             "failure_count": len(failures),
             "failures": failures[:20],
-            "samples": measured[:50],
+            "samples": measured[:80],
         }
     ]
