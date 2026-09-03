@@ -232,6 +232,32 @@ MUTANTS = [
         """,
         "expect_status": "FAIL",
     },
+    {
+        "id": "M16-horizontal-overflow",
+        "layer": "geometry",
+        "rule": "geometry.no-horizontal-overflow",
+        "owner": "PAGE",
+        "route": "/orders",
+        "viewport": 375,
+        "inject": """
+            const grid=document.querySelector('[data-testid=\"grid\"]');
+            if(grid){ grid.style.width='800px'; grid.style.maxWidth='none'; }
+        """,
+        "expect_status": "FAIL",
+    },
+    {
+        "id": "M17-layout-collision",
+        "layer": "geometry",
+        "rule": "geometry.no-layout-collision",
+        "owner": "SECTION",
+        "route": "/orders",
+        "viewport": 1024,
+        "inject": """
+            const cards=document.querySelectorAll('[data-testid=\"card\"]');
+            if(cards.length>1){ cards[1].style.transform='translateX(-200px)'; }
+        """,
+        "expect_status": "FAIL",
+    },
 ]
 
 
@@ -368,7 +394,9 @@ def run():
 
     by_layer = {}
     for result in results:
-        layer = by_layer.setdefault(result["layer"], {"total": 0, "detected": 0, "survived": 0})
+        layer = by_layer.setdefault(
+            result["layer"], {"total": 0, "detected": 0, "survived": 0}
+        )
         layer["total"] += 1
         if result["detected"]:
             layer["detected"] += 1
