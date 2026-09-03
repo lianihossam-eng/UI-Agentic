@@ -33,15 +33,87 @@ def _check_global_spacing(page):
         }"""
     )
     invalid = [item for item in evidence if round(float(item["value"]), 3) not in ALLOWED_SPACING]
-    return {
+    if not evidence:
+        status = "UNKNOWN"
+        reason = "no-positive-spacing-measurements"
+    elif invalid:
+        status = "FAIL"
+        reason = None
+    else:
+        status = "PASS"
+        reason = None
+    result = {
         "layer": "geometry",
         "constraint": "global.spacing.scale",
         "owner": "GLOBAL",
-        "status": "FAIL" if invalid else "PASS",
+        "status": status,
         "proof_level": "observed",
         "invalid": invalid[:20],
         "sample_count": len(evidence),
     }
+    if reason:
+        result["reason"] = reason
+    return result
+
+
+def _check_horizontal_overflow(page):
+    """Fail closed on unintended horizontal viewport overflow.
+
+    Vertical document growth is intentionally allowed; this rule only checks the
+    horizontal axis. Both document scroll width and visible instrumented boxes
+    must fit the viewport within a 1px rendering tolerance.
+    """
+    evidence = page.evaluate(
+        """() => {
+          const tolerance=1;
+          const width=window.innerWidth;
+          const doc=document.documentElement;
+          const body=document.body;
+          const scrollWidth=Math.max(doc?.scrollWidth||0, body?.scrollWidth||0);
+          const visible=[];
+          const offenders=[];
+          for(const el of document.querySelectorAll('[data-testid]')){
+            const s=getComputedStyle(el); const r=el.getBoundingClientRect();
+            const isVisible=s.display!=='none' && s.visibility!=='hidden' && Number(s.opacity)!==0 && r.width>0 && r.height>0;
+            if(!isVisible) continue;
+            const item={
+              testid:el.dataset.testid||null,
+              left:r.left,
+              right:r.right,
+              width:r.width,
+              position:s.position
+            };
+            visible.push(item);
+            if(r.left < -tolerance || r.right > width+tolerance) offenders.push(item);
+          }
+          return {
+            viewportWidth:width,
+            documentScrollWidth:scrollWidth,
+            visibleCount:visible.length,
+            documentOverflow:scrollWidth > width+tolerance,
+            offenders
+          };
+        }"""
+    )
+    if evidence.get("visibleCount", 0) <= 0:
+        status = "UNKNOWN"
+        reason = "no-visible-instrumented-elements"
+    else:
+        failed = bool(evidence.get("documentOverflow") or evidence.get("offenders"))
+        status = "FAIL" if failed else "PASS"
+        reason = None
+    result = {
+        "layer": "geometry",
+        "constraint": "geometry.no-horizontal-overflow",
+        "owner": "PAGE",
+        "status": status,
+        "proof_level": "observed",
+        "evidence_bundle": evidence,
+        "failure_count": len(evidence.get("offenders") or []) + (1 if evidence.get("documentOverflow") else 0),
+    }
+    if reason:
+        result["reason"] = reason
+    return result
 
 
 def _check_modal_integrity(page):
@@ -226,6 +298,7 @@ def verify_all(ir, page=None):
 
     findings.append(_check_modal_integrity(page))
     findings.append(_check_global_spacing(page))
+    findings.append(_check_horizontal_overflow(page))
     findings.append(_check_breakpoint(page, ir))
 
     for finding in check_paint(ir):
