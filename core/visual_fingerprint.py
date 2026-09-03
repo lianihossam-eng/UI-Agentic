@@ -1,9 +1,9 @@
 """Deterministic visual-review fingerprint over Playwright PNG screenshots.
 
 Exact PNG SHA-256 hashes remain the authoritative current-run artifact identity.
-This module provides a second, deliberately tolerant identity used only for
-subjective visual approval reuse. The fingerprint ignores isolated ±1 channel
-rasterisation noise while retaining coarse intra-block spatial structure so that
+This module provides a second identity used only for subjective visual approval
+reuse. The fingerprint is intentionally insensitive to sparse one-level Chromium
+rasterisation noise while retaining coarse intra-block spatial structure, so
 same-mean pixel rearrangements do not collapse to the same approval class.
 
 No third-party imaging dependency is used. The decoder supports the 8-bit,
@@ -17,9 +17,8 @@ import struct
 import zlib
 
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
-REVIEW_FINGERPRINT_ALGO = "png-spatialmoments4-v2"
-BLOCK_SIZE = 4
-QUANTIZATION = 2
+REVIEW_FINGERPRINT_ALGO = "png-spatialmoments8-v3"
+BLOCK_SIZE = 8
 
 
 class VisualFingerprintError(ValueError):
@@ -144,19 +143,14 @@ def _decode_png(path: pathlib.Path) -> tuple[int, int, int, list[bytes]]:
     return width, height, channels, rows
 
 
-def _quantized(value: int) -> int:
-    return min(255, max(0, value // QUANTIZATION))
-
-
 def screenshot_review_fingerprint(path: pathlib.Path, block_size: int = BLOCK_SIZE) -> str:
-    """Return a tolerant spatial fingerprint for subjective approval reuse.
+    """Return a coarse spatial fingerprint for subjective approval reuse.
 
-    For each source-aligned block and channel, encode three coarse statistics:
-    the channel mean, an X-weighted first moment and a Y-weighted first moment.
-    Each normalized statistic is quantized by two levels. Sparse ±1 raster noise
-    therefore remains within the same approval class in the demonstrated browser
-    runs, while a same-mean rearrangement with different spatial structure changes
-    at least one moment. Exact PNG bytes are still verified separately.
+    Each source-aligned 8x8 block encodes, per channel, its integer mean plus
+    normalized X/Y first moments. Averaging across up to 64 pixels absorbs the
+    sparse ±1 antialiasing noise observed across repeated pinned-Chromium runs,
+    while the spatial moments distinguish same-mean horizontal/vertical or other
+    structured rearrangements. Exact PNG bytes remain independently mandatory.
     """
     if block_size <= 0:
         raise VisualFingerprintError("block_size must be positive")
@@ -165,7 +159,7 @@ def screenshot_review_fingerprint(path: pathlib.Path, block_size: int = BLOCK_SI
     payload = bytearray()
     payload.extend(REVIEW_FINGERPRINT_ALGO.encode("ascii"))
     payload.append(0)
-    payload.extend(struct.pack(">IIHHH", width, height, channels, block_size, QUANTIZATION))
+    payload.extend(struct.pack(">IIHH", width, height, channels, block_size))
 
     for y0 in range(0, height, block_size):
         block_height = min(block_size, height - y0)
@@ -190,15 +184,7 @@ def screenshot_review_fingerprint(path: pathlib.Path, block_size: int = BLOCK_SI
                 mean = sums[channel] // count
                 x_moment = x_moments[channel] // (count * block_width)
                 y_moment = y_moments[channel] // (count * block_height)
-                payload.extend(
-                    bytes(
-                        (
-                            _quantized(mean),
-                            _quantized(x_moment),
-                            _quantized(y_moment),
-                        )
-                    )
-                )
+                payload.extend(bytes((mean, x_moment, y_moment)))
 
     return hashlib.sha256(payload).hexdigest()[:16]
 
