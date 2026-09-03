@@ -203,6 +203,35 @@ MUTANTS = [
         """,
         "expect_status": "FAIL",
     },
+    {
+        "id": "M14-escape-transition-handler-missing",
+        "layer": "interaction",
+        "rule": "transition:settings-modal",
+        "owner": "PAGE",
+        "route": "/settings",
+        "viewport": 320,
+        "open_modal": True,
+        "mode": "transition-escape-close",
+        "inject": """
+            const old=document.querySelector('[data-testid=\"modal\"]');
+            if(old){ old.replaceWith(old.cloneNode(true)); }
+        """,
+        "expect_status": "FAIL",
+    },
+    {
+        "id": "M15-modal-close-removed-from-tab-order",
+        "layer": "accessibility",
+        "rule": "accessibility.focus-order",
+        "owner": "PAGE",
+        "route": "/settings",
+        "viewport": 375,
+        "open_modal": True,
+        "inject": """
+            const close=document.querySelector('[data-testid=\"close\"]');
+            if(close){ close.tabIndex=-1; }
+        """,
+        "expect_status": "FAIL",
+    },
 ]
 
 
@@ -226,9 +255,30 @@ def transition_open_status(page):
     return "PASS" if evidence["visible"] and evidence["focusInside"] else "FAIL"
 
 
+def transition_escape_close_status(page):
+    page.keyboard.press("Escape")
+    evidence = page.evaluate(
+        """() => {
+          const modal=document.querySelector('[data-testid="modal"]');
+          const opener=document.querySelector('[data-testid="open-modal"]');
+          const shell=document.querySelector('.shell');
+          const active=document.activeElement;
+          const visible=!!modal && getComputedStyle(modal).display!=='none' && modal.hasAttribute('open');
+          return {
+            visible,
+            focusReturned:!!opener && active===opener,
+            backgroundInert:!!shell && shell.hasAttribute('inert')
+          };
+        }"""
+    )
+    return "PASS" if (not evidence["visible"] and evidence["focusReturned"] and not evidence["backgroundInert"]) else "FAIL"
+
+
 def evaluate(page, mutant):
     if mutant.get("mode") == "transition-open":
         return transition_open_status(page)
+    if mutant.get("mode") == "transition-escape-close":
+        return transition_escape_close_status(page)
     ir = compute_ir(page)
     finding = find_result(verify_all(ir, page), mutant["rule"])
     return finding.get("status") if finding else "MISSING"
