@@ -69,7 +69,7 @@ def _render_environment(page, domain: dict, state: str) -> dict:
     }
 
 
-def _apply_state(page, state: str) -> tuple[bool, str | None]:
+def _apply_state(page, state: str | None) -> tuple[bool, str | None]:
     if state in (None, "default"):
         return True, None
     if state == "modal-open":
@@ -96,25 +96,35 @@ def _apply_state(page, state: str) -> tuple[bool, str | None]:
 
 def _execute_transition(page, transition: dict) -> dict:
     action = transition.get("action", "")
-    if not action.startswith("click:"):
-        return {
-            "constraint": "transition",
-            "status": "UNKNOWN",
-            "reason": f"unsupported-transition-action:{action}",
-            "proof_level": "observed",
-        }
-    selector = action.split(":", 1)[1]
-    locator = page.locator(selector)
-    if locator.count() != 1:
-        return {
-            "constraint": "transition",
-            "status": "UNKNOWN",
-            "reason": f"transition-target-missing-or-ambiguous:{selector}",
-            "proof_level": "observed",
-        }
-
     try:
-        locator.click()
+        if action.startswith("click:"):
+            selector = action.split(":", 1)[1]
+            locator = page.locator(selector)
+            if locator.count() != 1:
+                return {
+                    "constraint": "transition",
+                    "status": "UNKNOWN",
+                    "reason": f"transition-target-missing-or-ambiguous:{selector}",
+                    "proof_level": "observed",
+                }
+            locator.click()
+        elif action.startswith("press:"):
+            key = action.split(":", 1)[1]
+            if not key:
+                return {
+                    "constraint": "transition",
+                    "status": "UNKNOWN",
+                    "reason": "transition-key-missing",
+                    "proof_level": "observed",
+                }
+            page.keyboard.press(key)
+        else:
+            return {
+                "constraint": "transition",
+                "status": "UNKNOWN",
+                "reason": f"unsupported-transition-action:{action}",
+                "proof_level": "observed",
+            }
     except Exception as exc:
         return {
             "constraint": "transition",
@@ -192,7 +202,6 @@ def replay(
         readiness: dict,
         rendered_environment: dict,
     ) -> None:
-        # Never silently coerce a checker result to a different obligation.
         if result.get("constraint") != scenario.get("rule"):
             result = {
                 "constraint": scenario.get("rule"),
@@ -256,7 +265,6 @@ def replay(
         browser = playwright.chromium.launch(headless=True)
         browser_version = f"chromium@{browser.version}"
 
-        # One rendered measurement snapshot per route/viewport/state.
         groups: dict[tuple[str, int, str], list[dict]] = {}
         for scenario in rendered:
             key = (
@@ -276,11 +284,7 @@ def replay(
             state_ok, state_reason = _apply_state(page, state)
             rendered_environment = _render_environment(page, domain, state)
             if not state_ok:
-                readiness = {
-                    "status": "UNKNOWN",
-                    "checks": {},
-                    "blockers": [state_reason],
-                }
+                readiness = {"status": "UNKNOWN", "checks": {}, "blockers": [state_reason]}
             else:
                 readiness = measurement_readiness(page)
             readiness_results.append(readiness)
@@ -309,61 +313,46 @@ def replay(
                 result = _result_for(findings, scenario["rule"])
                 if scenario["rule"] in ("TARGET_OPERABLE", "FOCUS_USABLE", "MODAL_INTEGRITY"):
                     cross_layer_results.append({"scenario": scenario, "result": result})
-                record(
-                    scenario,
-                    result,
-                    browser_version,
-                    readiness,
-                    rendered_environment,
-                )
+                record(scenario, result, browser_version, readiness, rendered_environment)
 
             if capture_screenshots and state == "default":
                 out = screenshot_dir / f"{route.strip('/')}-{viewport}.png"
                 page.screenshot(path=str(out), full_page=True)
             context.close()
 
-        # Transition sequence is stateful within each model+viewport. Readiness
-        # is re-established immediately before every event.
-        by_model_viewport: dict[tuple[str, int], list[dict]] = {}
+        # Every transition is an independent proof obligation. Its declared
+        # source state is established on a fresh page before readiness and the
+        # event, so branching exits from modal-open do not depend on list order.
         for scenario in transitions:
-            key = (scenario["model"], scenario.get("viewport", 768))
-            by_model_viewport.setdefault(key, []).append(scenario)
-
-        for (_, viewport), group in by_model_viewport.items():
-            route = group[0]["route"]
+            route = scenario["route"]
+            viewport = scenario.get("viewport", 768)
+            transition = scenario["transition"]
+            source_state = transition.get("from", "default")
             context = browser.new_context(
                 viewport={"width": viewport, "height": domain.get("viewport_height", 900)}
             )
             page = context.new_page()
             page.goto(route_files[route].as_uri())
-
-            for scenario in group:
-                transition = scenario["transition"]
-                rendered_environment = _render_environment(
-                    page,
-                    domain,
-                    transition.get("from", "transition"),
-                )
+            state_ok, state_reason = _apply_state(page, source_state)
+            rendered_environment = _render_environment(page, domain, source_state)
+            if not state_ok:
+                readiness = {"status": "UNKNOWN", "checks": {}, "blockers": [state_reason]}
+            else:
                 readiness = measurement_readiness(page)
-                readiness_results.append(readiness)
-                if readiness.get("status") != "PASS":
-                    result = {
-                        "constraint": scenario["rule"],
-                        "status": "UNKNOWN",
-                        "proof_level": "observed",
-                        "reason": "measurement-readiness-not-satisfied",
-                    }
-                else:
-                    result = _execute_transition(page, transition)
-                    result["constraint"] = scenario["rule"]
-                transition_results.append({"scenario": scenario, "result": result})
-                record(
-                    scenario,
-                    result,
-                    browser_version,
-                    readiness,
-                    rendered_environment,
-                )
+            readiness_results.append(readiness)
+
+            if readiness.get("status") != "PASS":
+                result = {
+                    "constraint": scenario["rule"],
+                    "status": "UNKNOWN",
+                    "proof_level": "observed",
+                    "reason": "measurement-readiness-not-satisfied",
+                }
+            else:
+                result = _execute_transition(page, transition)
+                result["constraint"] = scenario["rule"]
+            transition_results.append({"scenario": scenario, "result": result})
+            record(scenario, result, browser_version, readiness, rendered_environment)
             context.close()
 
         browser.close()
