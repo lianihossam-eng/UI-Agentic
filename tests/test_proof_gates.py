@@ -29,6 +29,19 @@ class ProofGateTests(unittest.TestCase):
                 {"browser": "test"},
             )
 
+    def test_generic_attestation_is_never_locked(self):
+        record = attest(
+            "build",
+            "contract",
+            "rules",
+            "scenarios",
+            "evidence",
+            {"passed": True},
+            {"browser": "test"},
+        )
+        self.assertEqual(record["verdict"], "PROVISIONAL")
+        self.assertNotEqual(record["verdict"], "LOCKED")
+
     def test_observed_sampling_is_not_certificate(self):
         observed = {
             "proof_level": "observed",
