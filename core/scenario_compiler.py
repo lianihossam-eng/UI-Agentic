@@ -5,15 +5,43 @@
 # demonstrated, viewport_width is therefore a dependency for every UI rule
 # below, including state transitions.
 RULE_SPECS = {
-    "group.uniform_gap": {"factors": ["route", "viewport_width"]},
-    "global.spacing.scale": {"factors": ["route", "viewport_width"]},
-    "paint.contrast.text": {"factors": ["route", "viewport_width"]},
-    "component.button.hit-target": {"factors": ["route", "viewport_width"]},
-    "TARGET_OPERABLE": {"factors": ["route", "viewport_width"]},
-    "accessibility.focus-order": {"factors": ["route", "viewport_width"]},
-    "FOCUS_USABLE": {"factors": ["route", "viewport_width"]},
-    "temporal.geometry-stable": {"factors": ["route", "viewport_width"]},
+    "group.uniform_gap": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
+    "global.spacing.scale": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
+    "paint.contrast.text": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
+    "component.button.hit-target": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
+    "TARGET_OPERABLE": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
+    "accessibility.focus-order": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
+    "FOCUS_USABLE": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
+    "temporal.geometry-stable": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
 }
+
+PROOF_LEVELS = {"observed", "bounded", "certified"}
+
+
+def scenario_id(scenario):
+    """Return a stable unique identity for one compiled proof obligation."""
+    route = scenario.get("route", "global")
+    viewport = scenario.get("viewport", 768)
+    rule = scenario["rule"]
+    transition = scenario.get("transition")
+    if transition:
+        event = transition.get("event", "event")
+        source = transition.get("from", "unknown")
+        target = transition.get("to", "unknown")
+        return f"{route}@{viewport}:{rule}:{event}:{source}->{target}"
+    state = scenario.get("state", "default")
+    model = scenario.get("model")
+    suffix = f":{model}" if model else ""
+    return f"{route}@{viewport}:{state}:{rule}{suffix}"
+
+
+def _finalize(scenario, proof_level="observed"):
+    if proof_level not in PROOF_LEVELS:
+        raise ValueError(f"unsupported proof level: {proof_level}")
+    scenario = dict(scenario)
+    scenario["required_proof_level"] = proof_level
+    scenario["scenario_id"] = scenario_id(scenario)
+    return scenario
 
 
 def _expand_rule(rule_id, spec, domain):
@@ -26,7 +54,7 @@ def _expand_rule(rule_id, spec, domain):
             scenario = {"rule": rule_id, "viewport": width}
             if route is not None:
                 scenario["route"] = route
-            scenarios.append(scenario)
+            scenarios.append(_finalize(scenario, spec.get("proof_level", "observed")))
     return scenarios
 
 
@@ -46,13 +74,15 @@ def compile(domain):
         for width in widths:
             for transition in model.get("transitions", []):
                 scenarios.append(
-                    {
-                        "rule": f"transition:{model['id']}",
-                        "model": model["id"],
-                        "route": route,
-                        "viewport": width,
-                        "transition": transition,
-                    }
+                    _finalize(
+                        {
+                            "rule": f"transition:{model['id']}",
+                            "model": model["id"],
+                            "route": route,
+                            "viewport": width,
+                            "transition": transition,
+                        }
+                    )
                 )
 
         # Modal geometry/interaction/accessibility is likewise observed at
@@ -60,12 +90,18 @@ def compile(domain):
         if "MODAL_INTEGRITY" in model.get("invariants", []):
             for width in widths:
                 scenarios.append(
-                    {
-                        "rule": "MODAL_INTEGRITY",
-                        "model": model["id"],
-                        "route": route,
-                        "viewport": width,
-                        "state": "modal-open",
-                    }
+                    _finalize(
+                        {
+                            "rule": "MODAL_INTEGRITY",
+                            "model": model["id"],
+                            "route": route,
+                            "viewport": width,
+                            "state": "modal-open",
+                        }
+                    )
                 )
+
+    ids = [scenario["scenario_id"] for scenario in scenarios]
+    if len(ids) != len(set(ids)):
+        raise ValueError("scenario compiler produced duplicate scenario_id values")
     return scenarios
