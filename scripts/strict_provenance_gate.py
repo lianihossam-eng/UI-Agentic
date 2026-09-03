@@ -17,9 +17,12 @@ import sys
 
 import yaml
 
+BASE = pathlib.Path(__file__).resolve().parent.parent
+if str(BASE) not in sys.path:
+    sys.path.insert(0, str(BASE))
+
 from core.scenario_compiler import compile as compile_scenarios
 
-BASE = pathlib.Path(__file__).resolve().parent.parent
 REPORT_NAMES = [
     "traceability_report",
     "assumptions_report",
