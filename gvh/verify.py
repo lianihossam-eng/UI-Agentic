@@ -4,45 +4,167 @@ from .a11y import check_a11y
 from .temporal import check_temporal
 from .wcag import trace
 
+ALLOWED_SPACING = {0.0, 4.0, 8.0, 16.0, 24.0, 32.0, 48.0}
+
+
+def _check_global_spacing(page):
+    evidence = page.evaluate(
+        """() => {
+          const selectors='[data-testid], .shell, .grid, .kpi-row, .card, .kpi, button';
+          const props=['gap','rowGap','columnGap','paddingTop','paddingRight','paddingBottom','paddingLeft'];
+          const out=[];
+          for(const el of document.querySelectorAll(selectors)){
+            const s=getComputedStyle(el);
+            for(const prop of props){
+              const raw=s[prop]; const n=parseFloat(raw);
+              if(Number.isFinite(n) && n>0) out.push({
+                element: el.dataset.testid || el.className || el.tagName,
+                property: prop,
+                value: n
+              });
+            }
+          }
+          return out;
+        }"""
+    )
+    invalid = [item for item in evidence if round(float(item["value"]), 3) not in ALLOWED_SPACING]
+    return {
+        "layer": "geometry",
+        "constraint": "global.spacing.scale",
+        "owner": "GLOBAL",
+        "status": "FAIL" if invalid else "PASS",
+        "proof_level": "observed",
+        "invalid": invalid[:20],
+        "sample_count": len(evidence),
+    }
+
+
+def _check_modal_integrity(page):
+    modal = page.locator('[data-testid="modal"]')
+    if modal.count() == 0:
+        return {
+            "layer": "interaction",
+            "constraint": "MODAL_INTEGRITY",
+            "owner": "PAGE",
+            "status": "UNKNOWN",
+            "reason": "modal-not-present",
+            "requires_layers": ["geometry", "interaction", "accessibility"],
+        }
+    evidence = modal.evaluate(
+        """m => {
+          const s=getComputedStyle(m); const r=m.getBoundingClientRect();
+          const dialog=m.matches('[role="dialog"]') ? m : m.querySelector('[role="dialog"]');
+          const ariaModal=dialog?.getAttribute('aria-modal') === 'true';
+          const active=document.activeElement;
+          const focusInside=!!active && m.contains(active);
+          const centerHit=document.elementFromPoint(r.x+r.width/2, r.y+r.height/2);
+          const centerOwned=!!centerHit && (centerHit===m || m.contains(centerHit));
+          const sidebar=document.querySelector('[data-testid="sidebar"]');
+          let backgroundBlocked=true;
+          if(sidebar){
+            const b=sidebar.getBoundingClientRect();
+            const hit=document.elementFromPoint(b.x+b.width/2, b.y+Math.min(40,b.height/2));
+            backgroundBlocked=!!hit && (hit===m || m.contains(hit));
+          }
+          return {
+            visible:s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0,
+            fixed:s.position==='fixed',
+            ariaModal,
+            focusInside,
+            centerOwned,
+            backgroundBlocked
+          };
+        }"""
+    )
+    passed = all(
+        evidence.get(key) is True
+        for key in ("visible", "fixed", "ariaModal", "focusInside", "centerOwned", "backgroundBlocked")
+    )
+    return {
+        "layer": "interaction",
+        "constraint": "MODAL_INTEGRITY",
+        "owner": "PAGE",
+        "status": "PASS" if passed else "FAIL",
+        "proof_level": "observed",
+        "requires_layers": ["geometry", "interaction", "accessibility"],
+        "evidence_bundle": evidence,
+    }
+
+
 def verify_all(ir, page=None):
-    findings=[]
-    # GEOMETRY
-    geo=check_hard(ir)
+    findings = []
+
+    geo = check_hard(ir)
     if geo:
-        for v in geo: findings.append({'layer':'geometry','proof_level':'observed', **v})  # downgraded per point 2
+        for violation in geo:
+            findings.append({"layer": "geometry", "proof_level": "observed", **violation})
     else:
-        findings.append({'layer':'geometry','constraint':'group.uniform_gap','owner':'PAGE','status':'PASS','proof_level':'observed'})
-    # PAINT + WCAG trace
-    if page is not None:
-        for f in check_paint(ir):
-            findings.append({'layer':'paint','proof_level':'observed', **f, 'wcag': trace(f['constraint'], f)})
+        findings.append({
+            "layer": "geometry",
+            "constraint": "group.uniform_gap",
+            "owner": "PAGE",
+            "status": "PASS",
+            "proof_level": "observed",
+        })
+
+    if page is None:
+        return findings
+
+    findings.append(_check_global_spacing(page))
+
+    for finding in check_paint(ir):
+        findings.append({
+            "layer": "paint",
+            "proof_level": "observed",
+            **finding,
+            "wcag": trace(finding["constraint"], finding),
+        })
+
+    buttons = [
+        value for value in ir["nodes"].values()
+        if value.get("visible") and (value.get("testid") == "btn" or value.get("tag") == "button")
+    ]
+    if buttons:
+        value = buttons[0]
+        hit_ok = value.get("hit", {}).get("hitOk", False)
+        width, height = value["box"][2], value["box"][3]
+        findings.append({
+            "layer": "interaction",
+            "constraint": "component.button.hit-target",
+            "owner": "COMPONENT",
+            "status": "PASS" if (width >= 44 and height >= 44 and hit_ok) else "FAIL",
+            "actual": [width, height],
+            "hit": hit_ok,
+            "proof_level": "observed",
+        })
+        visible = value["visibleRegion"][2] * value["visibleRegion"][3] > 0
+        operable = width >= 44 and height >= 44 and hit_ok and visible
+        findings.append({
+            "layer": "interaction",
+            "constraint": "TARGET_OPERABLE",
+            "owner": "COMPONENT",
+            "status": "PASS" if operable else "FAIL",
+            "requires_layers": ["geometry", "interaction"],
+            "proof_level": "observed",
+            "evidence_bundle": {"hit": hit_ok, "size": [width, height], "visible": visible},
+        })
     else:
-        findings.append({'layer':'paint','constraint':'paint.contrast.text','owner':'PAGE','status':'PASS'})
-    # INTERACTION + TARGET_OPERABLE atomic
-    btns=[v for v in ir['nodes'].values() if v.get('testid')=='btn' or v['tag']=='button']
-    for v in btns[:1]:
-        hitOk=v.get('hit',{}).get('hitOk', False)
-        w,h=v['box'][2],v['box'][3]
-        findings.append({'layer':'interaction','constraint':'component.button.hit-target','owner':'COMPONENT','status':'PASS' if (w>=44 and h>=44 and hitOk) else 'FAIL','actual':[w,h],'hit':hitOk,'proof_level':'observed'})
-        # atomic evidence bundle
-        visible=v['visibleRegion'][2]*v['visibleRegion'][3] > 0
-        operable=(w>=44 and h>=44 and hitOk and visible)
-        findings.append({'layer':'interaction','constraint':'TARGET_OPERABLE','owner':'COMPONENT','status':'PASS' if operable else 'FAIL','requires_layers':['geometry','interaction'],'proof_level':'observed','evidence_bundle':{'hit':hitOk,'size':[w,h],'visible':visible}})
-        break
-    # A11Y + FOCUS_USABLE atomic
-    if page is not None:
-        for f in check_a11y(page, ir):
-            findings.append({'layer':'accessibility','proof_level':'observed', **f, 'wcag': trace(f['constraint'], f) if 'wcag' not in f else f.get('wcag')})
-        # ensure FOCUS_USABLE has bundle
-        # already from check_a11y
-    # TEMPORAL durci
-    if page is not None:
-        for f in check_temporal(page):
-            findings.append({'layer':'temporal', **f})
-    else:
-        findings.append({'layer':'temporal','constraint':'temporal.geometry-stable','owner':'PAGE','status':'PASS'})
-    findings.append({'layer':'temporal','constraint':'MODAL_INTEGRITY','owner':'PAGE','status':'PASS','requires_layers':['geometry','interaction','accessibility'],'proof_level':'observed','evidence_bundle':{'layer_top':True}})
-    # ensure global.spacing.scale
-    if not any(r['constraint']=='global.spacing.scale' for r in findings):
-        findings.append({'layer':'geometry','constraint':'global.spacing.scale','owner':'GLOBAL','status':'PASS','proof_level':'observed'})
+        for constraint in ("component.button.hit-target", "TARGET_OPERABLE"):
+            findings.append({
+                "layer": "interaction",
+                "constraint": constraint,
+                "owner": "COMPONENT",
+                "status": "UNKNOWN",
+                "reason": "no-visible-button",
+            })
+
+    for finding in check_a11y(page, ir):
+        payload = {"layer": "accessibility", "proof_level": "observed", **finding}
+        payload["wcag"] = trace(finding["constraint"], finding)
+        findings.append(payload)
+
+    for finding in check_temporal(page):
+        findings.append({"layer": "temporal", **finding})
+
+    findings.append(_check_modal_integrity(page))
     return findings
