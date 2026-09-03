@@ -16,30 +16,16 @@ import yaml
 
 from core.attestation import attest
 from core.coverage import CoverageLedger, final_confirmation_gate
-from core.scenario_compiler import compile as compile_scenarios
+from core.measurement_kernel import measurement_kernel_digest
+from core.scenario_compiler import (
+    compile as compile_scenarios,
+    rule_contract_seed,
+)
 
 BASE = pathlib.Path(__file__).resolve().parent
 REPORT_DIR = BASE / "reports"
 DOMAIN = yaml.safe_load((BASE / "supported-domain.yaml").read_text())["supported_domain"]
 SCENARIOS = compile_scenarios(DOMAIN)
-RULES_SEED = [
-    "group.uniform_gap",
-    "global.spacing.scale",
-    "breakpoint.shell.direction",
-    "paint.contrast.text",
-    "component.button.hit-target",
-    "TARGET_OPERABLE",
-    "accessibility.focus-order",
-    "FOCUS_USABLE",
-    "temporal.geometry-stable",
-    "MODAL_INTEGRITY",
-]
-CHECKER_FILES = [
-    "gvh/verify.py",
-    "gvh/extractor.py",
-    "core/coverage.py",
-    "core/scenario_compiler.py",
-]
 REPORT_NAMES = (
     "traceability_report",
     "assumptions_report",
@@ -63,6 +49,13 @@ def sha16_json(value: object) -> str:
     return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()[:16]
 
 
+def canonical_rules_digest() -> str:
+    return hashlib.sha256(
+        (BASE / "supported-domain.yaml").read_bytes()
+        + json.dumps(rule_contract_seed(), sort_keys=True).encode()
+    ).hexdigest()[:16]
+
+
 def load(path: pathlib.Path) -> dict:
     try:
         value = json.loads(path.read_text())
@@ -77,7 +70,11 @@ def report_hash_valid(report: dict) -> bool:
     expected = report.get("report_hash")
     if not expected:
         return False
-    payload = {key: value for key, value in report.items() if key not in ("report_hash", "report_hash_algo")}
+    payload = {
+        key: value
+        for key, value in report.items()
+        if key not in ("report_hash", "report_hash_algo")
+    }
     return sha16_json(payload) == expected
 
 
@@ -104,15 +101,12 @@ def main() -> int:
         return 2
 
     scenario_digest = sha16_json(SCENARIOS)
-    rules_digest = hashlib.sha256(
-        (BASE / "supported-domain.yaml").read_bytes()
-        + json.dumps(RULES_SEED, sort_keys=True).encode()
-    ).hexdigest()[:16]
-    checker_digest = hashlib.sha256(
-        b"".join((BASE / path).read_bytes() for path in CHECKER_FILES)
-    ).hexdigest()[:16]
+    rules_digest = canonical_rules_digest()
+    measurement_digest = measurement_kernel_digest()
+    checker_digest = measurement_digest[:16]
     manifest_payload = {
-        key: value for key, value in manifest.items()
+        key: value
+        for key, value in manifest.items()
         if key not in ("manifest_digest", "manifest_hash_algo")
     }
     manifest_digest = sha16_json(manifest_payload)
@@ -128,6 +122,15 @@ def main() -> int:
     }
     binding = current.get("binding") or {}
     binding_valid = binding == expected_binding
+    measurement_binding_valid = (
+        manifest.get("measurement_kernel_digest") == measurement_digest
+        and current.get("measurement_kernel_digest") == measurement_digest
+        and all(
+            record.get("measurement_kernel_digest") == measurement_digest
+            for record in (current.get("records") or [])
+            if isinstance(record, dict)
+        )
+    )
     manifest_valid = (
         manifest.get("manifest_digest") == manifest_digest
         and manifest.get("commit_sha") == commit
@@ -135,6 +138,7 @@ def main() -> int:
         and manifest.get("scenario_digest") == scenario_digest
         and manifest.get("rules_digest") == rules_digest
         and manifest.get("checker_digest") == checker_digest
+        and manifest.get("measurement_kernel_digest") == measurement_digest
         and manifest.get("evidence_root") == current.get("evidence_root")
         and current.get("environment_manifest_digest") == manifest_digest
     )
@@ -152,7 +156,12 @@ def main() -> int:
         ledger.record(result if isinstance(result, dict) else {"status": "UNKNOWN"})
 
     reports = {}
-    reports_valid = binding_valid and manifest_valid and artifact_hash_valid
+    reports_valid = (
+        binding_valid
+        and manifest_valid
+        and artifact_hash_valid
+        and measurement_binding_valid
+    )
     for name in REPORT_NAMES:
         try:
             report = load(REPORT_DIR / f"{name}.json")
@@ -168,10 +177,18 @@ def main() -> int:
             if report.get(field) != expected_binding[field]:
                 reports_valid = False
 
-    strict_obligation_ok, strict_obligation_out, strict_obligation_err = run_gate("strict_obligation_gate.py")
-    strict_mutation_ok, strict_mutation_out, strict_mutation_err = run_gate("strict_mutation_gate.py")
-    strict_visual_ok, strict_visual_out, strict_visual_err = run_gate("strict_visual_gate.py")
-    strict_runtime_ok, strict_runtime_out, strict_runtime_err = run_gate("strict_runtime_identity_gate.py")
+    strict_obligation_ok, strict_obligation_out, strict_obligation_err = run_gate(
+        "strict_obligation_gate.py"
+    )
+    strict_mutation_ok, strict_mutation_out, strict_mutation_err = run_gate(
+        "strict_mutation_gate.py"
+    )
+    strict_visual_ok, strict_visual_out, strict_visual_err = run_gate(
+        "strict_visual_gate.py"
+    )
+    strict_runtime_ok, strict_runtime_out, strict_runtime_err = run_gate(
+        "strict_runtime_identity_gate.py"
+    )
 
     readiness_complete = (
         len(records) == len(SCENARIOS)
@@ -184,7 +201,8 @@ def main() -> int:
         if isinstance(record, dict)
     }
     transition_ids = {
-        scenario["scenario_id"] for scenario in SCENARIOS
+        scenario["scenario_id"]
+        for scenario in SCENARIOS
         if scenario["rule"].startswith("transition:")
     }
     state_transitions_complete = bool(transition_ids) and all(
@@ -207,6 +225,7 @@ def main() -> int:
         and regression.get("closed") is True
         and regression.get("run_a_evidence_root") == current.get("evidence_root")
         and regression.get("run_b_evidence_root") == current.get("evidence_root")
+        and regression.get("measurement_kernel_digest") == measurement_digest
         and (current.get("reproducibility") or {}).get("passed") is True
     )
 
@@ -246,9 +265,11 @@ def main() -> int:
         "coverage": ledger.summary(),
         "browser": current.get("browser"),
         "evidence_root": current.get("evidence_root"),
+        "measurement_kernel_digest": measurement_digest,
         "final_gate": gate,
         "bundle_validation": {
             "binding_valid": binding_valid,
+            "measurement_binding_valid": measurement_binding_valid,
             "manifest_valid": manifest_valid,
             "artifact_hash_valid": artifact_hash_valid,
             "reports_valid": reports_valid,
@@ -274,11 +295,12 @@ def main() -> int:
             },
         },
     }
-    # Runtime identity is a pre-attestation prerequisite even though the
-    # canonical Final Gate list predates this hardening.
     if not strict_runtime_ok:
         report["final_gate"]["passed"] = False
         report["final_gate"]["blocking_gates"].append("runtime_identity")
+    if not measurement_binding_valid:
+        report["final_gate"]["passed"] = False
+        report["final_gate"]["blocking_gates"].append("measurement_kernel_binding")
 
     print(json.dumps(report, indent=2, sort_keys=True))
 
@@ -293,10 +315,13 @@ def main() -> int:
             environment_manifest={
                 "browser": current.get("browser"),
                 "manifest_digest": manifest_digest,
+                "measurement_kernel_digest": measurement_digest,
             },
             visual_contract="ACCEPTED",
         )
-        (BASE / ".goal_attestation.json").write_text(json.dumps(provisional, indent=2, sort_keys=True))
+        (BASE / ".goal_attestation.json").write_text(
+            json.dumps(provisional, indent=2, sort_keys=True)
+        )
         return 0
 
     print("NO LOCK: Final Confirmation Gate is not closed.", file=sys.stderr)
