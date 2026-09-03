@@ -42,6 +42,9 @@ jobs:
       - name: Generate semantic current-run evidence
         run: python scripts/capture_current_run_evidence.py
 
+      - name: Build record-bound traceability
+        run: python scripts/build_traceability_report.py
+
       - name: Enforce complete visual contract
         run: python scripts/enforce_visual_contract.py
 
@@ -95,6 +98,16 @@ jobs:
           print('traceability deletion blocked OK')
           p3.write_text(json.dumps(orig3, indent=2, sort_keys=True))
 
+          p4=base/'reports/traceability_report.json'
+          orig4=json.loads(p4.read_text())
+          tamper4=json.loads(p4.read_text())
+          tamper4['mapping'][0]['evidence_key']='0000000000000000'
+          p4.write_text(json.dumps(reh(tamper4), indent=2, sort_keys=True))
+          r4=subprocess.run(['python','run_goal_verify.py'], capture_output=True)
+          assert r4.returncode==2, 'traceability evidence-key tamper should block'
+          print('traceability evidence-key tamper blocked OK')
+          p4.write_text(json.dumps(orig4, indent=2, sort_keys=True))
+
           visual=base/'reports/visual_review.json'
           origv=json.loads(visual.read_text())
           tamperv=json.loads(visual.read_text())
@@ -106,11 +119,11 @@ jobs:
           print('visual screenshot tamper blocked OK')
           visual.write_text(json.dumps(origv, indent=2, sort_keys=True))
 
-          r4=subprocess.run(['python','run_goal_verify.py'], capture_output=True)
-          assert r4.returncode==0, 'restored current-run evidence should pass'
-          r5=subprocess.run(['python','scripts/strict_visual_gate.py'], capture_output=True)
-          assert r5.returncode==0, 'restored visual evidence should pass'
-          print('provenance + visual tamper tests all pass')
+          r5=subprocess.run(['python','run_goal_verify.py'], capture_output=True)
+          assert r5.returncode==0, 'restored current-run evidence should pass'
+          r6=subprocess.run(['python','scripts/strict_visual_gate.py'], capture_output=True)
+          assert r6.returncode==0, 'restored visual evidence should pass'
+          print('provenance + traceability + visual tamper tests all pass')
           "
 
       - name: Remove provisional legacy attestation
