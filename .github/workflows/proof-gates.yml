@@ -42,11 +42,17 @@ jobs:
       - name: Generate semantic current-run evidence
         run: python scripts/capture_current_run_evidence.py
 
+      - name: Capture actual runtime binary and font identity
+        run: python scripts/capture_runtime_identity.py
+
       - name: Build record-bound traceability
         run: python scripts/build_traceability_report.py
 
       - name: Strict obligation and proof-level gate
         run: python scripts/strict_obligation_gate.py
+
+      - name: Strict runtime identity gate before attestation
+        run: python scripts/strict_runtime_identity_gate.py
 
       - name: Enforce complete visual contract
         run: python scripts/enforce_visual_contract.py
@@ -123,6 +129,16 @@ jobs:
           print('current-run scenario-id tamper blocked OK')
           current.write_text(json.dumps(origc, indent=2, sort_keys=True))
 
+          runtime=base/'reports/runtime_identity.json'
+          origr=json.loads(runtime.read_text())
+          tamperr=json.loads(runtime.read_text())
+          tamperr['browser']['sha256']='0'*64
+          runtime.write_text(json.dumps(reh(tamperr), indent=2, sort_keys=True))
+          rr=subprocess.run(['python','scripts/strict_runtime_identity_gate.py'], capture_output=True)
+          assert rr.returncode==2, 'runtime binary identity tamper should block'
+          print('runtime binary identity tamper blocked OK')
+          runtime.write_text(json.dumps(origr, indent=2, sort_keys=True))
+
           visual=base/'reports/visual_review.json'
           origv=json.loads(visual.read_text())
           tamperv=json.loads(visual.read_text())
@@ -138,13 +154,18 @@ jobs:
           assert r5.returncode==0, 'restored current-run evidence should pass'
           r6=subprocess.run(['python','scripts/strict_obligation_gate.py'], capture_output=True)
           assert r6.returncode==0, 'restored obligation evidence should pass'
-          r7=subprocess.run(['python','scripts/strict_visual_gate.py'], capture_output=True)
-          assert r7.returncode==0, 'restored visual evidence should pass'
-          print('provenance + obligation + visual tamper tests all pass')
+          r7=subprocess.run(['python','scripts/strict_runtime_identity_gate.py'], capture_output=True)
+          assert r7.returncode==0, 'restored runtime identity should pass'
+          r8=subprocess.run(['python','scripts/strict_visual_gate.py'], capture_output=True)
+          assert r8.returncode==0, 'restored visual evidence should pass'
+          print('provenance + obligation + runtime + visual tamper tests all pass')
           "
 
       - name: Recheck strict obligation gate after tamper tests
         run: python scripts/strict_obligation_gate.py
+
+      - name: Recheck runtime identity after tamper tests
+        run: python scripts/strict_runtime_identity_gate.py
 
       - name: Remove provisional legacy attestation
         run: rm -f .goal_attestation.json
@@ -158,12 +179,15 @@ jobs:
       - name: Strict current-run provenance gate
         run: python scripts/strict_provenance_gate.py
 
+      - name: Strict runtime identity + attestation gate
+        run: python scripts/strict_runtime_identity_gate.py
+
       - name: Strict Trusted Verification Kernel gate
         run: python scripts/strict_kernel_attestation_gate.py
 
       - name: Check final attestation LOCKED
         run: |
-          python -c "import json; d=json.load(open('.goal_attestation.json')); assert d['verdict']=='LOCKED'; assert d['attestation']['final_gate']['passed'] is True; print('LOCKED', d['digest'], d['attestation']['evidence_root'], d['attestation']['trusted_kernel_digest'])"
+          python -c "import json; d=json.load(open('.goal_attestation.json')); assert d['verdict']=='LOCKED'; assert d['attestation']['final_gate']['passed'] is True; assert d['attestation']['runtime_identity_root']; print('LOCKED', d['digest'], d['attestation']['evidence_root'], d['attestation']['runtime_identity_root'], d['attestation']['trusted_kernel_digest'])"
 
       - name: Upload final/current diagnostic artefact bundle
         if: always()
