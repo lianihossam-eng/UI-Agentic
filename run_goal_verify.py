@@ -221,7 +221,6 @@ def main():
         rules_digest_local = hashlib.sha256((BASE/"supported-domain.yaml").read_bytes() + json.dumps(rules_seed, sort_keys=True).encode()).hexdigest()[:16]
         checker_files = ["gvh/verify.py","gvh/extractor.py","core/coverage.py","core/scenario_compiler.py"]
         checker_digest_local = hashlib.sha256(b"".join((BASE/f).read_bytes() for f in checker_files)).hexdigest()[:16]
-        # env manifest digest
         env_path = BASE/"reports/environment_manifest.json"
         env_digest_local = None
         if env_path.exists():
@@ -261,29 +260,20 @@ def main():
             return False, f"hash-mismatch:{name}", data
         if data.get("status") == "PENDING":
             return False, f"pending:{name}", data
-        # binding checks — strict for scenario/evidence/rules/checker/env, lenient for commit (local dev vs CI)
         for field in ["scenario_digest","evidence_root","rules_digest","checker_digest"]:
             if field in data and data.get(field) != binding.get(field):
                 return False, f"binding-mismatch:{name}:{field} expected {binding.get(field)} got {data.get(field)}", data
         if "environment_manifest_digest" in data and binding.get("env_digest") and data.get("environment_manifest_digest") != binding.get("env_digest"):
             return False, f"binding-mismatch:{name}:environment_manifest_digest", data
-        # commit_sha is provenance: warn but not fail-closed locally (CI will enforce via artifact generation)
-        # if "commit_sha" in data and data.get("commit_sha") != binding.get("commit_sha"):
-        #    print(f"WARN binding-mismatch:{name}:commit_sha", file=sys.stderr)
         return True, "ok", data
 
     def _check_traceability_real(trace_data):
-        # deterministic checker: recalc SCENARIOS and verify mapping covers all obligations
-        # Note: transition rules share same scenario_id for two transitions of same model, so we check multiset, not set uniqueness
         try:
             mapping = trace_data.get("mapping", [])
             if len(mapping) != ledger.required:
                 return False, f"mapping len {len(mapping)} != required {ledger.required}"
-            # Build expected list with same ID generation as report (route@viewport:rule)
-            # For transition, report uses same ID for both open/close transitions -> allow duplicates
             expected_ids = [f"{sc.get('route','global')}@{sc.get('viewport',768)}:{sc['rule']}" for sc in SCENARIOS]
             mapped_ids = [m.get("scenario_id") for m in mapping]
-            # Check multiset equality (counts)
             from collections import Counter
             if Counter(expected_ids) != Counter(mapped_ids):
                 return False, f"scenario_ids multiset mismatch"
@@ -306,7 +296,6 @@ def main():
     )
 
     ok_mut, msg_mut, mut_data = _validate_report("mutation_report")
-    # strict per-mutant check
     mut_strict_ok = False
     if ok_mut and mut_data:
         details = mut_data.get("details", [])
@@ -327,7 +316,6 @@ def main():
             if d.get("survivor"):
                 mut_strict_ok = False
                 break
-        # also check owner/rule consistency already in details
     critical_mutants_zero = (
         ok_mut
         and mut_data.get("survived") == 0
@@ -347,7 +335,6 @@ def main():
     parent_contracts_valid = ok_parent and parent_data.get("all_valid") is True and parent_data.get("status") == "PASS"
 
     ok_cross, _, cross_data = _validate_report("cross_layer_report")
-    # cross must have evidence bundles for 3 invariants and snapshot all_pass
     cross_bundles_ok = False
     if ok_cross and cross_data:
         bundles = cross_data.get("evidence_bundles", {})
@@ -360,16 +347,38 @@ def main():
     cross_layer_invariants_complete = ok_cross and cross_data.get("complete") is True and cross_data.get("status") == "PASS" and cross_layer_ledger_complete and cross_bundles_ok
 
     ok_visual, _, visual_data = _validate_report("visual_review")
-    # visual must have screenshot digests and count 15 and snapshot matches hash of digests, and reference to digests.json exists
     visual_screenshots_ok = False
     if ok_visual and visual_data:
         digests = visual_data.get("screenshot_digests", {})
         count = visual_data.get("screenshot_count")
         snap = visual_data.get("snapshot_digest")
-        if isinstance(digests, dict) and count == 15 and len(digests)==15:
+        viewports = DOMAIN.get("viewport_widths", [])
+        default_names = {
+            f"{route.strip('/')}-{viewport}.png"
+            for route in DOMAIN.get("routes", [])
+            for viewport in viewports
+        }
+        modal_routes = {
+            route
+            for route, states in (DOMAIN.get("states_by_route") or {}).items()
+            if "modal-open" in (states or [])
+        }
+        modal_names = {
+            f"{route.strip('/')}-{viewport}-modal-open.png"
+            for route in modal_routes
+            for viewport in viewports
+        }
+        expected_names = default_names | modal_names
+        if (
+            isinstance(digests, dict)
+            and count == len(expected_names)
+            and len(digests) == len(expected_names)
+            and set(digests) == expected_names
+            and visual_data.get("contract") == "visual-v3-exact-snapshot"
+            and set(visual_data.get("required_states") or []) == {"default", "modal-open"}
+        ):
             calc_snap = hashlib.sha256(json.dumps(digests, sort_keys=True).encode()).hexdigest()[:16]
             if calc_snap == snap:
-                # also check file exists
                 dig_path = BASE/"reports/screenshots/digests.json"
                 if dig_path.exists():
                     try:
@@ -380,8 +389,7 @@ def main():
                         pass
     visual_acceptance = ok_visual and visual_data.get("verdict") == "ACCEPTED" and visual_data.get("status") == "PASS" and visual_screenshots_ok
 
-    # gates that remain ledger-derived (no artefact) but still fail-closed
-    certificate_validation = True  # no BOUNDED/CERTIFIED obligation in current executable demo domain
+    certificate_validation = True
     compliance_obligations_complete = not bool(DOMAIN.get("compliance_profiles"))
 
     gate_checks = {
