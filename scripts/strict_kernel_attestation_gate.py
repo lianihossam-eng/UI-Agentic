@@ -42,8 +42,10 @@ def main() -> int:
     if attestation.get("verdict") != "LOCKED":
         fail("attestation is not LOCKED")
     payload = attestation.get("attestation") or {}
-    if payload.get("attestation_version") != "2.1":
-        fail("attestation does not use kernel-bound v2.1 format")
+    if payload.get("attestation_version") != "2.2":
+        fail("attestation does not use runtime+kernel-bound v2.2 format")
+    if not payload.get("runtime_identity_root"):
+        fail("attestation v2.2 missing runtime_identity_root")
 
     actual_manifest = trusted_kernel_manifest(BASE)
     actual_digest = trusted_kernel_digest(BASE)
@@ -72,6 +74,7 @@ def main() -> int:
             {
                 "trusted_kernel_digest": actual_digest,
                 "files": len(actual_manifest),
+                "runtime_identity_root": payload["runtime_identity_root"],
                 "attestation_digest": expected_attestation_digest,
             },
             sort_keys=True,
