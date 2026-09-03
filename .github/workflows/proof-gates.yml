@@ -15,9 +15,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
       - name: Install deps
-        run: pip install pyyaml playwright
+        run: pip install pyyaml playwright==1.61.0
       - name: Run proof-gate unit tests
         run: python -m unittest discover -s tests -v
 
@@ -28,10 +28,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
       - name: Install deps + Chromium
         run: |
-          pip install pyyaml playwright
+          pip install pyyaml playwright==1.61.0
           python -m playwright install --with-deps chromium
       - name: Validate report hashes
         run: |
