@@ -4,3 +4,4 @@ __pycache__/
 .opencode/
 playwright-report/
 test-results/
+.goal_attestation.json
