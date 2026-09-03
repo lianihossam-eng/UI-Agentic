@@ -17,20 +17,45 @@ def check_a11y(page, ir):
         }}))"""
     )
 
-    page.evaluate("() => { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); }")
+    # blur() does not reset Chromium's sequential-focus navigation starting
+    # point. Anchor focus explicitly on BODY with tabindex=-1, which is
+    # programmatically focusable but excluded from sequential Tab order and is
+    # positioned before all descendants. This gives a deterministic real-key
+    # traversal without adding a sequential focus target.
+    body_tabindex = page.evaluate(
+        """() => {
+          const body=document.body;
+          const had=body.hasAttribute('tabindex');
+          const old=body.getAttribute('tabindex');
+          body.setAttribute('tabindex','-1');
+          body.focus();
+          return {had, old, focused:document.activeElement===body};
+        }"""
+    )
+
     actual_indices = []
-    for _ in range(len(focusables)):
-        page.keyboard.press("Tab")
-        active_index = page.evaluate(
-            f"""() => {{
-              const list=[...document.querySelectorAll('{FOCUSABLE_SELECTOR}')].filter(e => {{
-                const s=getComputedStyle(e); const r=e.getBoundingClientRect();
-                return !e.closest('[inert]') && s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0;
-              }});
-              return list.indexOf(document.activeElement);
-            }}"""
-        )
-        actual_indices.append(active_index)
+    if body_tabindex.get("focused"):
+        for _ in range(len(focusables)):
+            page.keyboard.press("Tab")
+            active_index = page.evaluate(
+                f"""() => {{
+                  const list=[...document.querySelectorAll('{FOCUSABLE_SELECTOR}')].filter(e => {{
+                    const s=getComputedStyle(e); const r=e.getBoundingClientRect();
+                    return !e.closest('[inert]') && s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0;
+                  }});
+                  return list.indexOf(document.activeElement);
+                }}"""
+            )
+            actual_indices.append(active_index)
+
+    page.evaluate(
+        """saved => {
+          const body=document.body;
+          if(saved.had) body.setAttribute('tabindex', saved.old ?? '');
+          else body.removeAttribute('tabindex');
+        }""",
+        body_tabindex,
+    )
 
     findings = []
     if not focusables:
@@ -40,6 +65,17 @@ def check_a11y(page, ir):
                 "owner": "PAGE",
                 "status": "UNKNOWN",
                 "reason": "no-focusable-elements",
+            }
+        )
+    elif not body_tabindex.get("focused"):
+        findings.append(
+            {
+                "constraint": "accessibility.focus-order",
+                "owner": "PAGE",
+                "status": "UNKNOWN",
+                "reason": "cannot-establish-keyboard-traversal-anchor",
+                "focusable_keys": [item["key"] for item in focusables],
+                "measured_count": len(focusables),
             }
         )
     else:
@@ -53,6 +89,7 @@ def check_a11y(page, ir):
                 "actual_indices": actual_indices,
                 "focusable_keys": [item["key"] for item in focusables],
                 "measured_count": len(focusables),
+                "traversal_anchor": "body[tabindex=-1]",
             }
         )
 
