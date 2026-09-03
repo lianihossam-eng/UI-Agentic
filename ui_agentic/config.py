@@ -121,16 +121,19 @@ def resolve_source_root(project_root: pathlib.Path, config: dict) -> pathlib.Pat
 
 
 def project_digest(root: pathlib.Path) -> str:
-    """Hash the local project source tree deterministically.
+    """Hash the local application source tree deterministically.
 
-    Volatile/generated directories are excluded. Symlinks are hashed by their
-    relative path and link target instead of dereferencing them.
+    Volatile/generated verifier state, dependency/build directories and the
+    UI-Agentic contract itself are excluded so changing the verification scope
+    does not masquerade as a change to the application subject.
     """
     root = root.resolve()
     digest = hashlib.sha256()
     files: list[pathlib.Path] = []
     for path in root.rglob("*"):
         rel = path.relative_to(root)
+        if rel.as_posix() == CONFIG_NAME:
+            continue
         if any(part in _EXCLUDED_DIRS for part in rel.parts):
             continue
         if path.is_file() or path.is_symlink():
