@@ -2,8 +2,8 @@
 
 Must run only after run_goal_verify.py and the pre-attestation gate have passed.
 The resulting attestation binds the current commit, environment, report root,
-visual snapshot, Evidence DAG root, runtime binaries/fonts and complete Trusted
-Verification Kernel.
+visual snapshot, Evidence DAG root, measurement kernel, runtime binaries/fonts
+and complete Trusted Verification Kernel.
 """
 from __future__ import annotations
 
@@ -19,6 +19,7 @@ BASE = pathlib.Path(__file__).resolve().parent.parent
 if str(BASE) not in sys.path:
     sys.path.insert(0, str(BASE))
 
+from core.measurement_kernel import measurement_kernel_digest
 from core.trust_kernel import trusted_kernel_digest, trusted_kernel_manifest
 
 REPORT_DIR = BASE / "reports"
@@ -75,6 +76,12 @@ def main() -> int:
     if manifest.get("evidence_root") != result.get("evidence_root"):
         fail("environment manifest evidence root != final result")
 
+    measurement_root = measurement_kernel_digest()
+    if manifest.get("measurement_kernel_digest") != measurement_root:
+        fail("environment manifest measurement kernel mismatch")
+    if result.get("measurement_kernel_digest") != measurement_root:
+        fail("final result measurement kernel mismatch")
+
     report_hashes = {}
     for name in REPORT_NAMES:
         report = load(REPORT_DIR / f"{name}.json")
@@ -104,6 +111,8 @@ def main() -> int:
         fail("current_run_evidence root mismatch")
     if current_run.get("visual_snapshot_digest") != visual_root:
         fail("current_run_evidence visual snapshot mismatch")
+    if current_run.get("measurement_kernel_digest") != measurement_root:
+        fail("current_run_evidence measurement kernel mismatch")
 
     runtime = load(REPORT_DIR / "runtime_identity.json")
     runtime_payload = {
@@ -146,12 +155,13 @@ def main() -> int:
     )
 
     payload = {
-        "attestation_version": "2.2",
+        "attestation_version": "2.3",
         "subject": {"commit_sha": commit, "build_digest": commit},
         "contract": "public-audit-contract-v2",
         "scenario_digest": manifest.get("scenario_digest"),
         "rules_digest": manifest.get("rules_digest"),
         "checker_digest": manifest.get("checker_digest"),
+        "measurement_kernel_digest": measurement_root,
         "trusted_kernel_digest": kernel_digest,
         "trusted_kernel_manifest": kernel_manifest,
         "environment_manifest_digest": manifest.get("manifest_digest"),
@@ -174,7 +184,9 @@ def main() -> int:
         "digest_algo": "sha256",
         "verdict": "LOCKED",
     }
-    (BASE / ".goal_attestation.json").write_text(json.dumps(attestation, indent=2, sort_keys=True))
+    (BASE / ".goal_attestation.json").write_text(
+        json.dumps(attestation, indent=2, sort_keys=True)
+    )
     print(
         "FINAL ATTESTATION LOCKED",
         json.dumps(
@@ -182,6 +194,7 @@ def main() -> int:
                 "digest": digest,
                 "commit_sha": commit,
                 "evidence_root": payload["evidence_root"],
+                "measurement_kernel_digest": measurement_root,
                 "reports_root": reports_root,
                 "visual_evidence_root": visual_root,
                 "runtime_identity_root": runtime_root,
