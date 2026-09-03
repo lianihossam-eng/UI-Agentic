@@ -1,7 +1,13 @@
+import pathlib
 import unittest
+
+import yaml
 
 from core.attestation import attest, checker
 from core.coverage import CoverageLedger, final_confirmation_gate
+from core.scenario_compiler import compile as compile_scenarios
+
+BASE = pathlib.Path(__file__).resolve().parent.parent
 
 
 class ProofGateTests(unittest.TestCase):
@@ -63,6 +69,25 @@ class ProofGateTests(unittest.TestCase):
             "domain": [320, 1440],
         }
         self.assertTrue(checker(bounded))
+
+    def test_compiler_emits_150_unique_obligations(self):
+        domain = yaml.safe_load((BASE / "supported-domain.yaml").read_text())["supported_domain"]
+        scenarios = compile_scenarios(domain)
+        ids = [scenario["scenario_id"] for scenario in scenarios]
+        self.assertEqual(len(scenarios), 150)
+        self.assertEqual(len(ids), len(set(ids)))
+        self.assertTrue(all(scenario["required_proof_level"] == "observed" for scenario in scenarios))
+
+    def test_transitions_are_executed_at_all_declared_viewports(self):
+        domain = yaml.safe_load((BASE / "supported-domain.yaml").read_text())["supported_domain"]
+        scenarios = compile_scenarios(domain)
+        transitions = [scenario for scenario in scenarios if scenario["rule"].startswith("transition:")]
+        self.assertEqual(len(transitions), 20)
+        self.assertEqual(
+            {scenario["viewport"] for scenario in transitions},
+            set(domain["viewport_widths"]),
+        )
+        self.assertEqual(len({scenario["scenario_id"] for scenario in transitions}), 20)
 
 
 if __name__ == "__main__":
