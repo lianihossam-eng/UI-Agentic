@@ -163,12 +163,14 @@ class ProofGateTests(unittest.TestCase):
         self.assertTrue(all(scenario["transition"]["action"] == "press:Escape" for scenario in escape))
         self.assertEqual({scenario["viewport"] for scenario in escape}, set(domain["viewport_widths"]))
 
-    def test_mutation_contract_has_15_unique_required_mutants(self):
+    def test_mutation_contract_has_17_unique_required_mutants(self):
         ids = [mutant["id"] for mutant in MUTANTS]
-        self.assertEqual(len(ids), 15)
+        self.assertEqual(len(ids), 17)
         self.assertEqual(len(ids), len(set(ids)))
         self.assertIn("M14-escape-transition-handler-missing", ids)
         self.assertIn("M15-modal-close-removed-from-tab-order", ids)
+        self.assertIn("M16-horizontal-overflow", ids)
+        self.assertIn("M17-layout-collision", ids)
 
 
 if __name__ == "__main__":
