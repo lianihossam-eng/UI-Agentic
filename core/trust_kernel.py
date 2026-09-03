@@ -2,7 +2,7 @@
 
 Every authoritative proof artifact must bind this digest. The manifest includes
 this file itself, all measurement/checker code, all final gates/finalizers, the
-proof-gate tests, and the CI recipe + dependency lock that execute them.
+runtime identity logic, proof-gate tests, and the CI recipe + dependency lock.
 """
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ BASE = pathlib.Path(__file__).resolve().parent.parent
 
 TRUSTED_KERNEL_FILES = (
     "core/trust_kernel.py",
+    "core/runtime_identity.py",
     "core/coverage.py",
     "core/scenario_compiler.py",
     "core/attestation.py",
@@ -28,6 +29,8 @@ TRUSTED_KERNEL_FILES = (
     "scripts/capture_current_run_evidence.py",
     "scripts/build_traceability_report.py",
     "scripts/strict_obligation_gate.py",
+    "scripts/capture_runtime_identity.py",
+    "scripts/strict_runtime_identity_gate.py",
     "scripts/enforce_visual_contract.py",
     "scripts/strict_visual_gate.py",
     "scripts/pre_attestation_gate.py",
