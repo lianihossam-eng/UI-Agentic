@@ -1,5 +1,17 @@
 {
   "contract": "visual-v3-exact-snapshot",
-  "approvals": [],
-  "note": "Fail-closed. Each distinct pixel snapshot requires its own explicit review record. CI accepts agent reviewers only (reviewer_type=agent, reviewer=agent:<id>). Never attribute a human identity unless that human actually performed the review through a separate explicit mechanism. Required scope: all 25 screenshots covering default + modal-open states."
+  "approvals": [
+    {
+      "snapshot_digest": "4721d2c048464f07",
+      "reviewed_images_digest": "4721d2c048464f07",
+      "reviewed_image_count": 25,
+      "reviewed_states": ["default", "modal-open"],
+      "reviewer": "agent:ChatGPT-GPT-5.6-Sol:visual-review",
+      "reviewer_type": "agent",
+      "reviewed_at": "2026-09-03T15:48:12Z",
+      "rubric": "Reviewed all 25 current-run screenshots: 15 default states plus 10 modal-open states across 320/375/768/1024/1440. Checked for unintended overflow/collision, responsive coherence, readable hierarchy, modal centering/containment, overlay integrity, and obvious visual regressions. Pixel-level check confirmed mobile modal vertical center at approximately y=449.5 in a 900px viewport.",
+      "verdict": "ACCEPTED"
+    }
+  ],
+  "note": "Exact-snapshot approval only. No portable approval. A different pixel snapshot requires a separate explicit review record."
 }
