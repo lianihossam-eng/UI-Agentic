@@ -4,7 +4,7 @@
 .chart{height:280px;background:linear-gradient(135deg,#e0f2fe,#f0f9ff);border:1px solid #e2e8f0;border-radius:8px;display:grid;place-items:center;margin-bottom:24px}
 .table{width:100%;border-collapse:collapse}.table th,.table td{border:1px solid #e2e8f0;padding:8px;text-align:left}
 button{padding:8px 16px;min-width:44px;min-height:44px}
-.modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.4)}.modal[open]{display:grid}.modal .box{background:white;padding:24px;border-radius:12px;width:480px}
+.modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.4);padding:16px}.modal[open]{display:grid}.modal .box{background:white;padding:24px;border-radius:12px;width:min(480px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto}
 @media (max-width: 767px){.shell{flex-direction:column}.sidebar{width:100%;min-height:auto;padding:16px}.kpi-row{grid-template-columns:1fr 1fr}.chart{height:180px}}
 </style></head><body>
 <div class="shell"><aside class="sidebar" data-testid="sidebar">Sidebar</aside>
@@ -19,20 +19,34 @@ button{padding:8px 16px;min-width:44px;min-height:44px}
   </div>
   <div class="chart" data-testid="chart">Chart placeholder</div>
   <table class="table" data-testid="table"><tr><th>Channel</th><th>Value</th></tr><tr><td>Organic</td><td>42%</td></tr></table>
-  <div class="modal" data-testid="modal"><div class="box" role="dialog" aria-modal="true"><h2>Drilldown</h2><button data-testid="close">Fermer</button></div></div>
 </main></div>
+<div class="modal" data-testid="modal"><div class="box" role="dialog" aria-modal="true" aria-labelledby="analytics-dialog-title"><h2 id="analytics-dialog-title">Drilldown</h2><button data-testid="close">Fermer</button></div></div>
 <script>
 (() => {
+  const shell=document.querySelector('.shell');
   const modal=document.querySelector('[data-testid="modal"]');
   const opener=document.querySelector('[data-testid="open-modal"]');
   const closer=document.querySelector('[data-testid="close"]');
-  opener.addEventListener('click', () => {
+  const open=() => {
+    shell.setAttribute('inert','');
     modal.setAttribute('open','');
     closer.focus();
-  });
-  closer.addEventListener('click', () => {
+  };
+  const close=() => {
     modal.removeAttribute('open');
+    shell.removeAttribute('inert');
     opener.focus();
+  };
+  opener.addEventListener('click', open);
+  closer.addEventListener('click', close);
+  modal.addEventListener('keydown', event => {
+    if(event.key==='Tab'){
+      event.preventDefault();
+      closer.focus();
+    } else if(event.key==='Escape'){
+      event.preventDefault();
+      close();
+    }
   });
 })();
 </script>
