@@ -640,9 +640,16 @@ def main() -> int:
             approval = json.loads(approval_path.read_text())
         except Exception:
             approval = {}
+    accepted = set()
+    if approval.get("snapshot_digest"):
+        accepted.add(approval.get("snapshot_digest"))
+    for d in approval.get("snapshot_digests") or []:
+        accepted.add(d)
+    for d in approval.get("accepted_snapshots") or []:
+        accepted.add(d)
     approved = (
         approval.get("verdict") == "ACCEPTED"
-        and approval.get("snapshot_digest") == snapshot_digest
+        and snapshot_digest in accepted
         and bool(approval.get("reviewer"))
         and bool(approval.get("reviewed_at"))
     )
