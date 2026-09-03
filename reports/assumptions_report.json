@@ -1,5 +1,7 @@
 {
   "assumptions": [],
+  "checker_digest": "920ae5aaa6401f93",
+  "commit_sha": "9d06596d6930e2e4e7db2d26a862555b1bf2d1f5",
   "documented_assumptions": [
     {
       "id": "A1",
@@ -17,9 +19,13 @@
       "text": "no hydration async required (static templates)"
     }
   ],
+  "environment_manifest_digest": "e3552579efe7f8df",
+  "evidence_root": "3de70793411e3277",
   "generated_at": "2026-09-03T08:30:00Z",
-  "report_hash": "23b4c404d9f58dd0",
+  "report_hash": "1f8e1a66ba6d8b53",
   "report_hash_algo": "sha256:16",
+  "rules_digest": "fabd8f3a8bfa1f50",
+  "scenario_digest": "5d43a5ee4cc4f8f5",
   "status": "PASS",
   "unstated_count": 0
 }

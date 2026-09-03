@@ -27,6 +27,8 @@
       "total": 1
     }
   },
+  "checker_digest": "920ae5aaa6401f93",
+  "commit_sha": "9d06596d6930e2e4e7db2d26a862555b1bf2d1f5",
   "critical_mutants_zero": true,
   "details": [
     {
@@ -128,25 +130,29 @@
     {
       "baseline_status": "PASS",
       "detected": true,
-      "evidence_key": "6c98a969032b",
+      "evidence_key": "8e6dc27f5cf4",
       "expected_status": "FAIL",
       "id": "M7-breakpoint-incorrect",
       "layer": "geometry",
       "mutated_status": "FAIL",
-      "owner_expected": "PAGE",
+      "owner_expected": "FAMILY",
       "revert_ok": true,
       "revert_status": "PASS",
       "route": "/orders",
-      "rule_expected": "group.uniform_gap",
+      "rule_expected": "breakpoint.shell.direction",
       "survivor": false,
       "viewport": 375
     }
   ],
   "detected": 7,
+  "environment_manifest_digest": "e3552579efe7f8df",
+  "evidence_root": "3de70793411e3277",
   "generated_at": "2026-09-03T08:35:00Z",
   "mutants_total": 7,
-  "report_hash": "d6cb7e237c67120a",
+  "report_hash": "8ea7ffd721191e22",
   "report_hash_algo": "sha256:16",
+  "rules_digest": "fabd8f3a8bfa1f50",
+  "scenario_digest": "5d43a5ee4cc4f8f5",
   "status": "PASS",
   "survived": 0,
   "survivors": []

@@ -60,3 +60,60 @@ jobs:
           python run_goal_verify.py > /tmp/a.json
           python run_goal_verify.py > /tmp/b.json
           python -c "import json; a=json.load(open('/tmp/a.json')); b=json.load(open('/tmp/b.json')); assert a['evidence_root']==b['evidence_root'], (a['evidence_root'], b['evidence_root']); assert a['coverage']==b['coverage']; print('reproducible', a['evidence_root'])"
+      - name: Provenance fail-closed tests
+        run: |
+          python -c "
+          import json, hashlib, pathlib, subprocess, shutil
+          base=pathlib.Path('.')
+          # 1: tamper scenario_digest
+          p=base/'reports/traceability_report.json'
+          orig=json.loads(p.read_text())
+          tamper=json.loads(p.read_text())
+          tamper['scenario_digest']='0000000000000000'
+          copy={k:v for k,v in tamper.items() if k not in ('report_hash','report_hash_algo')}
+          tamper['report_hash']=hashlib.sha256(json.dumps(copy, sort_keys=True).encode()).hexdigest()[:16]
+          p.write_text(json.dumps(tamper, indent=2, sort_keys=True))
+          r=subprocess.run(['python','run_goal_verify.py'], capture_output=True)
+          assert r.returncode==2, 'scenario_digest tamper should block'
+          print('scenario_digest tamper blocked OK')
+          p.write_text(json.dumps(orig, indent=2, sort_keys=True))
+          # 2: tamper evidence_root
+          p2=base/'reports/mutation_report.json'
+          orig2=json.loads(p2.read_text())
+          tamper2=json.loads(p2.read_text())
+          tamper2['evidence_root']='ffffffffffffffff'
+          copy2={k:v for k,v in tamper2.items() if k not in ('report_hash','report_hash_algo')}
+          tamper2['report_hash']=hashlib.sha256(json.dumps(copy2, sort_keys=True).encode()).hexdigest()[:16]
+          p2.write_text(json.dumps(tamper2, indent=2, sort_keys=True))
+          r2=subprocess.run(['python','run_goal_verify.py'], capture_output=True)
+          assert r2.returncode==2, 'evidence_root tamper should block'
+          print('evidence_root tamper blocked OK')
+          p2.write_text(json.dumps(orig2, indent=2, sort_keys=True))
+          # 3: delete one traceability entry
+          p3=base/'reports/traceability_report.json'
+          orig3=json.loads(p3.read_text())
+          tamper3=json.loads(p3.read_text())
+          tamper3['mapping']=tamper3['mapping'][:-1]
+          tamper3['traced_obligations']=len(tamper3['mapping'])
+          copy3={k:v for k,v in tamper3.items() if k not in ('report_hash','report_hash_algo')}
+          tamper3['report_hash']=hashlib.sha256(json.dumps(copy3, sort_keys=True).encode()).hexdigest()[:16]
+          p3.write_text(json.dumps(tamper3, indent=2, sort_keys=True))
+          r3=subprocess.run(['python','run_goal_verify.py'], capture_output=True)
+          assert r3.returncode==2, 'deleted traceability entry should block'
+          print('traceability deletion blocked OK')
+          p3.write_text(json.dumps(orig3, indent=2, sort_keys=True))
+          # final restore and verify passes
+          r4=subprocess.run(['python','run_goal_verify.py'], capture_output=True)
+          assert r4.returncode==0, 'should pass after restore'
+          print('provenance tests all pass')
+          "
+      - name: Upload final artefact bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-agentic-bundle-${{ github.sha }}
+          path: |
+            .goal_attestation.json
+            reports/
+            reports/screenshots/
+            reports/environment_manifest.json
+          retention-days: 30

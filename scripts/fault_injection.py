@@ -115,16 +115,15 @@ MUTANTS = [
     {
         "id": "M7-breakpoint-incorrect",
         "layer": "geometry",
-        "rule": "group.uniform_gap",
-        "owner": "PAGE",
+        "rule": "breakpoint.shell.direction",
+        "owner": "FAMILY",
         "route": "/orders",
         "viewport": 375,
         "inject": """
-            // Force shell to stay row at narrow viewport (should be column) and grid to stay 1fr incorrectly at wide?
-            // For 375, inject a gap anomaly that also violates uniform_gap interval check
+            // Pure breakpoint policy violation: shell must be column at 375, force row
             const style=document.createElement('style');
             style.id='mut-bp';
-            style.textContent='@media (max-width:767px){ .shell{flex-direction:row !important} .grid{gap:7px !important} }';
+            style.textContent='.shell{flex-direction:row !important}';
             document.head.appendChild(style);
         """,
         "expect_status": "FAIL",

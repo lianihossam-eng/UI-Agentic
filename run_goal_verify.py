@@ -1,10 +1,13 @@
 import hashlib
 import json
 import pathlib
+import subprocess
 import sys
+import platform
 
 import yaml
 from playwright.sync_api import sync_playwright
+import importlib.metadata
 
 from core.attestation import attest
 from core.coverage import CoverageLedger, EvidenceDAG, final_confirmation_gate, measurement_readiness
@@ -208,58 +211,174 @@ def main():
     cross_layer_ledger_complete = bool(cross_layer_results) and all(item.get("status") == "PASS" for item in cross_layer_results)
     readiness_complete = bool(readiness_results) and all(item.get("status") == "PASS" for item in readiness_results)
 
+    def _current_binding(evidence_root):
+        try:
+            commit_sha = subprocess.check_output(["git","rev-parse","HEAD"], cwd=BASE).decode().strip()
+        except:
+            commit_sha = "unknown"
+        scenario_digest_local = hashlib.sha256(json.dumps(SCENARIOS, sort_keys=True).encode()).hexdigest()[:16]
+        rules_seed = ["group.uniform_gap","global.spacing.scale","paint.contrast.text","component.button.hit-target","TARGET_OPERABLE","accessibility.focus-order","FOCUS_USABLE","temporal.geometry-stable","MODAL_INTEGRITY","breakpoint.shell.direction"]
+        rules_digest_local = hashlib.sha256((BASE/"supported-domain.yaml").read_bytes() + json.dumps(rules_seed, sort_keys=True).encode()).hexdigest()[:16]
+        checker_files = ["gvh/verify.py","gvh/extractor.py","core/coverage.py","core/scenario_compiler.py"]
+        checker_digest_local = hashlib.sha256(b"".join((BASE/f).read_bytes() for f in checker_files)).hexdigest()[:16]
+        # env manifest digest
+        env_path = BASE/"reports/environment_manifest.json"
+        env_digest_local = None
+        if env_path.exists():
+            try:
+                env_data = json.loads(env_path.read_text())
+                copy = {k:v for k,v in env_data.items() if k not in ("manifest_digest","manifest_hash_algo")}
+                env_digest_local = hashlib.sha256(json.dumps(copy, sort_keys=True).encode()).hexdigest()[:16]
+            except:
+                env_digest_local = None
+        return {
+            "commit_sha": commit_sha,
+            "scenario_digest": scenario_digest_local,
+            "rules_digest": rules_digest_local,
+            "checker_digest": checker_digest_local,
+            "evidence_root": evidence_root,
+            "env_digest": env_digest_local,
+            "browser_version": browser_version,
+        }
+
+    evidence_root_local = dag.root_digest()
+    binding = _current_binding(evidence_root_local)
+
     def _validate_report(name):
         p = BASE / "reports" / f"{name}.json"
         if not p.exists():
-            return False, f"missing:{name}"
+            return False, f"missing:{name}", None
         try:
             data = json.loads(p.read_text())
         except Exception as exc:
-            return False, f"invalid-json:{name}:{exc}"
+            return False, f"invalid-json:{name}:{exc}", None
         expected = data.get("report_hash")
         if not expected:
-            return False, f"no-hash:{name}"
+            return False, f"no-hash:{name}", data
         copy = {k: v for k, v in data.items() if k not in ("report_hash", "report_hash_algo")}
         computed = hashlib.sha256(json.dumps(copy, sort_keys=True).encode()).hexdigest()[:16]
         if computed != expected:
-            return False, f"hash-mismatch:{name}"
+            return False, f"hash-mismatch:{name}", data
         if data.get("status") == "PENDING":
-            return False, f"pending:{name}"
-        return True, data
+            return False, f"pending:{name}", data
+        # binding checks — strict for scenario/evidence/rules/checker/env, lenient for commit (local dev vs CI)
+        for field in ["scenario_digest","evidence_root","rules_digest","checker_digest"]:
+            if field in data and data.get(field) != binding.get(field):
+                return False, f"binding-mismatch:{name}:{field} expected {binding.get(field)} got {data.get(field)}", data
+        if "environment_manifest_digest" in data and binding.get("env_digest") and data.get("environment_manifest_digest") != binding.get("env_digest"):
+            return False, f"binding-mismatch:{name}:environment_manifest_digest", data
+        # commit_sha is provenance: warn but not fail-closed locally (CI will enforce via artifact generation)
+        # if "commit_sha" in data and data.get("commit_sha") != binding.get("commit_sha"):
+        #    print(f"WARN binding-mismatch:{name}:commit_sha", file=sys.stderr)
+        return True, "ok", data
 
-    # --- artefact-derived gates (fail-closed: absent/invalid/stale => False) ---
-    ok_trace, trace_data = _validate_report("traceability_report")
+    def _check_traceability_real(trace_data):
+        # deterministic checker: recalc SCENARIOS and verify mapping covers all obligations
+        # Note: transition rules share same scenario_id for two transitions of same model, so we check multiset, not set uniqueness
+        try:
+            mapping = trace_data.get("mapping", [])
+            if len(mapping) != ledger.required:
+                return False, f"mapping len {len(mapping)} != required {ledger.required}"
+            # Build expected list with same ID generation as report (route@viewport:rule)
+            # For transition, report uses same ID for both open/close transitions -> allow duplicates
+            expected_ids = [f"{sc.get('route','global')}@{sc.get('viewport',768)}:{sc['rule']}" for sc in SCENARIOS]
+            mapped_ids = [m.get("scenario_id") for m in mapping]
+            # Check multiset equality (counts)
+            from collections import Counter
+            if Counter(expected_ids) != Counter(mapped_ids):
+                return False, f"scenario_ids multiset mismatch"
+            for m in mapping:
+                if not all(k in m for k in ("requirement","failure_mode","rule","scenario_id")):
+                    return False, f"mapping entry missing keys {m}"
+            return True, "ok"
+        except Exception as exc:
+            return False, f"traceability-check-error:{exc}"
+
+    ok_trace, msg_trace, trace_data = _validate_report("traceability_report")
+    trace_real_ok, trace_real_msg = _check_traceability_real(trace_data) if ok_trace else (False, "no-trace")
     requirement_traceability = (
         ok_trace
         and trace_data.get("percentage") == 100
         and trace_data.get("traced_obligations") == ledger.required
         and trace_data.get("required_obligations") == ledger.required
         and trace_data.get("status") == "PASS"
+        and trace_real_ok
     )
 
-    ok_mut, mut_data = _validate_report("mutation_report")
+    ok_mut, msg_mut, mut_data = _validate_report("mutation_report")
+    # strict per-mutant check
+    mut_strict_ok = False
+    if ok_mut and mut_data:
+        details = mut_data.get("details", [])
+        mut_strict_ok = True
+        for d in details:
+            if d.get("baseline_status") != "PASS":
+                mut_strict_ok = False
+                break
+            if not d.get("detected"):
+                mut_strict_ok = False
+                break
+            if d.get("mutated_status") not in ("FAIL","UNKNOWN"):
+                mut_strict_ok = False
+                break
+            if d.get("revert_status") != "PASS":
+                mut_strict_ok = False
+                break
+            if d.get("survivor"):
+                mut_strict_ok = False
+                break
+        # also check owner/rule consistency already in details
     critical_mutants_zero = (
         ok_mut
         and mut_data.get("survived") == 0
         and mut_data.get("critical_mutants_zero") is True
         and mut_data.get("status") == "PASS"
         and mut_data.get("mutants_total") >= 7
+        and mut_strict_ok
     )
 
-    ok_assump, assump_data = _validate_report("assumptions_report")
+    ok_assump, _, assump_data = _validate_report("assumptions_report")
     unstated_assumptions_zero = ok_assump and assump_data.get("unstated_count") == 0 and assump_data.get("status") == "PASS"
 
-    ok_regress, regress_data = _validate_report("regression_report")
+    ok_regress, _, regress_data = _validate_report("regression_report")
     regression_closed = ok_regress and regress_data.get("closed") is True and regress_data.get("status") == "PASS"
 
-    ok_parent, parent_data = _validate_report("parent_contract_report")
+    ok_parent, _, parent_data = _validate_report("parent_contract_report")
     parent_contracts_valid = ok_parent and parent_data.get("all_valid") is True and parent_data.get("status") == "PASS"
 
-    ok_cross, cross_data = _validate_report("cross_layer_report")
-    cross_layer_invariants_complete = ok_cross and cross_data.get("complete") is True and cross_data.get("status") == "PASS" and cross_layer_ledger_complete
+    ok_cross, _, cross_data = _validate_report("cross_layer_report")
+    # cross must have evidence bundles for 3 invariants and snapshot all_pass
+    cross_bundles_ok = False
+    if ok_cross and cross_data:
+        bundles = cross_data.get("evidence_bundles", {})
+        snap = cross_data.get("snapshot_evidence", {})
+        cross_bundles_ok = (
+            all(k in bundles for k in ("TARGET_OPERABLE","FOCUS_USABLE","MODAL_INTEGRITY"))
+            and snap.get("all_pass") is True
+            and all(snap.get(f"{k}_status")=="PASS" for k in ("TARGET_OPERABLE","FOCUS_USABLE","MODAL_INTEGRITY"))
+        )
+    cross_layer_invariants_complete = ok_cross and cross_data.get("complete") is True and cross_data.get("status") == "PASS" and cross_layer_ledger_complete and cross_bundles_ok
 
-    ok_visual, visual_data = _validate_report("visual_review")
-    visual_acceptance = ok_visual and visual_data.get("verdict") == "ACCEPTED" and visual_data.get("status") == "PASS"
+    ok_visual, _, visual_data = _validate_report("visual_review")
+    # visual must have screenshot digests and count 15 and snapshot matches hash of digests, and reference to digests.json exists
+    visual_screenshots_ok = False
+    if ok_visual and visual_data:
+        digests = visual_data.get("screenshot_digests", {})
+        count = visual_data.get("screenshot_count")
+        snap = visual_data.get("snapshot_digest")
+        if isinstance(digests, dict) and count == 15 and len(digests)==15:
+            calc_snap = hashlib.sha256(json.dumps(digests, sort_keys=True).encode()).hexdigest()[:16]
+            if calc_snap == snap:
+                # also check file exists
+                dig_path = BASE/"reports/screenshots/digests.json"
+                if dig_path.exists():
+                    try:
+                        file_dig = json.loads(dig_path.read_text())
+                        if file_dig == digests:
+                            visual_screenshots_ok = True
+                    except:
+                        pass
+    visual_acceptance = ok_visual and visual_data.get("verdict") == "ACCEPTED" and visual_data.get("status") == "PASS" and visual_screenshots_ok
 
     # gates that remain ledger-derived (no artefact) but still fail-closed
     certificate_validation = True  # no BOUNDED/CERTIFIED obligation in current executable demo domain

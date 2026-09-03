@@ -1,5 +1,8 @@
 {
+  "checker_digest": "920ae5aaa6401f93",
+  "commit_sha": "9d06596d6930e2e4e7db2d26a862555b1bf2d1f5",
   "complete": true,
+  "environment_manifest_digest": "e3552579efe7f8df",
   "evidence_bundles": {
     "FOCUS_USABLE": {
       "boxShadow": "none",
@@ -33,6 +36,7 @@
       "visible": true
     }
   },
+  "evidence_root": "3de70793411e3277",
   "generated_at": "2026-09-03T08:30:00Z",
   "invariants": [
     {
@@ -74,8 +78,10 @@
       "verified": true
     }
   ],
-  "report_hash": "c70b858cd94ff43d",
+  "report_hash": "77671a7fc470d48a",
   "report_hash_algo": "sha256:16",
+  "rules_digest": "fabd8f3a8bfa1f50",
+  "scenario_digest": "5d43a5ee4cc4f8f5",
   "snapshot_evidence": {
     "FOCUS_USABLE_status": "PASS",
     "MODAL_INTEGRITY_status": "PASS",

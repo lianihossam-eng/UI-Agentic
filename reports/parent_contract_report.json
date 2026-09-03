@@ -1,5 +1,7 @@
 {
   "all_valid": true,
+  "checker_digest": "920ae5aaa6401f93",
+  "commit_sha": "9d06596d6930e2e4e7db2d26a862555b1bf2d1f5",
   "contracts": [
     {
       "id": "global.spacing.scale",
@@ -38,9 +40,13 @@
       "valid": true
     }
   ],
+  "environment_manifest_digest": "e3552579efe7f8df",
+  "evidence_root": "3de70793411e3277",
   "generated_at": "2026-09-03T08:30:00Z",
-  "report_hash": "f59d1fb88c0c563c",
+  "report_hash": "a8ebb32efdb61a2f",
   "report_hash_algo": "sha256:16",
+  "rules_digest": "fabd8f3a8bfa1f50",
+  "scenario_digest": "5d43a5ee4cc4f8f5",
   "shell_family_contract": "shell flex column @767 holds without local page patch",
   "status": "PASS"
 }

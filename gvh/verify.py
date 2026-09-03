@@ -115,6 +115,34 @@ def _check_modal_integrity(page):
     }
 
 
+def _check_breakpoint(page, ir):
+    """Breakpoint policy: shell flex direction column <=767 else row."""
+    try:
+        vp = ir.get("viewport", {}).get("width", page.viewport_size.get("width", 1024) if hasattr(page, "viewport_size") else 1024)
+    except:
+        vp = 1024
+    evidence = page.evaluate(
+        """() => {
+          const shell=document.querySelector('.shell');
+          if(!shell) return {found:false};
+          const s=getComputedStyle(shell);
+          return {found:true, flexDirection:s.flexDirection, display:s.display};
+        }"""
+    )
+    if not evidence.get("found"):
+        return {"layer":"geometry","constraint":"breakpoint.shell.direction","owner":"FAMILY","status":"UNKNOWN","reason":"shell-not-found","proof_level":"observed"}
+    expected = "column" if vp <= 767 else "row"
+    actual = evidence.get("flexDirection")
+    passed = actual == expected
+    return {
+        "layer":"geometry","constraint":"breakpoint.shell.direction","owner":"FAMILY",
+        "status":"PASS" if passed else "FAIL",
+        "proof_level":"observed",
+        "expected":expected,"actual":actual,"viewport":vp,
+        "evidence_bundle": evidence,
+    }
+
+
 def verify_all(ir, page=None):
     findings = []
 
@@ -138,6 +166,7 @@ def verify_all(ir, page=None):
     findings.append(_check_modal_integrity(page))
 
     findings.append(_check_global_spacing(page))
+    findings.append(_check_breakpoint(page, ir))
 
     for finding in check_paint(ir):
         findings.append({
