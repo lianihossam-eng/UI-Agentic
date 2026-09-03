@@ -1,17 +1,40 @@
 supported_domain:
   routes: ["/orders", "/settings", "/analytics"]
-  viewport_ranges: { width: [320, 1440], height: [600, 900] }
-  containers: ["main:[720,1152]"]
-  states: [default, hover, focus, loading, empty, error, modal-open]
+  viewport_widths: [320, 375, 768, 1024, 1440]
+  viewport_height: 900
+  states_by_route:
+    /orders: [default]
+    /settings: [default, modal-open]
+    /analytics: [default, modal-open]
   state_transition_models:
-    - {id: order-flow, initial: default, states: [default, loading, success], transitions: ["default --load --> loading","loading --success --> success"]}
-    - {id: settings-modal, initial: default, states: [default, modal-open], transitions: ["default --open --> modal-open","modal-open --close --> default"], invariants: ["MODAL_INTEGRITY"]}
-    - {id: analytics-drilldown, initial: default, states: [default, modal-open], transitions: ["default --drill --> modal-open"], invariants: ["MODAL_INTEGRITY"]}
-  content_extremes: {label: [1, 120], items: [0, 100]}
-  input_modalities: [mouse, keyboard, touch]
+    - id: settings-modal
+      route: /settings
+      initial: default
+      states: [default, modal-open]
+      transitions:
+        - {from: default, event: open, to: modal-open, action: "click:[data-testid='open-modal']", assertion: "modal-open"}
+        - {from: modal-open, event: close, to: default, action: "click:[data-testid='close']", assertion: "modal-closed"}
+      invariants: [MODAL_INTEGRITY]
+    - id: analytics-drilldown
+      route: /analytics
+      initial: default
+      states: [default, modal-open]
+      transitions:
+        - {from: default, event: drill, to: modal-open, action: "click:[data-testid='open-modal']", assertion: "modal-open"}
+        - {from: modal-open, event: close, to: default, action: "click:[data-testid='close']", assertion: "modal-closed"}
+      invariants: [MODAL_INTEGRITY]
+  input_modalities: [mouse, keyboard]
   locales_directions: ["fr-LTR"]
-  browsers_platforms: ["chromium@latest"]
+  browsers_platforms: ["chromium@playwright-managed"]
   zoom_dpr: ["100%", "DPR 1"]
-  temporal_async_scenarios: ["hydration","fonts.ready","chart-render"]
-  opaque_surface_adapters: [{surface: chart, instrumentation: "chart canvas opaque — external box only BOUNDED"}]
-  compliance_profiles: [{standard: WCAG, version: "2.2", level: AA, scope: full-pages}]
+  temporal_scenarios: ["fonts.ready", "geometry-stable"]
+  compliance_profiles: []
+
+target_domain_extensions:
+  continuous_viewport_width: [320, 1440]
+  content_extremes: {label: [1, 120], items: [0, 100]}
+  input_modalities: [touch]
+  temporal_async_scenarios: [hydration, chart-render, animation-clock]
+  compliance_profiles:
+    - {standard: WCAG, version: "2.2", level: AA, scope: full-pages-and-complete-processes}
+  note: "Targets are not part of the current CONFIRMED domain until obligations and evidence exist."
