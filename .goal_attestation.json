@@ -1,5 +1,5 @@
 {
-  "attestation": {
+  "previous_attestation": {
     "build": "build-v4-e0af6da2",
     "contract": "contract-v4",
     "rules": "rules-v4",
@@ -8,6 +8,7 @@
     "visual": "ACCEPTED",
     "time": 1788418728
   },
-  "digest": "db1a1f55a1bdda6e",
-  "verdict": "LOCKED"
+  "previous_digest": "db1a1f55a1bdda6e",
+  "verdict": "STALE",
+  "reason": "Independent public audit changed proof-critical code and removed synthetic PASS paths. A clean replay and new Final Confirmation Gate are required before LOCKED can be emitted again."
 }
