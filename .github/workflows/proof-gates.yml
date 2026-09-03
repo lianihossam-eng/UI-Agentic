@@ -51,6 +51,9 @@ jobs:
       - name: Strict obligation and proof-level gate
         run: python scripts/strict_obligation_gate.py
 
+      - name: Strict 13-mutant adequacy gate
+        run: python scripts/strict_mutation_gate.py
+
       - name: Strict runtime identity gate before attestation
         run: python scripts/strict_runtime_identity_gate.py
 
@@ -95,6 +98,18 @@ jobs:
           assert r2.returncode==2, 'evidence_root tamper should block'
           print('evidence_root tamper blocked OK')
           p2.write_text(json.dumps(orig2, indent=2, sort_keys=True))
+
+          pm=base/'reports/mutation_report.json'
+          origm=json.loads(pm.read_text())
+          tamperm=json.loads(pm.read_text())
+          tamperm['details']=tamperm['details'][:-1]
+          tamperm['mutants_total']=len(tamperm['details'])
+          tamperm['detected']=len(tamperm['details'])
+          pm.write_text(json.dumps(reh(tamperm), indent=2, sort_keys=True))
+          rm=subprocess.run(['python','scripts/strict_mutation_gate.py'], capture_output=True)
+          assert rm.returncode==2, 'deleted required mutant should block'
+          print('required mutant deletion blocked OK')
+          pm.write_text(json.dumps(origm, indent=2, sort_keys=True))
 
           p3=base/'reports/traceability_report.json'
           orig3=json.loads(p3.read_text())
@@ -154,15 +169,20 @@ jobs:
           assert r5.returncode==0, 'restored current-run evidence should pass'
           r6=subprocess.run(['python','scripts/strict_obligation_gate.py'], capture_output=True)
           assert r6.returncode==0, 'restored obligation evidence should pass'
-          r7=subprocess.run(['python','scripts/strict_runtime_identity_gate.py'], capture_output=True)
-          assert r7.returncode==0, 'restored runtime identity should pass'
-          r8=subprocess.run(['python','scripts/strict_visual_gate.py'], capture_output=True)
-          assert r8.returncode==0, 'restored visual evidence should pass'
-          print('provenance + obligation + runtime + visual tamper tests all pass')
+          r7=subprocess.run(['python','scripts/strict_mutation_gate.py'], capture_output=True)
+          assert r7.returncode==0, 'restored mutation evidence should pass'
+          r8=subprocess.run(['python','scripts/strict_runtime_identity_gate.py'], capture_output=True)
+          assert r8.returncode==0, 'restored runtime identity should pass'
+          r9=subprocess.run(['python','scripts/strict_visual_gate.py'], capture_output=True)
+          assert r9.returncode==0, 'restored visual evidence should pass'
+          print('provenance + obligation + mutation + runtime + visual tamper tests all pass')
           "
 
       - name: Recheck strict obligation gate after tamper tests
         run: python scripts/strict_obligation_gate.py
+
+      - name: Recheck strict mutation gate after tamper tests
+        run: python scripts/strict_mutation_gate.py
 
       - name: Recheck runtime identity after tamper tests
         run: python scripts/strict_runtime_identity_gate.py
