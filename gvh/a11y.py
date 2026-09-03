@@ -1,95 +1,122 @@
-"""Accessibility checks — real keyboard order + cross-layer focus evidence."""
+"""Accessibility checks — deterministic keyboard order + cross-layer focus evidence."""
 
-FOCUSABLE_SELECTOR = (
+# The broad surface intentionally includes tabindex=-1. Visible native controls
+# may not disappear from the proof set merely because a mutation removes them
+# from sequential keyboard navigation.
+KEYBOARD_SURFACE_SELECTOR = (
     'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), '
-    'textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    'textarea:not([disabled]), [tabindex]'
+)
+NATIVE_INTERACTIVE_SELECTOR = (
+    'button:not([disabled]), a[href], input:not([disabled]), '
+    'select:not([disabled]), textarea:not([disabled])'
 )
 
 
-def check_a11y(page, ir):
-    focusables = page.evaluate(
-        f"""() => [...document.querySelectorAll('{FOCUSABLE_SELECTOR}')].filter(e => {{
+def _active_keyboard_surface(page):
+    return page.evaluate(
+        f"""() => [...document.querySelectorAll('{KEYBOARD_SURFACE_SELECTOR}')].filter(e => {{
           const s=getComputedStyle(e); const r=e.getBoundingClientRect();
           return !e.closest('[inert]') && s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0;
         }}).map((e,index) => ({{
-          index,
-          key:`${{e.dataset.testid || e.tagName.toLowerCase()}}#${{index}}`
+          domIndex:index,
+          key:`${{e.dataset.testid || e.tagName.toLowerCase()}}#${{index}}`,
+          tabIndex:e.tabIndex,
+          nativeInteractive:e.matches('{NATIVE_INTERACTIVE_SELECTOR}')
         }}))"""
     )
 
-    # blur() does not reset Chromium's sequential-focus navigation starting
-    # point. Anchor focus explicitly on BODY with tabindex=-1, which is
-    # programmatically focusable but excluded from sequential Tab order and is
-    # positioned before all descendants. This gives a deterministic real-key
-    # traversal without adding a sequential focus target.
-    body_tabindex = page.evaluate(
-        """() => {
-          const body=document.body;
-          const had=body.hasAttribute('tabindex');
-          const old=body.getAttribute('tabindex');
-          body.setAttribute('tabindex','-1');
-          body.focus();
-          return {had, old, focused:document.activeElement===body};
-        }"""
-    )
 
-    actual_indices = []
-    if body_tabindex.get("focused"):
-        for _ in range(len(focusables)):
-            page.keyboard.press("Tab")
-            active_index = page.evaluate(
-                f"""() => {{
-                  const list=[...document.querySelectorAll('{FOCUSABLE_SELECTOR}')].filter(e => {{
-                    const s=getComputedStyle(e); const r=e.getBoundingClientRect();
-                    return !e.closest('[inert]') && s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0;
-                  }});
-                  return list.indexOf(document.activeElement);
-                }}"""
-            )
-            actual_indices.append(active_index)
-
-    page.evaluate(
-        """saved => {
-          const body=document.body;
-          if(saved.had) body.setAttribute('tabindex', saved.old ?? '');
-          else body.removeAttribute('tabindex');
-        }""",
-        body_tabindex,
-    )
-
+def check_a11y(page, ir):
+    keyboard_surface = _active_keyboard_surface(page)
     findings = []
-    if not focusables:
+
+    if not keyboard_surface:
         findings.append(
             {
                 "constraint": "accessibility.focus-order",
                 "owner": "PAGE",
                 "status": "UNKNOWN",
-                "reason": "no-focusable-elements",
-            }
-        )
-    elif not body_tabindex.get("focused"):
-        findings.append(
-            {
-                "constraint": "accessibility.focus-order",
-                "owner": "PAGE",
-                "status": "UNKNOWN",
-                "reason": "cannot-establish-keyboard-traversal-anchor",
-                "focusable_keys": [item["key"] for item in focusables],
-                "measured_count": len(focusables),
+                "reason": "no-active-visible-keyboard-surface",
+                "proof_level": "observed",
             }
         )
     else:
-        expected_indices = list(range(len(focusables)))
+        removed_native = [
+            item
+            for item in keyboard_surface
+            if item.get("nativeInteractive") and int(item.get("tabIndex", -1)) < 0
+        ]
+        positive_tabindex = [
+            item for item in keyboard_surface if int(item.get("tabIndex", -1)) > 0
+        ]
+        sequential = [
+            item for item in keyboard_surface if int(item.get("tabIndex", -1)) >= 0
+        ]
+
+        actual_indices = []
+        keyboard_navigation_ok = bool(sequential)
+        first_focus_ok = False
+        if sequential:
+            # Establish a deterministic real keyboard starting point by focusing
+            # the first sequential control itself. Then verify every internal
+            # adjacency with actual Tab events. We deliberately do not assert
+            # end-of-document wrapping here; modal wrapping/containment belongs
+            # to MODAL_INTEGRITY.
+            first_focus_ok = bool(
+                page.evaluate(
+                    f"""() => {{
+                      const list=[...document.querySelectorAll('{KEYBOARD_SURFACE_SELECTOR}')].filter(e => {{
+                        const s=getComputedStyle(e); const r=e.getBoundingClientRect();
+                        return !e.closest('[inert]') && s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0 && e.tabIndex>=0;
+                      }});
+                      if(!list.length) return false;
+                      list[0].focus();
+                      return document.activeElement===list[0];
+                    }}"""
+                )
+            )
+            keyboard_navigation_ok = first_focus_ok
+            for expected_index in range(1, len(sequential)):
+                page.keyboard.press("Tab")
+                active_index = page.evaluate(
+                    f"""() => {{
+                      const list=[...document.querySelectorAll('{KEYBOARD_SURFACE_SELECTOR}')].filter(e => {{
+                        const s=getComputedStyle(e); const r=e.getBoundingClientRect();
+                        return !e.closest('[inert]') && s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0 && e.tabIndex>=0;
+                      }});
+                      return list.indexOf(document.activeElement);
+                    }}"""
+                )
+                actual_indices.append(active_index)
+                if active_index != expected_index:
+                    keyboard_navigation_ok = False
+
+        expected_indices = list(range(1, len(sequential)))
+        passed = (
+            bool(sequential)
+            and first_focus_ok
+            and not removed_native
+            and not positive_tabindex
+            and keyboard_navigation_ok
+            and actual_indices == expected_indices
+        )
         findings.append(
             {
                 "constraint": "accessibility.focus-order",
                 "owner": "PAGE",
-                "status": "PASS" if actual_indices == expected_indices else "FAIL",
+                "status": "PASS" if passed else "FAIL",
+                "proof_level": "observed",
                 "expected_indices": expected_indices,
                 "actual_indices": actual_indices,
-                "focusable_keys": [item["key"] for item in focusables],
-                "measured_count": len(focusables),
-                "traversal_anchor": "body[tabindex=-1]",
+                "focusable_keys": [item["key"] for item in sequential],
+                "keyboard_surface_count": len(keyboard_surface),
+                "measured_count": len(sequential),
+                "removed_native_controls": removed_native,
+                "positive_tabindex_controls": positive_tabindex,
+                "first_focus_ok": first_focus_ok,
+                "keyboard_navigation_ok": keyboard_navigation_ok,
+                "navigation_contract": "DOM-order native controls; no positive tabindex; internal Tab adjacencies",
             }
         )
 
