@@ -27,6 +27,7 @@ TRUSTED_KERNEL_FILES = (
     "run_goal_verify.py",
     "scripts/capture_current_run_evidence.py",
     "scripts/build_traceability_report.py",
+    "scripts/strict_obligation_gate.py",
     "scripts/enforce_visual_contract.py",
     "scripts/strict_visual_gate.py",
     "scripts/pre_attestation_gate.py",
