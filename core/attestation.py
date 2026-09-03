@@ -1,4 +1,10 @@
-"""Verification Attestation + independent certificate checker."""
+"""Verification Attestation + independent certificate checker.
+
+The generic ``attest`` helper can only emit a PROVISIONAL record. Authoritative
+``LOCKED`` attestations are exclusively created by
+``scripts/finalize_current_run_attestation.py`` after the pre-attestation and
+current-run provenance gates.
+"""
 import hashlib
 import json
 import time
@@ -32,9 +38,14 @@ def attest(
     environment_manifest,
     visual_contract="ACCEPTED",
 ):
-    """Emit LOCKED only after an explicit passing Final Confirmation Gate."""
+    """Emit a PROVISIONAL record only after an explicit passing Final Gate.
+
+    This helper deliberately cannot emit ``LOCKED``. The authoritative lock is
+    produced only by the current-run finalizer after independent provenance
+    checks have passed.
+    """
     if not final_gate or final_gate.get("passed") is not True:
-        raise ValueError("Cannot emit LOCKED attestation: Final Confirmation Gate is not PASS")
+        raise ValueError("Cannot emit provisional attestation: Final Confirmation Gate is not PASS")
 
     payload = {
         "build": build_digest,
@@ -50,4 +61,9 @@ def attest(
     digest = hashlib.sha256(
         json.dumps(payload, sort_keys=True).encode()
     ).hexdigest()[:16]
-    return {"attestation": payload, "digest": digest, "verdict": "LOCKED"}
+    return {
+        "attestation": payload,
+        "digest": digest,
+        "digest_algo": "sha256:16",
+        "verdict": "PROVISIONAL",
+    }
