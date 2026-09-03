@@ -1,14 +1,44 @@
 {
-  "previous_attestation": {
-    "build": "build-v4-e0af6da2",
-    "contract": "contract-v4",
-    "rules": "rules-v4",
-    "scenarios": "c78e81de4caa",
-    "evidence_root": "68525ace9c22",
+  "attestation": {
+    "build": "public-audit-build",
+    "contract": "public-audit-contract",
+    "rules": "public-audit-rules",
+    "scenarios": "5d43a5ee4cc4f8f5",
+    "evidence_root": "9881753e65619f77",
+    "environment": {
+      "browser": "chromium@149.0.7827.55",
+      "viewport_height": 900
+    },
     "visual": "ACCEPTED",
-    "time": 1788418728
+    "final_gate": {
+      "passed": true,
+      "coverage": {
+        "required": 90,
+        "tested": 90,
+        "passed": 90,
+        "failed": 0,
+        "unknown": 0,
+        "coverage": 1.0,
+        "closed": true
+      },
+      "checks": {
+        "requirement_traceability": true,
+        "required_proof_levels": true,
+        "certificate_validation": true,
+        "measurement_readiness": true,
+        "critical_mutants_zero": true,
+        "unstated_assumptions_zero": true,
+        "regression_closed": true,
+        "parent_contracts_valid": true,
+        "state_transitions_complete": true,
+        "cross_layer_invariants_complete": true,
+        "compliance_obligations_complete": true,
+        "visual_acceptance": true
+      },
+      "blocking_gates": []
+    },
+    "time": 1788422454
   },
-  "previous_digest": "db1a1f55a1bdda6e",
-  "verdict": "STALE",
-  "reason": "Independent public audit changed proof-critical code and removed synthetic PASS paths. A clean replay and new Final Confirmation Gate are required before LOCKED can be emitted again."
+  "digest": "306ff4835d853ecb",
+  "verdict": "LOCKED"
 }

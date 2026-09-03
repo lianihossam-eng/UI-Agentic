@@ -14,7 +14,9 @@ EXTRACT_JS = r"""
       if(bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') return bg;
       n=n.parentElement;
     }
-    return getComputedStyle(document.body).backgroundColor || 'rgb(255, 255, 255)';
+    const bgBody=getComputedStyle(document.body).backgroundColor;
+    if(bgBody && bgBody !== 'transparent' && bgBody !== 'rgba(0, 0, 0, 0)') return bgBody;
+    return 'rgb(255, 255, 255)';
   }
 
   for(const el of els.slice(0,120)){
