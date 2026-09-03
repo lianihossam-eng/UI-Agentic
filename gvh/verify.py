@@ -32,7 +32,11 @@ def _check_global_spacing(page):
           return out;
         }"""
     )
-    invalid = [item for item in evidence if round(float(item["value"]), 3) not in ALLOWED_SPACING]
+    invalid = [
+        item
+        for item in evidence
+        if round(float(item["value"]), 3) not in ALLOWED_SPACING
+    ]
     if not evidence:
         status = "UNKNOWN"
         reason = "no-positive-spacing-measurements"
@@ -57,12 +61,7 @@ def _check_global_spacing(page):
 
 
 def _check_horizontal_overflow(page):
-    """Fail closed on unintended horizontal viewport overflow.
-
-    Vertical document growth is intentionally allowed; this rule only checks the
-    horizontal axis. Both document scroll width and visible instrumented boxes
-    must fit the viewport within a 1px rendering tolerance.
-    """
+    """Fail closed on unintended horizontal viewport overflow."""
     evidence = page.evaluate(
         """() => {
           const tolerance=1;
@@ -109,7 +108,88 @@ def _check_horizontal_overflow(page):
         "status": status,
         "proof_level": "observed",
         "evidence_bundle": evidence,
-        "failure_count": len(evidence.get("offenders") or []) + (1 if evidence.get("documentOverflow") else 0),
+        "failure_count": len(evidence.get("offenders") or [])
+        + (1 if evidence.get("documentOverflow") else 0),
+    }
+    if reason:
+        result["reason"] = reason
+    return result
+
+
+def _check_layout_collision(page):
+    """Check collisions only among direct children of declared layout groups.
+
+    Modal overlays and parent/child containment are intentionally outside this
+    rule; they have separate contracts. A collision requires positive overlap
+    greater than 0.5px on both axes between two visible direct siblings.
+    """
+    evidence = page.evaluate(
+        """() => {
+          const tolerance=0.5;
+          const groups=[];
+          const collisions=[];
+          for(const parent of document.querySelectorAll('.grid, .kpi-row')){
+            const ps=getComputedStyle(parent);
+            const pr=parent.getBoundingClientRect();
+            if(ps.display==='none' || ps.visibility==='hidden' || pr.width<=0 || pr.height<=0) continue;
+            const children=[...parent.children].filter(el=>{
+              const s=getComputedStyle(el); const r=el.getBoundingClientRect();
+              return s.display!=='none' && s.visibility!=='hidden' && Number(s.opacity)!==0 && r.width>0 && r.height>0;
+            });
+            const items=children.map((el,index)=>{
+              const r=el.getBoundingClientRect();
+              return {
+                index,
+                testid:el.dataset.testid||null,
+                left:r.left,
+                top:r.top,
+                right:r.right,
+                bottom:r.bottom,
+                width:r.width,
+                height:r.height
+              };
+            });
+            groups.push({
+              parent:parent.dataset.testid || parent.className || parent.tagName,
+              childCount:items.length
+            });
+            for(let i=0;i<items.length;i++){
+              for(let j=i+1;j<items.length;j++){
+                const a=items[i], b=items[j];
+                const overlapX=Math.min(a.right,b.right)-Math.max(a.left,b.left);
+                const overlapY=Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top);
+                if(overlapX>tolerance && overlapY>tolerance){
+                  collisions.push({
+                    parent:parent.dataset.testid || parent.className || parent.tagName,
+                    a,b,overlapX,overlapY
+                  });
+                }
+              }
+            }
+          }
+          return {
+            groupCount:groups.length,
+            comparableGroups:groups.filter(g=>g.childCount>=2).length,
+            groups,
+            collisions
+          };
+        }"""
+    )
+    if evidence.get("comparableGroups", 0) <= 0:
+        status = "UNKNOWN"
+        reason = "no-layout-group-with-two-visible-children"
+    else:
+        collisions = evidence.get("collisions") or []
+        status = "FAIL" if collisions else "PASS"
+        reason = None
+    result = {
+        "layer": "geometry",
+        "constraint": "geometry.no-layout-collision",
+        "owner": "SECTION",
+        "status": status,
+        "proof_level": "observed",
+        "evidence_bundle": evidence,
+        "failure_count": len(evidence.get("collisions") or []),
     }
     if reason:
         result["reason"] = reason
@@ -200,7 +280,11 @@ def _check_modal_integrity(page):
             status = "UNKNOWN"
             reason = "modal-required-evidence-not-observable"
         else:
-            status = "PASS" if all(evidence.get(key) is True for key in required_keys) else "FAIL"
+            status = (
+                "PASS"
+                if all(evidence.get(key) is True for key in required_keys)
+                else "FAIL"
+            )
             reason = None
     else:
         required_closed = ("fixed", "ariaModal")
@@ -238,7 +322,9 @@ def _check_breakpoint(page, ir):
     try:
         vp = ir.get("viewport", {}).get(
             "width",
-            page.viewport_size.get("width", 1024) if hasattr(page, "viewport_size") else 1024,
+            page.viewport_size.get("width", 1024)
+            if hasattr(page, "viewport_size")
+            else 1024,
         )
     except Exception:
         vp = 1024
@@ -278,7 +364,9 @@ def verify_all(ir, page=None):
     findings = []
 
     geo = check_hard(ir)
-    gap_findings = [item for item in geo if item.get("constraint") == "group.uniform_gap"]
+    gap_findings = [
+        item for item in geo if item.get("constraint") == "group.uniform_gap"
+    ]
     if not gap_findings:
         findings.append(
             {
@@ -299,6 +387,7 @@ def verify_all(ir, page=None):
     findings.append(_check_modal_integrity(page))
     findings.append(_check_global_spacing(page))
     findings.append(_check_horizontal_overflow(page))
+    findings.append(_check_layout_collision(page))
     findings.append(_check_breakpoint(page, ir))
 
     for finding in check_paint(ir):
