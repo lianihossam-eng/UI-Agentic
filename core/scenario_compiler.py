@@ -7,6 +7,7 @@
 RULE_SPECS = {
     "group.uniform_gap": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
     "global.spacing.scale": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
+    "breakpoint.shell.direction": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
     "paint.contrast.text": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
     "component.button.hit-target": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
     "TARGET_OPERABLE": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
@@ -14,6 +15,20 @@ RULE_SPECS = {
     "FOCUS_USABLE": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
     "temporal.geometry-stable": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
 }
+
+# These rules can change materially when a modal becomes active: the overlay
+# adds spacing/paint, changes the active hit/focus scope, and introduces a new
+# temporal geometry surface. Rules not listed here are deliberately not
+# duplicated across state until a dependency is demonstrated.
+MODAL_STATE_RULES = (
+    "global.spacing.scale",
+    "paint.contrast.text",
+    "component.button.hit-target",
+    "TARGET_OPERABLE",
+    "accessibility.focus-order",
+    "FOCUS_USABLE",
+    "temporal.geometry-stable",
+)
 
 PROOF_LEVELS = {"observed", "bounded", "certified"}
 
@@ -62,6 +77,7 @@ def compile(domain):
     scenarios = []
     widths = domain.get("viewport_widths", [768])
 
+    # Default rendered state.
     for rule_id, spec in RULE_SPECS.items():
         scenarios.extend(_expand_rule(rule_id, spec, domain))
 
@@ -85,8 +101,27 @@ def compile(domain):
                     )
                 )
 
-        # Modal geometry/interaction/accessibility is likewise observed at
-        # every declared discrete viewport.
+        if "modal-open" in model.get("states", []):
+            # Rendered modal-open state obligations. These are separate from
+            # transition semantics: the state itself must remain usable and
+            # visually/temporally valid after the transition has completed.
+            for width in widths:
+                for rule_id in MODAL_STATE_RULES:
+                    scenarios.append(
+                        _finalize(
+                            {
+                                "rule": rule_id,
+                                "model": model["id"],
+                                "route": route,
+                                "viewport": width,
+                                "state": "modal-open",
+                            },
+                            RULE_SPECS[rule_id].get("proof_level", "observed"),
+                        )
+                    )
+
+        # Modal cross-layer integrity is independently observed at every
+        # declared discrete viewport.
         if "MODAL_INTEGRITY" in model.get("invariants", []):
             for width in widths:
                 scenarios.append(
