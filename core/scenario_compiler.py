@@ -7,6 +7,7 @@
 RULE_SPECS = {
     "group.uniform_gap": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
     "global.spacing.scale": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
+    "geometry.no-horizontal-overflow": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
     "breakpoint.shell.direction": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
     "paint.contrast.text": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
     "component.button.hit-target": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
@@ -17,11 +18,12 @@ RULE_SPECS = {
 }
 
 # These rules can change materially when a modal becomes active: the overlay
-# adds spacing/paint, changes the active hit/focus scope, and introduces a new
-# temporal geometry surface. Rules not listed here are deliberately not
-# duplicated across state until a dependency is demonstrated.
+# adds spacing/paint, changes the active hit/focus scope, can affect horizontal
+# containment, and introduces a new temporal geometry surface. Rules not listed
+# here are deliberately not duplicated across state until a dependency is shown.
 MODAL_STATE_RULES = (
     "global.spacing.scale",
+    "geometry.no-horizontal-overflow",
     "paint.contrast.text",
     "component.button.hit-target",
     "TARGET_OPERABLE",
@@ -31,6 +33,11 @@ MODAL_STATE_RULES = (
 )
 
 PROOF_LEVELS = {"observed", "bounded", "certified"}
+
+
+def rule_contract_seed():
+    """Canonical rule vocabulary used by rules_digest producers/checkers."""
+    return sorted([*RULE_SPECS.keys(), "MODAL_INTEGRITY", "transition:*"])
 
 
 def scenario_id(scenario):
@@ -84,9 +91,9 @@ def compile(domain):
     for model in domain.get("state_transition_models", []):
         route = model.get("route")
 
-        # Transition semantics are viewport-dependent until independence is
-        # formally demonstrated. Execute the full ordered transition sequence
-        # at every declared discrete viewport.
+        # Every declared transition is an independent obligation at every
+        # viewport. replay_engine establishes its declared source state on a
+        # fresh page, so branching transitions do not rely on list order.
         for width in widths:
             for transition in model.get("transitions", []):
                 scenarios.append(
@@ -102,9 +109,6 @@ def compile(domain):
                 )
 
         if "modal-open" in model.get("states", []):
-            # Rendered modal-open state obligations. These are separate from
-            # transition semantics: the state itself must remain usable and
-            # visually/temporally valid after the transition has completed.
             for width in widths:
                 for rule_id in MODAL_STATE_RULES:
                     scenarios.append(
@@ -120,8 +124,6 @@ def compile(domain):
                         )
                     )
 
-        # Modal cross-layer integrity is independently observed at every
-        # declared discrete viewport.
         if "MODAL_INTEGRITY" in model.get("invariants", []):
             for width in widths:
                 scenarios.append(
