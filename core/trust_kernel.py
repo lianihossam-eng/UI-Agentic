@@ -1,8 +1,8 @@
 """Content-address the complete Trusted Verification Kernel.
 
 Every authoritative proof artifact must bind this digest. The manifest includes
-this file itself, all measurement/checker code, all final gates/finalizers, and
-the CI recipe + dependency lock that execute them.
+this file itself, all measurement/checker code, all final gates/finalizers, the
+proof-gate tests, and the CI recipe + dependency lock that execute them.
 """
 from __future__ import annotations
 
@@ -35,6 +35,7 @@ TRUSTED_KERNEL_FILES = (
     "scripts/strict_provenance_gate.py",
     "scripts/strict_kernel_attestation_gate.py",
     "scripts/fault_injection.py",
+    "tests/test_proof_gates.py",
     ".github/workflows/proof-gates.yml",
     "requirements-ci.txt",
 )
