@@ -1,6 +1,16 @@
 """Coverage Ledger, Evidence DAG, Measurement Readiness and Final Gate."""
 import hashlib
 import json
+import pathlib
+
+BASE = pathlib.Path(__file__).resolve().parent.parent
+PUBLIC_AUDIT_CONTRACT_FILES = (
+    "supported-domain.yaml",
+    "SKILL.md",
+    "references/global-design-contract.md",
+    "references/verification-stack.md",
+)
+LEGACY_PUBLIC_AUDIT_CONTRACT = "contract-public-audit-v1"
 
 FINAL_GATE_KEYS = [
     "requirement_traceability",
@@ -16,6 +26,28 @@ FINAL_GATE_KEYS = [
     "compliance_obligations_complete",
     "visual_acceptance",
 ]
+
+
+def public_audit_contract_digest(base=BASE):
+    """Return a full SHA-256 over the canonical public-audit contract bytes.
+
+    Path names and byte lengths are framed explicitly so the digest cannot depend
+    on ambiguous concatenation. Any change to the declared scope, skill contract,
+    global design contract or verification stack produces a different root.
+    """
+    h = hashlib.sha256()
+    h.update(b"public-audit-contract-v3\0")
+    for relative in PUBLIC_AUDIT_CONTRACT_FILES:
+        path = pathlib.Path(base) / relative
+        if not path.is_file():
+            raise FileNotFoundError(f"public-audit contract file missing: {relative}")
+        encoded = relative.encode("utf-8")
+        content = path.read_bytes()
+        h.update(len(encoded).to_bytes(4, "big"))
+        h.update(encoded)
+        h.update(len(content).to_bytes(8, "big"))
+        h.update(content)
+    return h.hexdigest()
 
 
 class CoverageLedger:
@@ -67,7 +99,15 @@ class EvidenceDAG:
         self.store = {}
 
     def key(self, code, contract, rule, scenario, browser, checker, environment=None):
-        payload = [code, contract, rule, scenario, browser, checker, environment or {}]
+        # The executable demo historically passed a semantic label here. Keep
+        # that call surface compatible, but never let the label become proof:
+        # replace it with the current content-addressed contract root.
+        contract_root = (
+            public_audit_contract_digest()
+            if contract == LEGACY_PUBLIC_AUDIT_CONTRACT
+            else contract
+        )
+        payload = [code, contract_root, rule, scenario, browser, checker, environment or {}]
         return hashlib.sha256(
             json.dumps(payload, sort_keys=True).encode()
         ).hexdigest()[:16]
