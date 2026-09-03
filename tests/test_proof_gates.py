@@ -74,10 +74,10 @@ class ProofGateTests(unittest.TestCase):
         domain = yaml.safe_load((BASE / "supported-domain.yaml").read_text())["supported_domain"]
         return domain, compile_scenarios(domain)
 
-    def test_compiler_emits_235_unique_obligations(self):
+    def test_compiler_emits_245_unique_obligations(self):
         _, scenarios = self._scenarios()
         ids = [scenario["scenario_id"] for scenario in scenarios]
-        self.assertEqual(len(scenarios), 235)
+        self.assertEqual(len(scenarios), 245)
         self.assertEqual(len(ids), len(set(ids)))
         self.assertTrue(all(scenario["required_proof_level"] == "observed" for scenario in scenarios))
 
@@ -86,7 +86,8 @@ class ProofGateTests(unittest.TestCase):
         breakpoint = [
             scenario
             for scenario in scenarios
-            if scenario["rule"] == "breakpoint.shell.direction" and scenario.get("state", "default") == "default"
+            if scenario["rule"] == "breakpoint.shell.direction"
+            and scenario.get("state", "default") == "default"
         ]
         self.assertEqual(len(breakpoint), len(domain["routes"]) * len(domain["viewport_widths"]))
         self.assertEqual(len(breakpoint), 15)
@@ -120,12 +121,24 @@ class ProofGateTests(unittest.TestCase):
     def test_transitions_are_executed_at_all_declared_viewports(self):
         domain, scenarios = self._scenarios()
         transitions = [scenario for scenario in scenarios if scenario["rule"].startswith("transition:")]
-        self.assertEqual(len(transitions), 20)
+        self.assertEqual(len(transitions), 30)
         self.assertEqual(
             {scenario["viewport"] for scenario in transitions},
             set(domain["viewport_widths"]),
         )
-        self.assertEqual(len({scenario["scenario_id"] for scenario in transitions}), 20)
+        self.assertEqual(len({scenario["scenario_id"] for scenario in transitions}), 30)
+
+    def test_escape_close_is_required_for_each_modal_route_viewport(self):
+        domain, scenarios = self._scenarios()
+        escape = [
+            scenario
+            for scenario in scenarios
+            if scenario["rule"].startswith("transition:")
+            and (scenario.get("transition") or {}).get("event") == "escape-close"
+        ]
+        self.assertEqual(len(escape), 10)
+        self.assertTrue(all((scenario["transition"]["action"] == "press:Escape") for scenario in escape))
+        self.assertEqual({scenario["viewport"] for scenario in escape}, set(domain["viewport_widths"]))
 
 
 if __name__ == "__main__":
