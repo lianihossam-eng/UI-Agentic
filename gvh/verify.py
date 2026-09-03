@@ -55,17 +55,20 @@ def _check_modal_integrity(page):
             "reason": "modal-not-present",
             "requires_layers": ["geometry", "interaction", "accessibility"],
         }
+
     evidence = modal.evaluate(
         """m => {
           const s=getComputedStyle(m); const r=m.getBoundingClientRect();
           const dialog=m.matches('[role="dialog"]') ? m : m.querySelector('[role="dialog"]');
+          const dr=dialog?.getBoundingClientRect();
           const ariaModal=dialog?.getAttribute('aria-modal') === 'true';
           const active=document.activeElement;
-          const dialogInside=m.querySelector('[role="dialog"]');
           const activeTestId=active?.getAttribute('data-testid');
-          const focusInside=!!active && (m.contains(active) || (dialogInside && dialogInside.contains(active)) || activeTestId==='close');
+          const focusInside=!!active && m.contains(active);
           const centerHit=document.elementFromPoint(r.x+r.width/2, r.y+r.height/2);
           const centerOwned=!!centerHit && (centerHit===m || m.contains(centerHit));
+          const shell=document.querySelector('.shell');
+          const backgroundInert=!!shell && shell.hasAttribute('inert');
           const sidebar=document.querySelector('[data-testid="sidebar"]');
           let backgroundBlocked=true;
           if(sidebar){
@@ -73,6 +76,9 @@ def _check_modal_integrity(page):
             const hit=document.elementFromPoint(b.x+b.width/2, b.y+Math.min(40,b.height/2));
             backgroundBlocked=!!hit && (hit===m || m.contains(hit));
           }
+          const dialogContained=!!dr && dr.width>0 && dr.height>0 &&
+            dr.left>=-0.5 && dr.top>=-0.5 &&
+            dr.right<=window.innerWidth+0.5 && dr.bottom<=window.innerHeight+0.5;
           return {
             visible:s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0,
             fixed:s.position==='fixed',
@@ -80,42 +86,79 @@ def _check_modal_integrity(page):
             focusInside,
             centerOwned,
             backgroundBlocked,
-            activeTestId,
-            isClose: activeTestId==='close'
+            backgroundInert,
+            dialogContained,
+            activeTestId
           };
         }"""
     )
-    required_keys = ("visible", "fixed", "ariaModal", "focusInside", "centerOwned", "backgroundBlocked")
-    if any(evidence.get(k) is None for k in required_keys):
-        return {
-            "layer": "interaction",
-            "constraint": "MODAL_INTEGRITY",
-            "owner": "PAGE",
-            "status": "UNKNOWN",
-            "reason": "modal-focus-not-observable",
-            "requires_layers": ["geometry", "interaction", "accessibility"],
-            "evidence_bundle": evidence,
-        }
+
     is_open = evidence.get("visible") is True
     if is_open:
-        passed = all(evidence.get(key) is True for key in required_keys)
-    else:
-        passed = (
-            evidence.get("visible") is False
-            and evidence.get("fixed") is True
-            and evidence.get("ariaModal") is True
-            and evidence.get("focusInside") is False
-            and evidence.get("backgroundBlocked") is False
+        page.keyboard.press("Tab")
+        tab_inside = page.evaluate(
+            """() => {
+              const m=document.querySelector('[data-testid="modal"]');
+              return !!m && !!document.activeElement && m.contains(document.activeElement);
+            }"""
         )
-    return {
+        page.keyboard.press("Shift+Tab")
+        shift_tab_inside = page.evaluate(
+            """() => {
+              const m=document.querySelector('[data-testid="modal"]');
+              return !!m && !!document.activeElement && m.contains(document.activeElement);
+            }"""
+        )
+        evidence["tabContained"] = bool(tab_inside)
+        evidence["shiftTabContained"] = bool(shift_tab_inside)
+        evidence["keyboardContained"] = bool(tab_inside and shift_tab_inside)
+
+        required_keys = (
+            "visible",
+            "fixed",
+            "ariaModal",
+            "focusInside",
+            "centerOwned",
+            "backgroundBlocked",
+            "backgroundInert",
+            "dialogContained",
+            "keyboardContained",
+        )
+        if any(evidence.get(key) is None for key in required_keys):
+            status = "UNKNOWN"
+            reason = "modal-required-evidence-not-observable"
+        else:
+            status = "PASS" if all(evidence.get(key) is True for key in required_keys) else "FAIL"
+            reason = None
+    else:
+        required_closed = ("fixed", "ariaModal")
+        if any(evidence.get(key) is None for key in required_closed):
+            status = "UNKNOWN"
+            reason = "closed-modal-evidence-not-observable"
+        else:
+            passed = (
+                evidence.get("visible") is False
+                and evidence.get("fixed") is True
+                and evidence.get("ariaModal") is True
+                and evidence.get("focusInside") is False
+                and evidence.get("backgroundBlocked") is False
+                and evidence.get("backgroundInert") is False
+            )
+            status = "PASS" if passed else "FAIL"
+            reason = None
+
+    result = {
         "layer": "interaction",
         "constraint": "MODAL_INTEGRITY",
         "owner": "PAGE",
-        "status": "PASS" if passed else "FAIL",
+        "status": status,
         "proof_level": "observed",
         "requires_layers": ["geometry", "interaction", "accessibility"],
         "evidence_bundle": evidence,
     }
+    if reason:
+        result["reason"] = reason
+    return result
 
 
 def _check_breakpoint(page, ir):
@@ -165,8 +208,6 @@ def verify_all(ir, page=None):
     geo = check_hard(ir)
     gap_findings = [item for item in geo if item.get("constraint") == "group.uniform_gap"]
     if not gap_findings:
-        # check_hard emits UNKNOWN when the rule is not applicable/measurable,
-        # so absence here means >=2 cards were measured with no gap violation.
         findings.append(
             {
                 "layer": "geometry",
@@ -182,7 +223,6 @@ def verify_all(ir, page=None):
     if page is None:
         return findings
 
-    # Modal integrity must be captured before a11y mutates focus (Tab/blur).
     findings.append(_check_modal_integrity(page))
     findings.append(_check_global_spacing(page))
     findings.append(_check_breakpoint(page, ir))
