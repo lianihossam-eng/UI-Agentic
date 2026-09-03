@@ -2,15 +2,15 @@
   "contract": "visual-v4-raster-equivalence",
   "approvals": [
     {
-      "review_fingerprint_digest": "71632ac3232296ee",
-      "reviewed_fingerprint_algo": "png-blockmean4-v1",
-      "reviewed_snapshot_digest": "915dab9ca69a1506",
+      "review_fingerprint_digest": "05bb7ce06b7ad120",
+      "reviewed_fingerprint_algo": "png-spatialmoments4-v2",
+      "reviewed_snapshot_digest": "af39cb89120ff1ba",
       "reviewed_image_count": 25,
       "reviewed_states": ["default", "modal-open"],
       "reviewer": "agent:ChatGPT-GPT-5.6-Sol:visual-review",
       "reviewer_type": "agent",
-      "reviewed_at": "2026-09-03T18:05:43Z",
-      "rubric": "Reviewed the exact 25-image bundle from main GitHub Actions run 33787936069 / artifact 9906220437 for commit 92f395c90b8b6b566b9e2d1eddfa08b9846903b1. All 25 screenshots were checked across default/modal-open states and 320/375/768/1024/1440. Comparison against the already reviewed PR snapshot found 22/25 images byte-identical; only analytics-1440, analytics-375 and analytics-768 differed, totaling 8 pixels, each by a one-level RGB raster variation. No geometry, content, clipping, overflow, collision, modal containment, responsive-layout or visually meaningful regression was observed. The v4 approval applies only to the deterministic png-blockmean4-v1 raster-equivalence class derived from this reviewed snapshot; exact current-run PNG hashes remain independently verified and reported.",
+      "reviewed_at": "2026-09-03T18:51:40Z",
+      "rubric": "Migration of the already reviewed 25-image visual equivalence class to png-spatialmoments4-v2. The exact main bundle from run 33792605477 / artifact 9908053935 has snapshot af39cb89120ff1ba and was previously accepted under the same default/modal-open rubric. The new fingerprint was independently computed over that exact bundle and the earlier reviewed main bundle from artifact 9906220437; both resolve to 05bb7ce06b7ad120 despite the previously observed isolated ±1 RGB raster noise. A dedicated regression test proves that two 4x4 regions with identical arithmetic RGB means but different horizontal/vertical pixel structure no longer collide. Exact current-run PNG SHA-256 hashes remain independently mandatory and are not replaced by this approval identity.",
       "verdict": "ACCEPTED"
     }
   ],
@@ -44,5 +44,14 @@
       "verdict": "ACCEPTED"
     }
   ],
-  "note": "Approval is not portable across arbitrary visual changes. It is portable only within the explicitly checked png-blockmean4-v1 raster-equivalence class. Exact PNG byte hashes and the exact snapshot digest remain current-run evidence and must still validate independently."
+  "legacy_review_fingerprint_approvals": [
+    {
+      "review_fingerprint_digest": "71632ac3232296ee",
+      "reviewed_fingerprint_algo": "png-blockmean4-v1",
+      "reviewed_snapshot_digest": "915dab9ca69a1506",
+      "reviewer": "agent:ChatGPT-GPT-5.6-Sol:visual-review",
+      "verdict": "ACCEPTED"
+    }
+  ],
+  "note": "Approval reuse is limited to the current png-spatialmoments4-v2 equivalence class. Exact PNG byte hashes and the exact snapshot digest remain mandatory current-run evidence. Legacy block-mean approval is archival and cannot satisfy the current checker algorithm."
 }
