@@ -75,10 +75,10 @@ class ProofGateTests(unittest.TestCase):
         domain = yaml.safe_load((BASE / "supported-domain.yaml").read_text())["supported_domain"]
         return domain, compile_scenarios(domain)
 
-    def test_compiler_emits_270_unique_obligations(self):
+    def test_compiler_emits_295_unique_obligations(self):
         _, scenarios = self._scenarios()
         ids = [scenario["scenario_id"] for scenario in scenarios]
-        self.assertEqual(len(scenarios), 270)
+        self.assertEqual(len(scenarios), 295)
         self.assertEqual(len(ids), len(set(ids)))
         self.assertTrue(all(scenario["required_proof_level"] == "observed" for scenario in scenarios))
 
@@ -104,6 +104,17 @@ class ProofGateTests(unittest.TestCase):
         self.assertEqual(len(overflow), len(domain["routes"]) * len(domain["viewport_widths"]))
         self.assertEqual(len(overflow), 15)
 
+    def test_layout_collision_is_required_for_every_default_route_viewport(self):
+        domain, scenarios = self._scenarios()
+        collision = [
+            scenario
+            for scenario in scenarios
+            if scenario["rule"] == "geometry.no-layout-collision"
+            and scenario.get("state", "default") == "default"
+        ]
+        self.assertEqual(len(collision), len(domain["routes"]) * len(domain["viewport_widths"]))
+        self.assertEqual(len(collision), 15)
+
     def test_modal_open_state_has_explicit_rule_matrix(self):
         domain, scenarios = self._scenarios()
         modal_state = [
@@ -117,7 +128,7 @@ class ProofGateTests(unittest.TestCase):
             if "modal-open" in states
         ]
         expected = len(MODAL_STATE_RULES) * len(modal_routes) * len(domain["viewport_widths"])
-        self.assertEqual(expected, 80)
+        self.assertEqual(expected, 90)
         self.assertEqual(len(modal_state), expected)
         self.assertEqual(len({scenario["scenario_id"] for scenario in modal_state}), expected)
 
