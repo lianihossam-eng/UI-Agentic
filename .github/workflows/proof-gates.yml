@@ -42,7 +42,9 @@ jobs:
         run: python scripts/capture_current_run_evidence.py
 
       - name: Run GOAL verification against current-run reports
-        run: python run_goal_verify.py | tee reports/final_result.json
+        run: |
+          set -o pipefail
+          python run_goal_verify.py | tee reports/final_result.json
 
       - name: Provenance fail-closed tests
         run: |
