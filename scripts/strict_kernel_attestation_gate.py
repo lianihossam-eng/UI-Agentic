@@ -1,8 +1,8 @@
 """Independent checker for the Trusted Verification Kernel attested by LOCKED.
 
-Runs after the current-run provenance checker. It recomputes every kernel file
-from the checkout, verifies the per-file manifest embedded in the attestation,
-and revalidates the attestation's full SHA-256 digest.
+Runs after the current-run provenance checker. It recomputes the measurement and
+trusted kernels from the checkout, verifies the per-file trusted-kernel manifest
+embedded in the attestation, and revalidates the attestation SHA-256.
 """
 from __future__ import annotations
 
@@ -15,6 +15,7 @@ BASE = pathlib.Path(__file__).resolve().parent.parent
 if str(BASE) not in sys.path:
     sys.path.insert(0, str(BASE))
 
+from core.measurement_kernel import measurement_kernel_digest
 from core.trust_kernel import trusted_kernel_digest, trusted_kernel_manifest
 
 
@@ -42,10 +43,14 @@ def main() -> int:
     if attestation.get("verdict") != "LOCKED":
         fail("attestation is not LOCKED")
     payload = attestation.get("attestation") or {}
-    if payload.get("attestation_version") != "2.2":
-        fail("attestation does not use runtime+kernel-bound v2.2 format")
+    if payload.get("attestation_version") != "2.3":
+        fail("attestation does not use measurement+runtime+kernel-bound v2.3 format")
     if not payload.get("runtime_identity_root"):
-        fail("attestation v2.2 missing runtime_identity_root")
+        fail("attestation v2.3 missing runtime_identity_root")
+
+    actual_measurement = measurement_kernel_digest(BASE)
+    if payload.get("measurement_kernel_digest") != actual_measurement:
+        fail("measurement kernel digest mismatch")
 
     actual_manifest = trusted_kernel_manifest(BASE)
     actual_digest = trusted_kernel_digest(BASE)
@@ -72,6 +77,7 @@ def main() -> int:
         "STRICT KERNEL PASS",
         json.dumps(
             {
+                "measurement_kernel_digest": actual_measurement,
                 "trusted_kernel_digest": actual_digest,
                 "files": len(actual_manifest),
                 "runtime_identity_root": payload["runtime_identity_root"],
