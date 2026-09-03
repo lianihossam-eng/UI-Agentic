@@ -1,8 +1,8 @@
 """Finalize an attestation from the exact current-run proof bundle.
 
-Must run only after run_goal_verify.py has returned a passing Final Gate.
+Must run only after run_goal_verify.py and the pre-attestation gate have passed.
 The resulting attestation binds the current commit, environment, report root,
-visual snapshot and Evidence DAG root.
+visual snapshot, Evidence DAG root and complete Trusted Verification Kernel.
 """
 from __future__ import annotations
 
@@ -15,6 +15,11 @@ import sys
 from datetime import datetime, timezone
 
 BASE = pathlib.Path(__file__).resolve().parent.parent
+if str(BASE) not in sys.path:
+    sys.path.insert(0, str(BASE))
+
+from core.trust_kernel import trusted_kernel_digest, trusted_kernel_manifest
+
 REPORT_DIR = BASE / "reports"
 REPORT_NAMES = [
     "traceability_report",
@@ -95,13 +100,30 @@ def main() -> int:
     if current_run.get("visual_snapshot_digest") != visual_root:
         fail("current_run_evidence visual snapshot mismatch")
 
+    kernel_manifest = trusted_kernel_manifest(BASE)
+    kernel_digest = trusted_kernel_digest(BASE)
+    kernel_manifest_path = REPORT_DIR / "trusted_kernel_manifest.json"
+    kernel_manifest_path.write_text(
+        json.dumps(
+            {
+                "trusted_kernel_digest": kernel_digest,
+                "algorithm": "sha256",
+                "files": kernel_manifest,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
     payload = {
-        "attestation_version": "2.0",
+        "attestation_version": "2.1",
         "subject": {"commit_sha": commit, "build_digest": commit},
         "contract": "public-audit-contract-v2",
         "scenario_digest": manifest.get("scenario_digest"),
         "rules_digest": manifest.get("rules_digest"),
         "checker_digest": manifest.get("checker_digest"),
+        "trusted_kernel_digest": kernel_digest,
+        "trusted_kernel_manifest": kernel_manifest,
         "environment_manifest_digest": manifest.get("manifest_digest"),
         "evidence_root": result.get("evidence_root"),
         "reports_root": reports_root,
@@ -131,6 +153,7 @@ def main() -> int:
                 "evidence_root": payload["evidence_root"],
                 "reports_root": reports_root,
                 "visual_evidence_root": visual_root,
+                "trusted_kernel_digest": kernel_digest,
                 "source_run_id": payload["source_run_id"],
             },
             sort_keys=True,
