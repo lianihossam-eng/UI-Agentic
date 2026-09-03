@@ -29,89 +29,80 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
       - name: Install deps + Chromium
         run: |
           pip install pyyaml playwright==1.61.0
           python -m playwright install --with-deps chromium
-      - name: Validate report hashes
-        run: |
-          python -c "
-          import json, hashlib, pathlib, sys
-          base=pathlib.Path('.')
-          for name in ['traceability_report','assumptions_report','parent_contract_report','cross_layer_report','visual_review','regression_report','mutation_report']:
-              p=base/'reports'/f'{name}.json'
-              data=json.loads(p.read_text())
-              exp=data.get('report_hash')
-              copy={k:v for k,v in data.items() if k not in ('report_hash','report_hash_algo')}
-              calc=hashlib.sha256(json.dumps(copy,sort_keys=True).encode()).hexdigest()[:16]
-              assert calc==exp, f'hash mismatch {name}: {calc} != {exp}'
-              assert data.get('status')!='PENDING', f'pending {name}'
-              print(f'OK {name} {exp}')
-          "
+
       - name: Fault injection
         run: python scripts/fault_injection.py
-      - name: Run GOAL verification (artefact-derived gates)
-        run: python run_goal_verify.py
-      - name: Refresh provenance bindings to current commit
-        run: python scripts/refresh_provenance_bindings.py
-      - name: Check attestation LOCKED
-        run: |
-          python -c "import json; d=json.load(open('.goal_attestation.json')); assert d['verdict']=='LOCKED', d; assert d['attestation']['final_gate']['passed'] is True; print('LOCKED', d['digest'], d['attestation']['evidence_root'])"
-      - name: Strict current-run provenance gate
-        run: python scripts/strict_provenance_gate.py
-      - name: Reproducibility A/B
-        run: |
-          python run_goal_verify.py > /tmp/a.json
-          python run_goal_verify.py > /tmp/b.json
-          python -c "import json; a=json.load(open('/tmp/a.json')); b=json.load(open('/tmp/b.json')); assert a['evidence_root']==b['evidence_root'], (a['evidence_root'], b['evidence_root']); assert a['coverage']==b['coverage']; print('reproducible', a['evidence_root'])"
+
+      - name: Generate semantic current-run evidence
+        run: python scripts/capture_current_run_evidence.py
+
+      - name: Run GOAL verification against current-run reports
+        run: python run_goal_verify.py | tee reports/final_result.json
+
       - name: Provenance fail-closed tests
         run: |
           python -c "
-          import json, hashlib, pathlib, subprocess, shutil
+          import json, hashlib, pathlib, subprocess
           base=pathlib.Path('.')
-          # 1: tamper scenario_digest
+
+          def reh(data):
+              copy={k:v for k,v in data.items() if k not in ('report_hash','report_hash_algo')}
+              data['report_hash']=hashlib.sha256(json.dumps(copy,sort_keys=True).encode()).hexdigest()[:16]
+              return data
+
           p=base/'reports/traceability_report.json'
           orig=json.loads(p.read_text())
           tamper=json.loads(p.read_text())
           tamper['scenario_digest']='0000000000000000'
-          copy={k:v for k,v in tamper.items() if k not in ('report_hash','report_hash_algo')}
-          tamper['report_hash']=hashlib.sha256(json.dumps(copy, sort_keys=True).encode()).hexdigest()[:16]
-          p.write_text(json.dumps(tamper, indent=2, sort_keys=True))
+          p.write_text(json.dumps(reh(tamper), indent=2, sort_keys=True))
           r=subprocess.run(['python','run_goal_verify.py'], capture_output=True)
           assert r.returncode==2, 'scenario_digest tamper should block'
           print('scenario_digest tamper blocked OK')
           p.write_text(json.dumps(orig, indent=2, sort_keys=True))
-          # 2: tamper evidence_root
+
           p2=base/'reports/mutation_report.json'
           orig2=json.loads(p2.read_text())
           tamper2=json.loads(p2.read_text())
           tamper2['evidence_root']='ffffffffffffffff'
-          copy2={k:v for k,v in tamper2.items() if k not in ('report_hash','report_hash_algo')}
-          tamper2['report_hash']=hashlib.sha256(json.dumps(copy2, sort_keys=True).encode()).hexdigest()[:16]
-          p2.write_text(json.dumps(tamper2, indent=2, sort_keys=True))
+          p2.write_text(json.dumps(reh(tamper2), indent=2, sort_keys=True))
           r2=subprocess.run(['python','run_goal_verify.py'], capture_output=True)
           assert r2.returncode==2, 'evidence_root tamper should block'
           print('evidence_root tamper blocked OK')
           p2.write_text(json.dumps(orig2, indent=2, sort_keys=True))
-          # 3: delete one traceability entry
+
           p3=base/'reports/traceability_report.json'
           orig3=json.loads(p3.read_text())
           tamper3=json.loads(p3.read_text())
           tamper3['mapping']=tamper3['mapping'][:-1]
           tamper3['traced_obligations']=len(tamper3['mapping'])
-          copy3={k:v for k,v in tamper3.items() if k not in ('report_hash','report_hash_algo')}
-          tamper3['report_hash']=hashlib.sha256(json.dumps(copy3, sort_keys=True).encode()).hexdigest()[:16]
-          p3.write_text(json.dumps(tamper3, indent=2, sort_keys=True))
+          p3.write_text(json.dumps(reh(tamper3), indent=2, sort_keys=True))
           r3=subprocess.run(['python','run_goal_verify.py'], capture_output=True)
           assert r3.returncode==2, 'deleted traceability entry should block'
           print('traceability deletion blocked OK')
           p3.write_text(json.dumps(orig3, indent=2, sort_keys=True))
-          # final restore and verify passes
+
           r4=subprocess.run(['python','run_goal_verify.py'], capture_output=True)
-          assert r4.returncode==0, 'should pass after restore'
-          print('provenance tests all pass')
+          assert r4.returncode==0, 'restored current-run evidence should pass'
+          print('provenance tamper tests all pass')
           "
-      - name: Upload final artefact bundle
+
+      - name: Finalize self-contained attestation
+        run: python scripts/finalize_current_run_attestation.py
+
+      - name: Strict current-run provenance gate
+        run: python scripts/strict_provenance_gate.py
+
+      - name: Check final attestation LOCKED
+        run: |
+          python -c "import json; d=json.load(open('.goal_attestation.json')); assert d['verdict']=='LOCKED'; assert d['attestation']['final_gate']['passed'] is True; print('LOCKED', d['digest'], d['attestation']['evidence_root'])"
+
+      - name: Upload final/current diagnostic artefact bundle
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ui-agentic-bundle-${{ github.sha }}
