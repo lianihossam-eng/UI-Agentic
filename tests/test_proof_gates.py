@@ -6,6 +6,7 @@ import yaml
 from core.attestation import attest, checker
 from core.coverage import CoverageLedger, final_confirmation_gate
 from core.scenario_compiler import MODAL_STATE_RULES, compile as compile_scenarios
+from scripts.fault_injection import MUTANTS
 
 BASE = pathlib.Path(__file__).resolve().parent.parent
 
@@ -148,8 +149,15 @@ class ProofGateTests(unittest.TestCase):
             and (scenario.get("transition") or {}).get("event") == "escape-close"
         ]
         self.assertEqual(len(escape), 10)
-        self.assertTrue(all((scenario["transition"]["action"] == "press:Escape") for scenario in escape))
+        self.assertTrue(all(scenario["transition"]["action"] == "press:Escape" for scenario in escape))
         self.assertEqual({scenario["viewport"] for scenario in escape}, set(domain["viewport_widths"]))
+
+    def test_mutation_contract_has_15_unique_required_mutants(self):
+        ids = [mutant["id"] for mutant in MUTANTS]
+        self.assertEqual(len(ids), 15)
+        self.assertEqual(len(ids), len(set(ids)))
+        self.assertIn("M14-escape-transition-handler-missing", ids)
+        self.assertIn("M15-modal-close-removed-from-tab-order", ids)
 
 
 if __name__ == "__main__":
