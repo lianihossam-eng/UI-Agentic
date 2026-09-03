@@ -36,6 +36,7 @@ EXTRACT_JS = r"""
     }
     const isTop = el.matches(':modal') || el.hasAttribute('open') || cs.position==='fixed';
     const visible = cs.display!=='none' && cs.visibility!=='hidden' && Number(cs.opacity)!==0 && rect.width>0 && rect.height>0;
+    const interactionActive = !el.closest('[inert]');
     const paint={
       color:cs.color,
       bg:cs.backgroundColor,
@@ -58,6 +59,7 @@ EXTRACT_JS = r"""
       transform: cs.transform,
       clippingAncestors: clips,
       visible,
+      interactionActive,
       visibleRegion: visible ? (rects[0]||[rect.x,rect.y,rect.width,rect.height]) : [0,0,0,0],
       layer:{positionMode:cs.position, zIndex:cs.zIndex, topLayer:!!isTop, paintOrder: els.indexOf(el)},
       paint, role, name, hit:{x:cx,y:cy, hitOk, hitTag: hitEl?.tagName||null},
