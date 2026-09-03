@@ -5,7 +5,7 @@ import yaml
 
 from core.attestation import attest, checker
 from core.coverage import CoverageLedger, final_confirmation_gate
-from core.scenario_compiler import compile as compile_scenarios
+from core.scenario_compiler import MODAL_STATE_RULES, compile as compile_scenarios
 
 BASE = pathlib.Path(__file__).resolve().parent.parent
 
@@ -70,17 +70,55 @@ class ProofGateTests(unittest.TestCase):
         }
         self.assertTrue(checker(bounded))
 
-    def test_compiler_emits_150_unique_obligations(self):
+    def _scenarios(self):
         domain = yaml.safe_load((BASE / "supported-domain.yaml").read_text())["supported_domain"]
-        scenarios = compile_scenarios(domain)
+        return domain, compile_scenarios(domain)
+
+    def test_compiler_emits_235_unique_obligations(self):
+        _, scenarios = self._scenarios()
         ids = [scenario["scenario_id"] for scenario in scenarios]
-        self.assertEqual(len(scenarios), 150)
+        self.assertEqual(len(scenarios), 235)
         self.assertEqual(len(ids), len(set(ids)))
         self.assertTrue(all(scenario["required_proof_level"] == "observed" for scenario in scenarios))
 
+    def test_breakpoint_rule_is_required_for_every_default_route_viewport(self):
+        domain, scenarios = self._scenarios()
+        breakpoint = [
+            scenario
+            for scenario in scenarios
+            if scenario["rule"] == "breakpoint.shell.direction" and scenario.get("state", "default") == "default"
+        ]
+        self.assertEqual(len(breakpoint), len(domain["routes"]) * len(domain["viewport_widths"]))
+        self.assertEqual(len(breakpoint), 15)
+
+    def test_modal_open_state_has_explicit_rule_matrix(self):
+        domain, scenarios = self._scenarios()
+        modal_state = [
+            scenario
+            for scenario in scenarios
+            if scenario.get("state") == "modal-open" and scenario["rule"] in MODAL_STATE_RULES
+        ]
+        modal_routes = [
+            route
+            for route, states in domain["states_by_route"].items()
+            if "modal-open" in states
+        ]
+        expected = len(MODAL_STATE_RULES) * len(modal_routes) * len(domain["viewport_widths"])
+        self.assertEqual(expected, 70)
+        self.assertEqual(len(modal_state), expected)
+        self.assertEqual(len({scenario["scenario_id"] for scenario in modal_state}), expected)
+
+    def test_modal_integrity_is_required_at_all_modal_viewports(self):
+        domain, scenarios = self._scenarios()
+        modal_integrity = [scenario for scenario in scenarios if scenario["rule"] == "MODAL_INTEGRITY"]
+        self.assertEqual(len(modal_integrity), 10)
+        self.assertEqual(
+            {scenario["viewport"] for scenario in modal_integrity},
+            set(domain["viewport_widths"]),
+        )
+
     def test_transitions_are_executed_at_all_declared_viewports(self):
-        domain = yaml.safe_load((BASE / "supported-domain.yaml").read_text())["supported_domain"]
-        scenarios = compile_scenarios(domain)
+        domain, scenarios = self._scenarios()
         transitions = [scenario for scenario in scenarios if scenario["rule"].startswith("transition:")]
         self.assertEqual(len(transitions), 20)
         self.assertEqual(
