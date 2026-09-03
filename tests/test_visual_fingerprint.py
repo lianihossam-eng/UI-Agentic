@@ -46,7 +46,7 @@ class VisualFingerprintTests(unittest.TestCase):
         return [[(value, value, value) for _ in range(8)] for _ in range(8)]
 
     def test_algorithm_identifier_is_versioned(self):
-        self.assertEqual(REVIEW_FINGERPRINT_ALGO, "png-blockmean4-v1")
+        self.assertEqual(REVIEW_FINGERPRINT_ALGO, "png-spatialmoments4-v2")
 
     def test_isolated_one_level_raster_noise_does_not_invalidate_review(self):
         base = self.root / "base.png"
@@ -77,6 +77,27 @@ class VisualFingerprintTests(unittest.TestCase):
         self.assertNotEqual(
             screenshot_review_fingerprint(base),
             screenshot_review_fingerprint(changed),
+        )
+
+    def test_same_mean_spatial_rearrangement_changes_review_fingerprint(self):
+        horizontal = self.root / "horizontal.png"
+        vertical = self.root / "vertical.png"
+        horizontal_pixels = self.image()
+        vertical_pixels = self.image()
+
+        for y in range(4):
+            for x in range(4):
+                horizontal_pixels[y][x] = (80 if x < 2 else 120, 100, 100)
+                vertical_pixels[y][x] = (80 if y < 2 else 120, 100, 100)
+
+        write_rgb_png(horizontal, 8, 8, horizontal_pixels)
+        write_rgb_png(vertical, 8, 8, vertical_pixels)
+
+        # Both 4x4 red blocks have exactly the same arithmetic mean (100), but
+        # their spatial arrangement differs. v1 block means collided here.
+        self.assertNotEqual(
+            screenshot_review_fingerprint(horizontal),
+            screenshot_review_fingerprint(vertical),
         )
 
     def test_corrupt_png_is_fail_closed(self):
