@@ -14,6 +14,7 @@ supported_domain:
       transitions:
         - {from: default, event: open, to: modal-open, action: "click:[data-testid='open-modal']", assertion: "modal-open"}
         - {from: modal-open, event: close, to: default, action: "click:[data-testid='close']", assertion: "modal-closed"}
+        - {from: modal-open, event: escape-close, to: default, action: "press:Escape", assertion: "modal-closed"}
       invariants: [MODAL_INTEGRITY]
     - id: analytics-drilldown
       route: /analytics
@@ -22,6 +23,7 @@ supported_domain:
       transitions:
         - {from: default, event: drill, to: modal-open, action: "click:[data-testid='open-modal']", assertion: "modal-open"}
         - {from: modal-open, event: close, to: default, action: "click:[data-testid='close']", assertion: "modal-closed"}
+        - {from: modal-open, event: escape-close, to: default, action: "press:Escape", assertion: "modal-closed"}
       invariants: [MODAL_INTEGRITY]
   input_modalities: [mouse, keyboard]
   locales_directions: ["fr-LTR"]
