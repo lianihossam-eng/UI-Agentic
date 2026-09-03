@@ -19,6 +19,7 @@ TRUSTED_KERNEL_FILES = (
     "gvh/extractor.py",
     "gvh/constraints.py",
     "gvh/paint.py",
+    "gvh/interaction.py",
     "gvh/a11y.py",
     "gvh/temporal.py",
     "gvh/wcag.py",
