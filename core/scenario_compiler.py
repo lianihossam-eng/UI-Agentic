@@ -8,6 +8,7 @@ RULE_SPECS = {
     "group.uniform_gap": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
     "global.spacing.scale": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
     "geometry.no-horizontal-overflow": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
+    "geometry.no-layout-collision": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
     "breakpoint.shell.direction": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
     "paint.contrast.text": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
     "component.button.hit-target": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
@@ -17,13 +18,13 @@ RULE_SPECS = {
     "temporal.geometry-stable": {"factors": ["route", "viewport_width"], "proof_level": "observed"},
 }
 
-# These rules can change materially when a modal becomes active: the overlay
-# adds spacing/paint, changes the active hit/focus scope, can affect horizontal
-# containment, and introduces a new temporal geometry surface. Rules not listed
-# here are deliberately not duplicated across state until a dependency is shown.
+# Modal activation changes active interaction/focus scope and can interact with
+# responsive geometry/paint. Until independence is proved, all state-sensitive
+# rules below are re-observed in modal-open.
 MODAL_STATE_RULES = (
     "global.spacing.scale",
     "geometry.no-horizontal-overflow",
+    "geometry.no-layout-collision",
     "paint.contrast.text",
     "component.button.hit-target",
     "TARGET_OPERABLE",
@@ -84,16 +85,12 @@ def compile(domain):
     scenarios = []
     widths = domain.get("viewport_widths", [768])
 
-    # Default rendered state.
     for rule_id, spec in RULE_SPECS.items():
         scenarios.extend(_expand_rule(rule_id, spec, domain))
 
     for model in domain.get("state_transition_models", []):
         route = model.get("route")
 
-        # Every declared transition is an independent obligation at every
-        # viewport. replay_engine establishes its declared source state on a
-        # fresh page, so branching transitions do not rely on list order.
         for width in widths:
             for transition in model.get("transitions", []):
                 scenarios.append(
