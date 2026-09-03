@@ -41,10 +41,16 @@ jobs:
       - name: Generate semantic current-run evidence
         run: python scripts/capture_current_run_evidence.py
 
+      - name: Enforce complete visual contract
+        run: python scripts/enforce_visual_contract.py
+
       - name: Run GOAL verification against current-run reports
         run: |
           set -o pipefail
           python run_goal_verify.py | tee reports/final_result.json
+
+      - name: Strict visual acceptance gate
+        run: python scripts/strict_visual_gate.py
 
       - name: Provenance fail-closed tests
         run: |
@@ -88,9 +94,22 @@ jobs:
           print('traceability deletion blocked OK')
           p3.write_text(json.dumps(orig3, indent=2, sort_keys=True))
 
+          visual=base/'reports/visual_review.json'
+          origv=json.loads(visual.read_text())
+          tamperv=json.loads(visual.read_text())
+          first_name=sorted(tamperv['screenshot_digests'])[0]
+          tamperv['screenshot_digests'][first_name]='0000000000000000'
+          visual.write_text(json.dumps(reh(tamperv), indent=2, sort_keys=True))
+          rv=subprocess.run(['python','scripts/strict_visual_gate.py'], capture_output=True)
+          assert rv.returncode==2, 'visual screenshot digest tamper should block'
+          print('visual screenshot tamper blocked OK')
+          visual.write_text(json.dumps(origv, indent=2, sort_keys=True))
+
           r4=subprocess.run(['python','run_goal_verify.py'], capture_output=True)
           assert r4.returncode==0, 'restored current-run evidence should pass'
-          print('provenance tamper tests all pass')
+          r5=subprocess.run(['python','scripts/strict_visual_gate.py'], capture_output=True)
+          assert r5.returncode==0, 'restored visual evidence should pass'
+          print('provenance + visual tamper tests all pass')
           "
 
       - name: Finalize self-contained attestation
