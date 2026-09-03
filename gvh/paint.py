@@ -36,6 +36,8 @@ def check_paint(ir):
         for value in ir["nodes"].values()
         if value.get("visible") and value.get("testid") in ("card", "main", "btn")
     ]
+
+    measured = []
     for value in candidates:
         paint = value.get("paint", {})
         color = paint.get("color")
@@ -43,18 +45,37 @@ def check_paint(ir):
         ratio = contrast(color, background)
         if ratio is None:
             continue
-        return [{
+        measured.append(
+            {
+                "testid": value.get("testid"),
+                "ratio": round(ratio, 4),
+                "color": color,
+                "background": background,
+            }
+        )
+
+    if not measured:
+        return [
+            {
+                "constraint": "paint.contrast.text",
+                "owner": "PAGE",
+                "status": "UNKNOWN",
+                "reason": "no-measurable-visible-text-surface",
+            }
+        ]
+
+    failures = [item for item in measured if item["ratio"] < 4.5]
+    minimum = min(item["ratio"] for item in measured)
+    return [
+        {
             "constraint": "paint.contrast.text",
             "owner": "PAGE",
-            "status": "PASS" if ratio >= 4.5 else "FAIL",
-            "ratio": round(ratio, 2),
+            "status": "FAIL" if failures else "PASS",
             "expected": 4.5,
-            "actual": f"{color} on {background}",
-        }]
-
-    return [{
-        "constraint": "paint.contrast.text",
-        "owner": "PAGE",
-        "status": "UNKNOWN",
-        "reason": "no-measurable-visible-text-surface",
-    }]
+            "minimum_ratio": round(minimum, 2),
+            "measured_count": len(measured),
+            "failure_count": len(failures),
+            "failures": failures[:20],
+            "samples": measured[:50],
+        }
+    ]
