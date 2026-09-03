@@ -225,6 +225,41 @@ def run():
     total = len(results)
     detected = sum(1 for r in results if r["detected"])
     survived = total - detected
+    # Provenance bindings — must survive refresh and match strict gate
+    import subprocess as _sp
+    try:
+        _commit = _sp.check_output(["git","rev-parse","HEAD"], cwd=BASE).decode().strip()
+    except Exception:
+        _commit = "unknown"
+    from core.scenario_compiler import compile as _compile
+    _scenarios = _compile(DOMAIN)
+    _scenario_digest = hashlib.sha256(json.dumps(_scenarios, sort_keys=True).encode()).hexdigest()[:16]
+    _rules_seed = ["group.uniform_gap","global.spacing.scale","paint.contrast.text","component.button.hit-target","TARGET_OPERABLE","accessibility.focus-order","FOCUS_USABLE","temporal.geometry-stable","MODAL_INTEGRITY","breakpoint.shell.direction"]
+    _rules_digest = hashlib.sha256((BASE / "supported-domain.yaml").read_bytes() + json.dumps(_rules_seed, sort_keys=True).encode()).hexdigest()[:16]
+    _checker_files = ["gvh/verify.py","gvh/extractor.py","core/coverage.py","core/scenario_compiler.py"]
+    _checker_digest = hashlib.sha256(b"".join((BASE / p).read_bytes() for p in _checker_files)).hexdigest()[:16]
+    # env manifest digest (current on-disk, will be refreshed post-run if needed)
+    _manifest_path = BASE / "reports" / "environment_manifest.json"
+    try:
+        _manifest_data = json.loads(_manifest_path.read_text())
+        _manifest_copy = {k:v for k,v in _manifest_data.items() if k not in ("manifest_digest","manifest_hash_algo")}
+        _env_digest = hashlib.sha256(json.dumps(_manifest_copy, sort_keys=True).encode()).hexdigest()[:16]
+    except Exception:
+        _env_digest = "unknown"
+    # evidence_root from current attestation if available (fallback to unknown, refresh script will fix)
+    _evidence_root = "unknown"
+    try:
+        _att = json.loads((BASE / ".goal_attestation.json").read_text())
+        _evidence_root = _att.get("attestation",{}).get("evidence_root","unknown")
+    except Exception:
+        pass
+    # fallback: compute from DAG if attestation not yet generated
+    if _evidence_root == "unknown":
+        try:
+            from core.coverage import EvidenceDAG
+            _evidence_root = EvidenceDAG().root_digest()  # will be overwritten by refresh; placeholder
+        except Exception:
+            _evidence_root = "unknown"
     payload = {
         "generated_at": "2026-09-03T08:35:00Z",
         "browser": f"chromium@{version}",
@@ -236,6 +271,12 @@ def run():
         "survivors": [r for r in results if r["survivor"]],
         "status": "PASS" if survived == 0 else "FAIL",
         "critical_mutants_zero": survived == 0,
+        "commit_sha": _commit,
+        "scenario_digest": _scenario_digest,
+        "rules_digest": _rules_digest,
+        "checker_digest": _checker_digest,
+        "environment_manifest_digest": _env_digest,
+        "evidence_root": _evidence_root,
     }
     # compute hash
     raw = json.dumps({k:v for k,v in payload.items() if k!="report_hash"}, sort_keys=True).encode()

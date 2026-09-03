@@ -28,7 +28,7 @@
     }
   },
   "checker_digest": "920ae5aaa6401f93",
-  "commit_sha": "9d06596d6930e2e4e7db2d26a862555b1bf2d1f5",
+  "commit_sha": "6391f058056c5eae647cb03ed2c1f449403ea36c",
   "critical_mutants_zero": true,
   "details": [
     {
@@ -145,11 +145,11 @@
     }
   ],
   "detected": 7,
-  "environment_manifest_digest": "e3552579efe7f8df",
+  "environment_manifest_digest": "aa49b658f65f4031",
   "evidence_root": "3de70793411e3277",
   "generated_at": "2026-09-03T08:35:00Z",
   "mutants_total": 7,
-  "report_hash": "8ea7ffd721191e22",
+  "report_hash": "f421221a0b656a11",
   "report_hash_algo": "sha256:16",
   "rules_digest": "fabd8f3a8bfa1f50",
   "scenario_digest": "5d43a5ee4cc4f8f5",

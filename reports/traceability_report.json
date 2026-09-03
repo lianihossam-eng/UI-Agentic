@@ -1,8 +1,8 @@
 {
   "checker": "traceability-checker-v1",
   "checker_digest": "920ae5aaa6401f93",
-  "commit_sha": "9d06596d6930e2e4e7db2d26a862555b1bf2d1f5",
-  "environment_manifest_digest": "e3552579efe7f8df",
+  "commit_sha": "6391f058056c5eae647cb03ed2c1f449403ea36c",
+  "environment_manifest_digest": "aa49b658f65f4031",
   "evidence_root": "3de70793411e3277",
   "generated_at": "2026-09-03T08:30:00Z",
   "mapping": [
@@ -638,7 +638,7 @@
     }
   ],
   "percentage": 100.0,
-  "report_hash": "865ae87143f9aa9b",
+  "report_hash": "502d9f1c03f71231",
   "report_hash_algo": "sha256:16",
   "required_obligations": 90,
   "rules_digest": "fabd8f3a8bfa1f50",

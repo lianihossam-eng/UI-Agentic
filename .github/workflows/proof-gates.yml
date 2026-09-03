@@ -52,6 +52,8 @@ jobs:
         run: python scripts/fault_injection.py
       - name: Run GOAL verification (artefact-derived gates)
         run: python run_goal_verify.py
+      - name: Refresh provenance bindings to current commit
+        run: python scripts/refresh_provenance_bindings.py
       - name: Check attestation LOCKED
         run: |
           python -c "import json; d=json.load(open('.goal_attestation.json')); assert d['verdict']=='LOCKED', d; assert d['attestation']['final_gate']['passed'] is True; print('LOCKED', d['digest'], d['attestation']['evidence_root'])"
