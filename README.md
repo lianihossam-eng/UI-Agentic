@@ -2,7 +2,7 @@
 
 > Un seul workflow pour concevoir, stabiliser, vérifier et verrouiller une UI avec preuves — de la pyramide au pixel.
 
-**Statut public actuel:** architecture **STABLE** • moteur de validation exécutable **AUDITÉ / fail-closed** • ancienne attestation `db1a1f55a1bdda6e` **STALE** après suppression de chemins `PASS` synthétiques • nouvelle confirmation requise avant tout statut `LOCKED`.
+**Statut public actuel:** architecture **STABLE** • moteur de validation exécutable **AUDITÉ / fail-closed** • vertical slice public `90/90` sur le Supported Domain déclaré • un commit n’est `LOCKED` que lorsque son workflow GitHub `proof-gates` est entièrement vert et que l’artefact CI du même run contient l’attestation finale autoportante.
 
 ## Le principe
 
@@ -67,13 +67,16 @@ UI-Agentic/
 ├── assets/templates/
 ├── evaluations/
 ├── archive/
-├── run_goal_verify.py
-└── .goal_attestation.json
+├── scripts/
+├── reports/visual_approval.json
+└── run_goal_verify.py
 ```
+
+`.goal_attestation.json` est **généré au runtime par CI et ignoré par Git**. Il n’est pas versionné, car une attestation qui prétend lier le SHA du commit qui la contient créerait une référence récursive impossible à rendre exacte. L’autorité est donc l’artefact GitHub Actions produit par le run du commit attesté.
 
 ## Supported Domain exécutable actuel
 
-Le fichier `supported-domain.yaml` sépare désormais explicitement :
+Le fichier `supported-domain.yaml` sépare explicitement :
 
 - `supported_domain` : facteurs réellement visés par le runner public ;
 - `target_domain_extensions` : fonctionnalités futures qui **ne comptent pas** dans la confirmation actuelle.
@@ -90,6 +93,30 @@ Le domaine exécutable actuel comprend :
 
 Le domaine continu `[320,1440]`, touch, WCAG 2.2 AA complet, contenu extrême et scénarios async avancés sont actuellement hors confirmation.
 
+## Visual Acceptance v3
+
+Le gate visuel est **exact-snapshot**, pas portable.
+
+La matrice actuelle comprend :
+
+```text
+3 routes × 5 viewports en état default       = 15 images
+2 routes modales × 5 viewports en modal-open = 10 images
+                                                ---------
+                                                 25 images
+```
+
+Le digest du snapshot est calculé à partir des digests des 25 fichiers. Une approbation n’est valable que pour **un seul digest exact** et doit contenir :
+
+- reviewer explicite (`reviewer_type=agent`, `reviewer=agent:<id>` dans la CI actuelle) ;
+- timestamp de revue ;
+- portée `default + modal-open` ;
+- nombre exact d’images ;
+- digest exact du bundle revu ;
+- verdict `ACCEPTED` ou `REJECTED`.
+
+Un autre rendu pixel, même fonctionnellement équivalent, nécessite un nouvel enregistrement d’approbation. Il n’existe plus de whitelist `accepted_snapshots` ni d’attribution implicite à un humain.
+
 ## Quickstart
 
 ```bash
@@ -98,32 +125,39 @@ playwright install chromium
 python run_goal_verify.py
 ```
 
-Le runner est volontairement **fail-closed** : tant que les gates externes ne sont pas fournis, il termine sans nouvelle attestation `LOCKED`.
+Le runner est volontairement **fail-closed** : une preuve absente, un report invalide, un binding incohérent ou un Visual Acceptance non accepté bloque le `LOCKED`.
 
 ## Corrections issues de l’audit public indépendant
 
-La publication GitHub a permis de détecter plusieurs défauts que les rapports précédents ne permettaient pas de voir :
+La publication GitHub a permis de détecter plusieurs défauts que les rapports initiaux ne permettaient pas de voir :
 
 1. plusieurs règles recevaient un `PASS` synthétique dans le runner final ;
 2. `measurement_readiness()` contenait un `or True` qui neutralisait le gate ;
 3. les transitions étaient comptées comme `PASS` sans événement réellement exécuté ;
 4. l’attestation pouvait retourner `LOCKED` sans valider le Final Confirmation Gate ;
-5. le README revendiquait un périmètre WCAG/ACT plus large que l’implémentation publique.
+5. le README revendiquait un périmètre WCAG/ACT plus large que l’implémentation publique ;
+6. des reports pouvaient être rebindés au run courant sans être réellement régénérés ;
+7. une ancienne preuve visuelle pouvait être transférée entre plusieurs snapshots ;
+8. une identité humaine pouvait être déclarée sans mécanisme de preuve ;
+9. le Final Gate visuel était encore câblé sur `15` screenshots alors que les états modaux devaient aussi être revus ;
+10. une attestation runtime ancienne était versionnée dans le dépôt et pouvait être confondue avec l’attestation du HEAD courant.
 
-Ces chemins ont été supprimés ou reclassés. Désormais :
+Ces chemins ont été supprimés ou rendus fail-closed. Désormais :
 
 ```text
 preuve réelle → PASS
 preuve négative → FAIL
 preuve absente / checker absent → UNKNOWN
 Final Gate incomplet → NO LOCK
+Visual snapshot différent → nouvelle revue
+attestation autoritative → artefact CI du commit exact
 ```
 
-L’ancienne attestation `db1a1f55a1bdda6e` est donc conservée uniquement comme historique et marquée `STALE`.
+L’ancienne attestation `db1a1f55a1bdda6e` et les anciennes attestations locales sont uniquement historiques et ne constituent pas une preuve du HEAD courant.
 
-## Gates encore nécessaires avant une nouvelle attestation
+## Final Confirmation Gate
 
-Le runner exige désormais explicitement les gates suivants :
+Le runner exige explicitement :
 
 ```text
 requirement_traceability
@@ -142,13 +176,49 @@ visual_acceptance
 
 Un gate absent ou non démontré bloque la confirmation.
 
+Le workflow CI ajoute en plus :
+
+```text
+unit tests
+→ fault injection 7 classes
+→ semantic current-run evidence
+→ complete visual contract
+→ GOAL verification
+→ strict visual gate
+→ provenance tamper tests
+→ self-contained attestation
+→ strict current-run provenance gate
+→ LOCKED assertion
+→ immutable Actions artifact
+```
+
+## Autorité de l’attestation
+
+Pour un commit donné, la preuve autoritative est le bundle GitHub Actions du **même SHA**. L’attestation finale lie notamment :
+
+```text
+commit_sha
+source_run_id
+scenario_digest
+rules_digest
+checker_digest
+environment_manifest_digest
+evidence_root
+reports_root
+visual_evidence_root
+final_gate
+```
+
+Le strict provenance gate recalcule les hashes de reports, le runtime Python/Playwright/Chromium, les bytes des screenshots, le snapshot visuel et le digest de l’attestation avant de permettre `LOCKED`.
+
 ## Preuves honnêtes
 
 - sampling seul = `OBSERVED`, jamais `BOUNDED` ;
 - `UNKNOWN` bloque la confirmation ;
 - aucune attestation `LOCKED` si le Final Gate n’est pas `PASS` ;
 - Evidence DAG inclut code, contrat, règle, scénario, navigateur, checker et environnement ;
-- toute modification d’une entrée de preuve invalide l’attestation correspondante.
+- toute modification d’une entrée de preuve invalide l’attestation correspondante ;
+- une revue visuelle ne se transfère jamais vers un digest pixel différent.
 
 ## Publication / contribution
 
@@ -166,8 +236,9 @@ clean replay
 → fault injection / mutation adequacy
 → deterministic reproduction
 → gates externes fermés
-→ Visual Acceptance indépendant
-→ nouvelle attestation
+→ Visual Acceptance exact-snapshot
+→ attestation CI autoportante
+→ strict provenance PASS
 → LOCKED
 ```
 
@@ -183,4 +254,4 @@ ROOT — workflow canonique
 README — façade humaine / publication
 ```
 
-Le dépôt GitHub est désormais la source auditable de l’implémentation publique. Notion reste la source de conception et de coordination de l’équipe.
+Le dépôt GitHub est la source auditable de l’implémentation publique. Notion reste la source de conception et de coordination de l’équipe.
