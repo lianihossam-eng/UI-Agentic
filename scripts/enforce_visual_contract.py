@@ -9,14 +9,18 @@ from __future__ import annotations
 import hashlib
 import json
 import pathlib
+import sys
 from datetime import datetime, timezone
+
+BASE = pathlib.Path(__file__).resolve().parent.parent
+if str(BASE) not in sys.path:
+    sys.path.insert(0, str(BASE))
 
 import yaml
 from playwright.sync_api import sync_playwright
 
 from core.visual_fingerprint import REVIEW_FINGERPRINT_ALGO, review_fingerprint_manifest
 
-BASE = pathlib.Path(__file__).resolve().parent.parent
 REPORT_DIR = BASE / "reports"
 SCREENSHOT_DIR = REPORT_DIR / "screenshots"
 APPROVAL_PATH = REPORT_DIR / "visual_approval.json"
