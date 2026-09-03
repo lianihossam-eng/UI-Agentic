@@ -2,7 +2,8 @@
 
 Must run only after run_goal_verify.py and the pre-attestation gate have passed.
 The resulting attestation binds the current commit, environment, report root,
-visual snapshot, Evidence DAG root and complete Trusted Verification Kernel.
+visual snapshot, Evidence DAG root, runtime binaries/fonts and complete Trusted
+Verification Kernel.
 """
 from __future__ import annotations
 
@@ -39,6 +40,10 @@ def fail(message: str):
 
 def sha256_json(data: object) -> str:
     return hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()
+
+
+def sha16_json(data: object) -> str:
+    return hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()[:16]
 
 
 def current_commit() -> str:
@@ -100,6 +105,31 @@ def main() -> int:
     if current_run.get("visual_snapshot_digest") != visual_root:
         fail("current_run_evidence visual snapshot mismatch")
 
+    runtime = load(REPORT_DIR / "runtime_identity.json")
+    runtime_payload = {
+        key: value
+        for key, value in runtime.items()
+        if key not in ("report_hash", "report_hash_algo")
+    }
+    if not runtime.get("report_hash") or sha16_json(runtime_payload) != runtime.get("report_hash"):
+        fail("runtime_identity report hash mismatch")
+    if runtime.get("generation_mode") != "current-run" or runtime.get("status") != "PASS":
+        fail("runtime_identity is not current-run PASS")
+    current_binding = current_run.get("binding") or {}
+    for field in (
+        "commit_sha",
+        "scenario_digest",
+        "rules_digest",
+        "checker_digest",
+        "environment_manifest_digest",
+        "evidence_root",
+    ):
+        if runtime.get(field) != current_binding.get(field):
+            fail(f"runtime_identity binding mismatch: {field}")
+    runtime_root = runtime.get("runtime_identity_root")
+    if not runtime_root:
+        fail("runtime_identity_root missing")
+
     kernel_manifest = trusted_kernel_manifest(BASE)
     kernel_digest = trusted_kernel_digest(BASE)
     kernel_manifest_path = REPORT_DIR / "trusted_kernel_manifest.json"
@@ -116,7 +146,7 @@ def main() -> int:
     )
 
     payload = {
-        "attestation_version": "2.1",
+        "attestation_version": "2.2",
         "subject": {"commit_sha": commit, "build_digest": commit},
         "contract": "public-audit-contract-v2",
         "scenario_digest": manifest.get("scenario_digest"),
@@ -125,6 +155,7 @@ def main() -> int:
         "trusted_kernel_digest": kernel_digest,
         "trusted_kernel_manifest": kernel_manifest,
         "environment_manifest_digest": manifest.get("manifest_digest"),
+        "runtime_identity_root": runtime_root,
         "evidence_root": result.get("evidence_root"),
         "reports_root": reports_root,
         "report_hashes": report_hashes,
@@ -153,6 +184,7 @@ def main() -> int:
                 "evidence_root": payload["evidence_root"],
                 "reports_root": reports_root,
                 "visual_evidence_root": visual_root,
+                "runtime_identity_root": runtime_root,
                 "trusted_kernel_digest": kernel_digest,
                 "source_run_id": payload["source_run_id"],
             },
