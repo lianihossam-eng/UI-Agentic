@@ -181,12 +181,13 @@ def main():
             record(ledger, dag, scenario, result, browser_version, readiness)
             context.close()
 
-        by_model = {}
+        by_model_viewport = {}
         for scenario in transition_scenarios:
-            by_model.setdefault(scenario["model"], []).append(scenario)
-        for model, scenarios in by_model.items():
+            key = (scenario["model"], scenario.get("viewport", 768))
+            by_model_viewport.setdefault(key, []).append(scenario)
+        for (model, viewport), scenarios in by_model_viewport.items():
             route = scenarios[0]["route"]
-            context = browser.new_context(viewport={"width": 768, "height": DOMAIN.get("viewport_height", 900)})
+            context = browser.new_context(viewport={"width": viewport, "height": DOMAIN.get("viewport_height", 900)})
             page = context.new_page()
             page.goto(ROUTE_FILE[route].as_uri())
             readiness = measurement_readiness(page)
