@@ -2,7 +2,7 @@
 <style>:root{--gap:24px;--pad:16px}*{box-sizing:border-box}body{margin:0;font:14px/1.5 system-ui}.shell{display:flex;gap:24px}.sidebar{width:264px;background:#f1f5f9;min-height:100vh}.main{flex:1;padding:16px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}.card{border:1px solid #e2e8f0;border-radius:8px;padding:16px}button{padding:8px 16px;min-width:44px;min-height:44px}.modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.4)}.modal[open]{display:grid}.modal .box{background:white;padding:24px;border-radius:12px;width:480px}
   @media (max-width: 767px){
     .shell{flex-direction:column}
-    .sidebar{width:100%;min-height:auto;padding:12px}
+    .sidebar{width:100%;min-height:auto;padding:16px}
     .grid{grid-template-columns:1fr !important}
   }
 </style>
@@ -10,10 +10,26 @@
 <div class="shell"><aside class="sidebar" data-testid="sidebar">Sidebar</aside>
 <main class="main" data-testid="main">
   <h1>Settings</h1>
+  <button data-testid="open-modal">Open confirmation</button>
   <div class="grid" data-testid="grid">
     <div class="card" data-testid="card"><h3>Profile</h3><button data-testid="btn">Edit</button></div>
     <div class="card" data-testid="card"><h3>Notifications</h3><button data-testid="btn">Configure</button></div>
   </div>
-  <!-- L4 test: modal that should be PAINTED_ABOVE header -->
   <div class="modal" data-testid="modal"><div class="box" role="dialog" aria-modal="true"><h2>Confirm</h2><button data-testid="close">OK</button></div></div>
-</main></div></body></html>
+</main></div>
+<script>
+(() => {
+  const modal=document.querySelector('[data-testid="modal"]');
+  const opener=document.querySelector('[data-testid="open-modal"]');
+  const closer=document.querySelector('[data-testid="close"]');
+  opener.addEventListener('click', () => {
+    modal.setAttribute('open','');
+    closer.focus();
+  });
+  closer.addEventListener('click', () => {
+    modal.removeAttribute('open');
+    opener.focus();
+  });
+})();
+</script>
+</body></html>
