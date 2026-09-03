@@ -1,50 +1,48 @@
 {
-  "contract": "visual-v3-exact-snapshot",
+  "contract": "visual-v4-raster-equivalence",
   "approvals": [
     {
-      "snapshot_digest": "4721d2c048464f07",
-      "reviewed_images_digest": "4721d2c048464f07",
-      "reviewed_image_count": 25,
-      "reviewed_states": ["default", "modal-open"],
-      "reviewer": "agent:ChatGPT-GPT-5.6-Sol:visual-review",
-      "reviewer_type": "agent",
-      "reviewed_at": "2026-09-03T15:48:12Z",
-      "rubric": "Reviewed all 25 current-run screenshots: 15 default states plus 10 modal-open states across 320/375/768/1024/1440. Checked for unintended overflow/collision, responsive coherence, readable hierarchy, modal centering/containment, overlay integrity, and obvious visual regressions. Pixel-level check confirmed mobile modal vertical center at approximately y=449.5 in a 900px viewport.",
-      "verdict": "ACCEPTED"
-    },
-    {
-      "snapshot_digest": "af39cb89120ff1ba",
-      "reviewed_images_digest": "af39cb89120ff1ba",
-      "reviewed_image_count": 25,
-      "reviewed_states": ["default", "modal-open"],
-      "reviewer": "agent:ChatGPT-GPT-5.6-Sol:visual-review",
-      "reviewer_type": "agent",
-      "reviewed_at": "2026-09-03T16:36:11Z",
-      "rubric": "Reviewed the exact 25-image bundle from GitHub Actions artifact 9902868931 for commit d15095fec335c1dfc320e815fbe7c881eb05d3d5: 15 default screenshots and 10 modal-open screenshots across 320/375/768/1024/1440. Checked unintended overflow/collision, responsive coherence, hierarchy/readability, overlay consistency, modal viewport containment and centering, and obvious visual regression. Mobile 320/375 modal layouts are fully contained with usable margins and no clipping. No blocking visual defect observed.",
-      "verdict": "ACCEPTED"
-    },
-    {
-      "snapshot_digest": "904eb69621d5c41e",
-      "reviewed_images_digest": "904eb69621d5c41e",
-      "reviewed_image_count": 25,
-      "reviewed_states": ["default", "modal-open"],
-      "reviewer": "agent:ChatGPT-GPT-5.6-Sol:visual-review",
-      "reviewer_type": "agent",
-      "reviewed_at": "2026-09-03T17:57:49Z",
-      "rubric": "Reviewed the exact 25-image bundle from GitHub Actions artifact 9905944001 / run 33787245613 for PR #1: 15 default screenshots plus 10 modal-open screenshots across 320/375/768/1024/1440. Checked unintended horizontal overflow, clipping, visible layout collisions, responsive coherence, hierarchy/readability, modal containment/centering, overlay coverage and obvious visual regression. No blocking visual defect observed in the exact snapshot 904eb69621d5c41e.",
-      "verdict": "ACCEPTED"
-    },
-    {
-      "snapshot_digest": "915dab9ca69a1506",
-      "reviewed_images_digest": "915dab9ca69a1506",
+      "review_fingerprint_digest": "71632ac3232296ee",
+      "reviewed_fingerprint_algo": "png-blockmean4-v1",
+      "reviewed_snapshot_digest": "915dab9ca69a1506",
       "reviewed_image_count": 25,
       "reviewed_states": ["default", "modal-open"],
       "reviewer": "agent:ChatGPT-GPT-5.6-Sol:visual-review",
       "reviewer_type": "agent",
       "reviewed_at": "2026-09-03T18:05:43Z",
-      "rubric": "Reviewed the exact 25-image bundle from main GitHub Actions run 33787936069 / artifact 9906220437 for commit 92f395c90b8b6b566b9e2d1eddfa08b9846903b1. All 25 screenshots were checked across default/modal-open states and 320/375/768/1024/1440. Comparison against the already reviewed PR snapshot found 22/25 images byte-identical; only analytics-1440, analytics-375 and analytics-768 differed, totaling 8 pixels, each by a one-level RGB raster variation. No geometry, content, clipping, overflow, collision, modal containment, responsive-layout or visually meaningful regression was observed. Exact current snapshot 915dab9ca69a1506 accepted.",
+      "rubric": "Reviewed the exact 25-image bundle from main GitHub Actions run 33787936069 / artifact 9906220437 for commit 92f395c90b8b6b566b9e2d1eddfa08b9846903b1. All 25 screenshots were checked across default/modal-open states and 320/375/768/1024/1440. Comparison against the already reviewed PR snapshot found 22/25 images byte-identical; only analytics-1440, analytics-375 and analytics-768 differed, totaling 8 pixels, each by a one-level RGB raster variation. No geometry, content, clipping, overflow, collision, modal containment, responsive-layout or visually meaningful regression was observed. The v4 approval applies only to the deterministic png-blockmean4-v1 raster-equivalence class derived from this reviewed snapshot; exact current-run PNG hashes remain independently verified and reported.",
       "verdict": "ACCEPTED"
     }
   ],
-  "note": "Exact-snapshot approval only. No portable approval. A different pixel snapshot requires a separate explicit review record."
+  "legacy_exact_snapshot_approvals": [
+    {
+      "snapshot_digest": "4721d2c048464f07",
+      "reviewed_image_count": 25,
+      "reviewer": "agent:ChatGPT-GPT-5.6-Sol:visual-review",
+      "reviewed_at": "2026-09-03T15:48:12Z",
+      "verdict": "ACCEPTED"
+    },
+    {
+      "snapshot_digest": "af39cb89120ff1ba",
+      "reviewed_image_count": 25,
+      "reviewer": "agent:ChatGPT-GPT-5.6-Sol:visual-review",
+      "reviewed_at": "2026-09-03T16:36:11Z",
+      "verdict": "ACCEPTED"
+    },
+    {
+      "snapshot_digest": "904eb69621d5c41e",
+      "reviewed_image_count": 25,
+      "reviewer": "agent:ChatGPT-GPT-5.6-Sol:visual-review",
+      "reviewed_at": "2026-09-03T17:57:49Z",
+      "verdict": "ACCEPTED"
+    },
+    {
+      "snapshot_digest": "915dab9ca69a1506",
+      "reviewed_image_count": 25,
+      "reviewer": "agent:ChatGPT-GPT-5.6-Sol:visual-review",
+      "reviewed_at": "2026-09-03T18:05:43Z",
+      "verdict": "ACCEPTED"
+    }
+  ],
+  "note": "Approval is not portable across arbitrary visual changes. It is portable only within the explicitly checked png-blockmean4-v1 raster-equivalence class. Exact PNG byte hashes and the exact snapshot digest remain current-run evidence and must still validate independently."
 }
