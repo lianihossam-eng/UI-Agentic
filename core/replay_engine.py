@@ -179,14 +179,48 @@ def _execute_transition(page, transition: dict) -> dict:
     }
 
 
+def _route_navigation_target(
+    route: str,
+    route_files: dict[str, pathlib.Path] | None,
+    route_targets: dict[str, str] | None,
+) -> str:
+    if route_targets is not None:
+        target = route_targets.get(route)
+        if not target:
+            raise ValueError(f"missing navigation target for route {route}")
+        return target
+    if route_files is not None and route in route_files:
+        return route_files[route].as_uri()
+    raise ValueError(f"no route source configured for {route}")
+
+
+def _route_code_digest(
+    route: str,
+    route_files: dict[str, pathlib.Path] | None,
+    route_code_digests: dict[str, str] | None,
+) -> str:
+    if route_code_digests is not None:
+        digest = route_code_digests.get(route)
+        if not digest:
+            raise ValueError(f"missing code digest for route {route}")
+        return digest
+    if route_files is not None and route in route_files:
+        return _file_hash(route_files[route])
+    raise ValueError(f"no code identity configured for route {route}")
+
+
 def replay(
     *,
     domain: dict,
     scenarios: list[dict],
-    route_files: dict[str, pathlib.Path],
+    route_files: dict[str, pathlib.Path] | None = None,
+    route_targets: dict[str, str] | None = None,
+    route_code_digests: dict[str, str] | None = None,
     capture_screenshots: bool = False,
     screenshot_dir: pathlib.Path | None = None,
 ) -> dict:
+    if route_targets is not None and route_code_digests is None:
+        raise ValueError("route_code_digests is required for external navigation targets")
     ledger = CoverageLedger(scenarios)
     dag = EvidenceDAG()
     records: list[dict] = []
@@ -214,7 +248,7 @@ def replay(
             }
         ledger.record(result)
         route = scenario.get("route", "global")
-        code_digest = _file_hash(route_files[route]) if route in route_files else "no-route"
+        code_digest = _route_code_digest(route, route_files, route_code_digests)
         environment = {
             **rendered_environment,
             "browser": browser_version,
@@ -280,7 +314,7 @@ def replay(
                 viewport={"width": viewport, "height": domain.get("viewport_height", 900)}
             )
             page = context.new_page()
-            page.goto(route_files[route].as_uri())
+            page.goto(_route_navigation_target(route, route_files, route_targets))
 
             state_ok, state_reason = _apply_state(page, state)
             rendered_environment = _render_environment(page, domain, state)
@@ -317,13 +351,10 @@ def replay(
                 record(scenario, result, browser_version, readiness, rendered_environment)
 
             if capture_screenshots and state == "default":
-                out = screenshot_dir / f"{route.strip('/')}-{viewport}.png"
+                out = screenshot_dir / f"{route.strip('/').replace('/', '-') or 'root'}-{viewport}.png"
                 page.screenshot(path=str(out), full_page=True)
             context.close()
 
-        # Every transition is an independent proof obligation. Its declared
-        # source state is established on a fresh page before readiness and the
-        # event, so branching exits from modal-open do not depend on list order.
         for scenario in transitions:
             route = scenario["route"]
             viewport = scenario.get("viewport", 768)
@@ -333,7 +364,7 @@ def replay(
                 viewport={"width": viewport, "height": domain.get("viewport_height", 900)}
             )
             page = context.new_page()
-            page.goto(route_files[route].as_uri())
+            page.goto(_route_navigation_target(route, route_files, route_targets))
             state_ok, state_reason = _apply_state(page, source_state)
             rendered_environment = _render_environment(page, domain, source_state)
             if not state_ok:
