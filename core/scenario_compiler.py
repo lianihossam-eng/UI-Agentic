@@ -1,31 +1,56 @@
-"""Scenario Compiler v3 — 3 routes, recompile R"""
+"""Scenario Compiler — dependency-scoped obligations for the executable demo."""
+
+RULE_SPECS = {
+    "group.uniform_gap": {"factors": ["route", "viewport_width"]},
+    "global.spacing.scale": {"factors": ["route", "viewport_width"]},
+    "paint.contrast.text": {"factors": ["route"]},
+    "component.button.hit-target": {"factors": ["route", "viewport_width"]},
+    "TARGET_OPERABLE": {"factors": ["route", "viewport_width"]},
+    "accessibility.focus-order": {"factors": ["route"]},
+    "FOCUS_USABLE": {"factors": ["route"]},
+    "temporal.geometry-stable": {"factors": ["route", "viewport_width"]},
+}
+
+
+def _expand_rule(rule_id, spec, domain):
+    factors = spec.get("factors", [])
+    routes = domain.get("routes", []) if "route" in factors else [None]
+    widths = domain.get("viewport_widths", [768]) if "viewport_width" in factors else [768]
+    scenarios = []
+    for route in routes:
+        for width in widths:
+            scenario = {"rule": rule_id, "viewport": width}
+            if route is not None:
+                scenario["route"] = route
+            scenarios.append(scenario)
+    return scenarios
+
+
 def compile(domain):
-    routes=domain['routes']
-    vw=domain['viewport_ranges']['width']
-    classes=[w for w in [320,375,768,1024,1440] if vw[0]<=w<=vw[1]]
-    rules={
-        'group.uniform_gap': ['viewport_width','route'],
-        'global.spacing.scale': [],
-        'paint.contrast.text': [],
-        'component.button.hit-target': ['viewport_width','route'],
-        'TARGET_OPERABLE': ['viewport_width','route'],
-        'accessibility.focus-order': ['route'],
-        'FOCUS_USABLE': ['route'],
-        'temporal.geometry-stable': [],
-        'MODAL_INTEGRITY': ['route'],
-    }
-    scenarios=[]
-    for r,f in rules.items():
-        if 'route' in f:
-            for route in routes:
-                if 'viewport_width' in f:
-                    for w in classes: scenarios.append({'rule':r,'route':route,'viewport':w})
-                else: scenarios.append({'rule':r,'route':route,'viewport':768})
-        elif 'viewport_width' in f:
-            for w in classes: scenarios.append({'rule':r,'viewport':w})
-        else:
-            scenarios.append({'rule':r,'viewport':768})
-    for m in domain.get('state_transition_models',[]):
-        for t in m.get('transitions',[]):
-            scenarios.append({'rule':f"transition:{m['id']}",'transition':t,'viewport':768})
+    scenarios = []
+    for rule_id, spec in RULE_SPECS.items():
+        scenarios.extend(_expand_rule(rule_id, spec, domain))
+
+    for model in domain.get("state_transition_models", []):
+        route = model.get("route")
+        for transition in model.get("transitions", []):
+            scenarios.append(
+                {
+                    "rule": f"transition:{model['id']}",
+                    "model": model["id"],
+                    "route": route,
+                    "viewport": 768,
+                    "transition": transition,
+                }
+            )
+        if "MODAL_INTEGRITY" in model.get("invariants", []):
+            scenarios.append(
+                {
+                    "rule": "MODAL_INTEGRITY",
+                    "model": model["id"],
+                    "route": route,
+                    "viewport": 768,
+                    "state": "modal-open",
+                }
+            )
     return scenarios
