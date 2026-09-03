@@ -42,6 +42,10 @@ jobs:
       - name: Generate semantic current-run evidence
         run: python scripts/capture_current_run_evidence.py
 
+      - name: Diagnose replay obligations on capture failure
+        if: failure()
+        run: python scripts/diagnose_replay.py
+
       - name: Capture actual runtime binary and font identity
         run: python scripts/capture_runtime_identity.py
 
@@ -77,6 +81,11 @@ jobs:
           def reh(data):
               copy={k:v for k,v in data.items() if k not in ('report_hash','report_hash_algo')}
               data['report_hash']=hashlib.sha256(json.dumps(copy,sort_keys=True).encode()).hexdigest()[:16]
+              return data
+
+          def reartifact(data):
+              data.pop('artifact_hash', None)
+              data['artifact_hash']=hashlib.sha256(json.dumps(data,sort_keys=True).encode()).hexdigest()[:16]
               return data
 
           p=base/'reports/traceability_report.json'
@@ -136,12 +145,18 @@ jobs:
           origc=json.loads(current.read_text())
           tamperc=json.loads(current.read_text())
           tamperc['records'][0]['scenario']['scenario_id']='forged-obligation'
-          tamperc.pop('artifact_hash', None)
-          tamperc['artifact_hash']=hashlib.sha256(json.dumps(tamperc,sort_keys=True).encode()).hexdigest()[:16]
-          current.write_text(json.dumps(tamperc, indent=2, sort_keys=True))
+          current.write_text(json.dumps(reartifact(tamperc), indent=2, sort_keys=True))
           rc=subprocess.run(['python','scripts/strict_obligation_gate.py'], capture_output=True)
           assert rc.returncode==2, 'current-run scenario-id tamper should block'
           print('current-run scenario-id tamper blocked OK')
+          current.write_text(json.dumps(origc, indent=2, sort_keys=True))
+
+          tamperc2=json.loads(current.read_text())
+          tamperc2['records'][0]['result']['constraint']='forged-rule'
+          current.write_text(json.dumps(reartifact(tamperc2), indent=2, sort_keys=True))
+          rc2=subprocess.run(['python','scripts/strict_obligation_gate.py'], capture_output=True)
+          assert rc2.returncode==2, 'current-run result constraint tamper should block'
+          print('current-run result constraint tamper blocked OK')
           current.write_text(json.dumps(origc, indent=2, sort_keys=True))
 
           runtime=base/'reports/runtime_identity.json'
