@@ -1,52 +1,116 @@
 {
   "all_valid": true,
   "checker_digest": "920ae5aaa6401f93",
-  "commit_sha": "5b85528e9fcae15787c00f25a72dae62903d9f34",
+  "commit_sha": "fc360890861457d16445d775d59689e31404e547",
   "contracts": [
     {
-      "id": "global.spacing.scale",
-      "owner": "GLOBAL",
-      "rule": "global.spacing.scale",
-      "valid": true
-    },
-    {
-      "id": "group.uniform_gap",
-      "owner": "PAGE",
-      "rule": "group.uniform_gap",
-      "valid": true
-    },
-    {
-      "id": "component.button.hit-target",
+      "failed": 0,
       "owner": "COMPONENT",
-      "rule": "component.button.hit-target",
-      "valid": true
-    },
-    {
-      "id": "MODAL_INTEGRITY",
-      "owner": "PAGE",
-      "rule": "MODAL_INTEGRITY",
-      "valid": true
-    },
-    {
-      "id": "TARGET_OPERABLE",
-      "owner": "COMPONENT",
-      "rule": "TARGET_OPERABLE",
-      "valid": true
-    },
-    {
-      "id": "FOCUS_USABLE",
-      "owner": "PAGE",
+      "passed": 3,
+      "required": 3,
       "rule": "FOCUS_USABLE",
+      "unknown": 0,
+      "valid": true
+    },
+    {
+      "failed": 0,
+      "owner": "COMPONENT",
+      "passed": 15,
+      "required": 15,
+      "rule": "TARGET_OPERABLE",
+      "unknown": 0,
+      "valid": true
+    },
+    {
+      "failed": 0,
+      "owner": "COMPONENT",
+      "passed": 15,
+      "required": 15,
+      "rule": "component.button.hit-target",
+      "unknown": 0,
+      "valid": true
+    },
+    {
+      "failed": 0,
+      "owner": "GLOBAL",
+      "passed": 15,
+      "required": 15,
+      "rule": "global.spacing.scale",
+      "unknown": 0,
+      "valid": true
+    },
+    {
+      "failed": 0,
+      "owner": "PAGE",
+      "passed": 2,
+      "required": 2,
+      "rule": "MODAL_INTEGRITY",
+      "unknown": 0,
+      "valid": true
+    },
+    {
+      "failed": 0,
+      "owner": "PAGE",
+      "passed": 3,
+      "required": 3,
+      "rule": "accessibility.focus-order",
+      "unknown": 0,
+      "valid": true
+    },
+    {
+      "failed": 0,
+      "owner": "PAGE",
+      "passed": 3,
+      "required": 3,
+      "rule": "paint.contrast.text",
+      "unknown": 0,
+      "valid": true
+    },
+    {
+      "failed": 0,
+      "owner": "PAGE",
+      "passed": 15,
+      "required": 15,
+      "rule": "temporal.geometry-stable",
+      "unknown": 0,
+      "valid": true
+    },
+    {
+      "failed": 0,
+      "owner": "PAGE",
+      "passed": 2,
+      "required": 2,
+      "rule": "transition:analytics-drilldown",
+      "unknown": 0,
+      "valid": true
+    },
+    {
+      "failed": 0,
+      "owner": "PAGE",
+      "passed": 2,
+      "required": 2,
+      "rule": "transition:settings-modal",
+      "unknown": 0,
+      "valid": true
+    },
+    {
+      "failed": 0,
+      "owner": "SECTION",
+      "passed": 15,
+      "required": 15,
+      "rule": "group.uniform_gap",
+      "unknown": 0,
       "valid": true
     }
   ],
-  "environment_manifest_digest": "58466c920ba94cb4",
+  "environment_manifest_digest": "75c094eaf2d4fe91",
   "evidence_root": "3de70793411e3277",
-  "generated_at": "2026-09-03T08:30:00Z",
-  "report_hash": "a505302b721e7be0",
+  "generated_at": "2026-09-03T09:41:34.043211Z",
+  "generation_mode": "current-run",
+  "report_hash": "beb668c483b2520c",
   "report_hash_algo": "sha256:16",
   "rules_digest": "fabd8f3a8bfa1f50",
   "scenario_digest": "5d43a5ee4cc4f8f5",
-  "shell_family_contract": "shell flex column @767 holds without local page patch",
+  "source_run_id": "local",
   "status": "PASS"
 }

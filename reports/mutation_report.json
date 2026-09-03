@@ -28,7 +28,7 @@
     }
   },
   "checker_digest": "920ae5aaa6401f93",
-  "commit_sha": "5b85528e9fcae15787c00f25a72dae62903d9f34",
+  "commit_sha": "fc360890861457d16445d775d59689e31404e547",
   "critical_mutants_zero": true,
   "details": [
     {
@@ -145,14 +145,16 @@
     }
   ],
   "detected": 7,
-  "environment_manifest_digest": "58466c920ba94cb4",
+  "environment_manifest_digest": "75c094eaf2d4fe91",
   "evidence_root": "3de70793411e3277",
-  "generated_at": "2026-09-03T08:35:00Z",
+  "generated_at": "2026-09-03T09:41:34.043211Z",
+  "generation_mode": "current-run",
   "mutants_total": 7,
-  "report_hash": "5f0ec30b6680d5e4",
+  "report_hash": "148a94d6f291a128",
   "report_hash_algo": "sha256:16",
   "rules_digest": "fabd8f3a8bfa1f50",
   "scenario_digest": "5d43a5ee4cc4f8f5",
+  "source_run_id": "local",
   "status": "PASS",
   "survived": 0,
   "survivors": []

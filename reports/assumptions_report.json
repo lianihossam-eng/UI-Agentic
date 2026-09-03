@@ -1,31 +1,78 @@
 {
   "assumptions": [],
   "checker_digest": "920ae5aaa6401f93",
-  "commit_sha": "5b85528e9fcae15787c00f25a72dae62903d9f34",
+  "commit_sha": "fc360890861457d16445d775d59689e31404e547",
   "documented_assumptions": [
     {
+      "category": "fixture",
       "id": "A1",
-      "scope": "supported_domain.viewport_height",
-      "text": "viewport_height fixed 900"
+      "text": "verification targets repository file:// demo fixtures only"
     },
     {
+      "category": "browser",
       "id": "A2",
-      "scope": "browsers_platforms",
-      "text": "browser chromium@playwright-managed single DPR1"
+      "text": "supported browser is chromium@149.0.7827.55 for this attested run"
     },
     {
+      "category": "locale",
       "id": "A3",
-      "scope": "temporal_scenarios",
-      "text": "no hydration async required (static templates)"
+      "text": "locale/direction scope is ['fr-LTR']"
+    },
+    {
+      "category": "display",
+      "id": "A4",
+      "text": "DPR/zoom scope is ['100%', 'DPR 1']"
+    },
+    {
+      "category": "network",
+      "id": "A5",
+      "text": "demo fixtures require no remote application network dependency"
+    },
+    {
+      "category": "temporal",
+      "id": "A6",
+      "text": "temporal scope is ['fonts.ready', 'geometry-stable']"
+    },
+    {
+      "category": "compliance",
+      "id": "A7",
+      "text": "compliance profiles are []"
+    },
+    {
+      "category": "visual",
+      "id": "A8",
+      "text": "visual acceptance is external and reusable only by exact screenshot snapshot digest"
     }
   ],
-  "environment_manifest_digest": "58466c920ba94cb4",
+  "documented_categories": [
+    "browser",
+    "compliance",
+    "display",
+    "fixture",
+    "locale",
+    "network",
+    "temporal",
+    "visual"
+  ],
+  "environment_manifest_digest": "75c094eaf2d4fe91",
   "evidence_root": "3de70793411e3277",
-  "generated_at": "2026-09-03T08:30:00Z",
-  "report_hash": "45cefa8eac39306a",
+  "generated_at": "2026-09-03T09:41:34.043211Z",
+  "generation_mode": "current-run",
+  "report_hash": "e80ca1bad377de5d",
   "report_hash_algo": "sha256:16",
+  "required_categories": [
+    "browser",
+    "compliance",
+    "display",
+    "fixture",
+    "locale",
+    "network",
+    "temporal",
+    "visual"
+  ],
   "rules_digest": "fabd8f3a8bfa1f50",
   "scenario_digest": "5d43a5ee4cc4f8f5",
+  "source_run_id": "local",
   "status": "PASS",
   "unstated_count": 0
 }

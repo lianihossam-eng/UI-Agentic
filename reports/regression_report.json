@@ -1,16 +1,35 @@
 {
   "checker_digest": "920ae5aaa6401f93",
   "closed": true,
-  "commit_sha": "5b85528e9fcae15787c00f25a72dae62903d9f34",
-  "environment_manifest_digest": "58466c920ba94cb4",
+  "commit_sha": "fc360890861457d16445d775d59689e31404e547",
+  "environment_manifest_digest": "75c094eaf2d4fe91",
   "evidence_root": "3de70793411e3277",
-  "generated_at": "2026-09-03T08:30:00Z",
-  "invalidated_scenarios_rerun": 90,
-  "regressions": [],
-  "report_hash": "35b1d89c4265d9d8",
+  "generated_at": "2026-09-03T09:41:34.043211Z",
+  "generation_mode": "current-run",
+  "report_hash": "ed40266632cb09ce",
   "report_hash_algo": "sha256:16",
-  "rerun_status": "all_pass",
   "rules_digest": "fabd8f3a8bfa1f50",
+  "run_a_coverage": {
+    "closed": true,
+    "coverage": 1.0,
+    "failed": 0,
+    "passed": 90,
+    "required": 90,
+    "tested": 90,
+    "unknown": 0
+  },
+  "run_a_evidence_root": "3de70793411e3277",
+  "run_b_coverage": {
+    "closed": true,
+    "coverage": 1.0,
+    "failed": 0,
+    "passed": 90,
+    "required": 90,
+    "tested": 90,
+    "unknown": 0
+  },
+  "run_b_evidence_root": "3de70793411e3277",
   "scenario_digest": "5d43a5ee4cc4f8f5",
+  "source_run_id": "local",
   "status": "PASS"
 }

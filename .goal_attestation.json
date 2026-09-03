@@ -1,44 +1,69 @@
 {
   "attestation": {
-    "build": "public-audit-build",
-    "contract": "public-audit-contract",
-    "rules": "public-audit-rules",
-    "scenarios": "5d43a5ee4cc4f8f5",
-    "evidence_root": "3de70793411e3277",
-    "environment": {
-      "browser": "chromium@149.0.7827.55",
-      "viewport_height": 900
+    "attestation_version": "2.0",
+    "browser": "chromium@149.0.7827.55",
+    "checker_digest": "920ae5aaa6401f93",
+    "contract": "public-audit-contract-v2",
+    "coverage": {
+      "closed": true,
+      "coverage": 1.0,
+      "failed": 0,
+      "passed": 90,
+      "required": 90,
+      "tested": 90,
+      "unknown": 0
     },
-    "visual": "ACCEPTED",
+    "environment_manifest_digest": "75c094eaf2d4fe91",
+    "evidence_root": "3de70793411e3277",
     "final_gate": {
-      "passed": true,
-      "coverage": {
-        "required": 90,
-        "tested": 90,
-        "passed": 90,
-        "failed": 0,
-        "unknown": 0,
-        "coverage": 1.0,
-        "closed": true
-      },
+      "blocking_gates": [],
       "checks": {
-        "requirement_traceability": true,
-        "required_proof_levels": true,
         "certificate_validation": true,
-        "measurement_readiness": true,
-        "critical_mutants_zero": true,
-        "unstated_assumptions_zero": true,
-        "regression_closed": true,
-        "parent_contracts_valid": true,
-        "state_transitions_complete": true,
-        "cross_layer_invariants_complete": true,
         "compliance_obligations_complete": true,
+        "critical_mutants_zero": true,
+        "cross_layer_invariants_complete": true,
+        "measurement_readiness": true,
+        "parent_contracts_valid": true,
+        "regression_closed": true,
+        "required_proof_levels": true,
+        "requirement_traceability": true,
+        "state_transitions_complete": true,
+        "unstated_assumptions_zero": true,
         "visual_acceptance": true
       },
-      "blocking_gates": []
+      "coverage": {
+        "closed": true,
+        "coverage": 1.0,
+        "failed": 0,
+        "passed": 90,
+        "required": 90,
+        "tested": 90,
+        "unknown": 0
+      },
+      "passed": true
     },
-    "time": 1788425929
+    "generated_at": "2026-09-03T09:42:34.943011Z",
+    "report_hashes": {
+      "assumptions_report": "e80ca1bad377de5d",
+      "cross_layer_report": "0f40fc8a57cc96c7",
+      "mutation_report": "148a94d6f291a128",
+      "parent_contract_report": "beb668c483b2520c",
+      "regression_report": "ed40266632cb09ce",
+      "traceability_report": "3ff940038cdf3b07",
+      "visual_review": "a076fb9189ba7845"
+    },
+    "reports_root": "98059d46381284126585e8496dffef07b353d4342dd8a12184095dafc9de8fec",
+    "rules_digest": "fabd8f3a8bfa1f50",
+    "scenario_digest": "5d43a5ee4cc4f8f5",
+    "source_run_id": "local",
+    "subject": {
+      "build_digest": "fc360890861457d16445d775d59689e31404e547",
+      "commit_sha": "fc360890861457d16445d775d59689e31404e547"
+    },
+    "visual_evidence_root": "378a6ab3ceaac21b",
+    "visual_reviewer": "human:Hossam Liani"
   },
-  "digest": "18a7a28810ee1d71",
+  "digest": "cc4d0baf54adaad2695937706cf6261796d8e1f217f3d5d34ccf4de4f36ad50d",
+  "digest_algo": "sha256",
   "verdict": "LOCKED"
 }

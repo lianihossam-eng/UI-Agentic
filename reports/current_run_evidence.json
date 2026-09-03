@@ -1,0 +1,2179 @@
+{
+  "artifact_hash": "996bd6a4c111cda3",
+  "binding": {
+    "checker_digest": "920ae5aaa6401f93",
+    "commit_sha": "fc360890861457d16445d775d59689e31404e547",
+    "environment_manifest_digest": "75c094eaf2d4fe91",
+    "evidence_root": "3de70793411e3277",
+    "rules_digest": "fabd8f3a8bfa1f50",
+    "scenario_digest": "5d43a5ee4cc4f8f5"
+  },
+  "browser": "chromium@149.0.7827.55",
+  "coverage": {
+    "closed": true,
+    "coverage": 1.0,
+    "failed": 0,
+    "passed": 90,
+    "required": 90,
+    "tested": 90,
+    "unknown": 0
+  },
+  "environment_manifest_digest": "75c094eaf2d4fe91",
+  "evidence_root": "3de70793411e3277",
+  "generated_at": "2026-09-03T09:41:34.043211Z",
+  "generation_mode": "current-run",
+  "records": [
+    {
+      "evidence_key": "471d843b58ce6f89",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "group.uniform_gap",
+        "layer": "geometry",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "group.uniform_gap",
+        "viewport": 320
+      }
+    },
+    {
+      "evidence_key": "bcb7bd5d21fe385d",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "global.spacing.scale",
+        "invalid": [],
+        "layer": "geometry",
+        "owner": "GLOBAL",
+        "proof_level": "observed",
+        "sample_count": 42,
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "global.spacing.scale",
+        "viewport": 320
+      }
+    },
+    {
+      "evidence_key": "5c8dcef75aa89f52",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          58.96875,
+          44
+        ],
+        "constraint": "component.button.hit-target",
+        "hit": true,
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "component.button.hit-target",
+        "viewport": 320
+      }
+    },
+    {
+      "evidence_key": "720344366a4f155b",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "TARGET_OPERABLE",
+        "evidence_bundle": {
+          "hit": true,
+          "size": [
+            58.96875,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "TARGET_OPERABLE",
+        "viewport": 320
+      }
+    },
+    {
+      "evidence_key": "e8446ff05258f206",
+      "readiness_status": "PASS",
+      "result": {
+        "checks": {
+          "fonts": "loaded",
+          "hydration": "no-marker",
+          "images": "complete",
+          "pendingLayout": "exists",
+          "reason": "rAF 2 frames",
+          "stable": true
+        },
+        "constraint": "temporal.geometry-stable",
+        "layer": "temporal",
+        "note": "hydration marker absent but not required",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "temporal.geometry-stable",
+        "viewport": 320
+      }
+    },
+    {
+      "evidence_key": "d42997463d2de13d",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "group.uniform_gap",
+        "layer": "geometry",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "group.uniform_gap",
+        "viewport": 375
+      }
+    },
+    {
+      "evidence_key": "d978be1da6d44bf8",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "global.spacing.scale",
+        "invalid": [],
+        "layer": "geometry",
+        "owner": "GLOBAL",
+        "proof_level": "observed",
+        "sample_count": 42,
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "global.spacing.scale",
+        "viewport": 375
+      }
+    },
+    {
+      "evidence_key": "47ee3e6e3a503092",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          58.96875,
+          44
+        ],
+        "constraint": "component.button.hit-target",
+        "hit": true,
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "component.button.hit-target",
+        "viewport": 375
+      }
+    },
+    {
+      "evidence_key": "39f20a259e08f7d1",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "TARGET_OPERABLE",
+        "evidence_bundle": {
+          "hit": true,
+          "size": [
+            58.96875,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "TARGET_OPERABLE",
+        "viewport": 375
+      }
+    },
+    {
+      "evidence_key": "5100dd94c61534f8",
+      "readiness_status": "PASS",
+      "result": {
+        "checks": {
+          "fonts": "loaded",
+          "hydration": "no-marker",
+          "images": "complete",
+          "pendingLayout": "exists",
+          "reason": "rAF 2 frames",
+          "stable": true
+        },
+        "constraint": "temporal.geometry-stable",
+        "layer": "temporal",
+        "note": "hydration marker absent but not required",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "temporal.geometry-stable",
+        "viewport": 375
+      }
+    },
+    {
+      "evidence_key": "0144b11f3e94392a",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "group.uniform_gap",
+        "layer": "geometry",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "group.uniform_gap",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "2c45ed01aa58363f",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "global.spacing.scale",
+        "invalid": [],
+        "layer": "geometry",
+        "owner": "GLOBAL",
+        "proof_level": "observed",
+        "sample_count": 38,
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "global.spacing.scale",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "d950c61190b0d2d8",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": "rgb(0, 0, 0) on rgb(255, 255, 255)",
+        "constraint": "paint.contrast.text",
+        "expected": 4.5,
+        "layer": "paint",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "ratio": 21.0,
+        "status": "PASS",
+        "wcag": {
+          "applicability": "text normal",
+          "criterion": "1.4.3 Contrast (Minimum)",
+          "expectation": "ratio >=4.5",
+          "finding_status": "PASS",
+          "level": "AA",
+          "rule": "paint.contrast.text",
+          "verification_mode": "automated + manual"
+        }
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "paint.contrast.text",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "9a64ec8dda1af08a",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          58.96875,
+          44
+        ],
+        "constraint": "component.button.hit-target",
+        "hit": true,
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "component.button.hit-target",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "b448ecad4db17ebb",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "TARGET_OPERABLE",
+        "evidence_bundle": {
+          "hit": true,
+          "size": [
+            58.96875,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "TARGET_OPERABLE",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "4ffba1cf17d1b610",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          "btn",
+          "btn",
+          "btn"
+        ],
+        "constraint": "accessibility.focus-order",
+        "expected": [
+          "btn",
+          "btn",
+          "btn"
+        ],
+        "layer": "accessibility",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS",
+        "wcag": {
+          "applicability": "focusable elements",
+          "criterion": "2.4.3 Focus Order",
+          "expectation": "focus order preserves meaning",
+          "finding_status": "PASS",
+          "level": "A",
+          "rule": "accessibility.focus-order",
+          "verification_mode": "semi-automated"
+        }
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "accessibility.focus-order",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "1857df4395c79e38",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "FOCUS_USABLE",
+        "evidence_bundle": {
+          "boxShadow": "none",
+          "focusIndicator": true,
+          "focused": true,
+          "notObscured": true,
+          "outlineStyle": "auto",
+          "outlineWidth": "1px",
+          "size": [
+            58.96875,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "accessibility",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "accessibility",
+          "paint"
+        ],
+        "status": "PASS",
+        "wcag": {
+          "applicability": "focus indicator",
+          "criterion": "2.4.7 Focus Visible + 1.4.11 Non-text",
+          "expectation": "visible + non-occluded",
+          "finding_status": "PASS",
+          "level": "AA",
+          "rule": "FOCUS_USABLE",
+          "verification_mode": "semi-automated"
+        }
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "FOCUS_USABLE",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "387c62df98fbf309",
+      "readiness_status": "PASS",
+      "result": {
+        "checks": {
+          "fonts": "loaded",
+          "hydration": "no-marker",
+          "images": "complete",
+          "pendingLayout": "exists",
+          "reason": "rAF 2 frames",
+          "stable": true
+        },
+        "constraint": "temporal.geometry-stable",
+        "layer": "temporal",
+        "note": "hydration marker absent but not required",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "temporal.geometry-stable",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "f66ffff066ff32ef",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "group.uniform_gap",
+        "layer": "geometry",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "group.uniform_gap",
+        "viewport": 1024
+      }
+    },
+    {
+      "evidence_key": "dac2582562aaf47c",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "global.spacing.scale",
+        "invalid": [],
+        "layer": "geometry",
+        "owner": "GLOBAL",
+        "proof_level": "observed",
+        "sample_count": 38,
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "global.spacing.scale",
+        "viewport": 1024
+      }
+    },
+    {
+      "evidence_key": "c38ecb8f23a6fa53",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          58.96875,
+          44
+        ],
+        "constraint": "component.button.hit-target",
+        "hit": true,
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "component.button.hit-target",
+        "viewport": 1024
+      }
+    },
+    {
+      "evidence_key": "f522753d77ae93ee",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "TARGET_OPERABLE",
+        "evidence_bundle": {
+          "hit": true,
+          "size": [
+            58.96875,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "TARGET_OPERABLE",
+        "viewport": 1024
+      }
+    },
+    {
+      "evidence_key": "2c38574e21ab5345",
+      "readiness_status": "PASS",
+      "result": {
+        "checks": {
+          "fonts": "loaded",
+          "hydration": "no-marker",
+          "images": "complete",
+          "pendingLayout": "exists",
+          "reason": "rAF 2 frames",
+          "stable": true
+        },
+        "constraint": "temporal.geometry-stable",
+        "layer": "temporal",
+        "note": "hydration marker absent but not required",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "temporal.geometry-stable",
+        "viewport": 1024
+      }
+    },
+    {
+      "evidence_key": "458c007059fc226a",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "group.uniform_gap",
+        "layer": "geometry",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "group.uniform_gap",
+        "viewport": 1440
+      }
+    },
+    {
+      "evidence_key": "55f80e580f7d1913",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "global.spacing.scale",
+        "invalid": [],
+        "layer": "geometry",
+        "owner": "GLOBAL",
+        "proof_level": "observed",
+        "sample_count": 38,
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "global.spacing.scale",
+        "viewport": 1440
+      }
+    },
+    {
+      "evidence_key": "583a31b272b59e83",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          58.96875,
+          44
+        ],
+        "constraint": "component.button.hit-target",
+        "hit": true,
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "component.button.hit-target",
+        "viewport": 1440
+      }
+    },
+    {
+      "evidence_key": "265e84af815db2e4",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "TARGET_OPERABLE",
+        "evidence_bundle": {
+          "hit": true,
+          "size": [
+            58.96875,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "TARGET_OPERABLE",
+        "viewport": 1440
+      }
+    },
+    {
+      "evidence_key": "ccb8de7b29a96711",
+      "readiness_status": "PASS",
+      "result": {
+        "checks": {
+          "fonts": "loaded",
+          "hydration": "no-marker",
+          "images": "complete",
+          "pendingLayout": "exists",
+          "reason": "rAF 2 frames",
+          "stable": true
+        },
+        "constraint": "temporal.geometry-stable",
+        "layer": "temporal",
+        "note": "hydration marker absent but not required",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/orders",
+        "rule": "temporal.geometry-stable",
+        "viewport": 1440
+      }
+    },
+    {
+      "evidence_key": "db7de009a687af29",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "group.uniform_gap",
+        "layer": "geometry",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "group.uniform_gap",
+        "viewport": 320
+      }
+    },
+    {
+      "evidence_key": "5ef1b9a0f7dd0b05",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "global.spacing.scale",
+        "invalid": [],
+        "layer": "geometry",
+        "owner": "GLOBAL",
+        "proof_level": "observed",
+        "sample_count": 38,
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "global.spacing.scale",
+        "viewport": 320
+      }
+    },
+    {
+      "evidence_key": "14eec813520bb829",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          144.90625,
+          44
+        ],
+        "constraint": "component.button.hit-target",
+        "hit": true,
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "component.button.hit-target",
+        "viewport": 320
+      }
+    },
+    {
+      "evidence_key": "84048e9a91b88bcd",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "TARGET_OPERABLE",
+        "evidence_bundle": {
+          "hit": true,
+          "size": [
+            144.90625,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "TARGET_OPERABLE",
+        "viewport": 320
+      }
+    },
+    {
+      "evidence_key": "f905c22fbf97164d",
+      "readiness_status": "PASS",
+      "result": {
+        "checks": {
+          "fonts": "loaded",
+          "hydration": "no-marker",
+          "images": "complete",
+          "pendingLayout": "exists",
+          "reason": "rAF 2 frames",
+          "stable": true
+        },
+        "constraint": "temporal.geometry-stable",
+        "layer": "temporal",
+        "note": "hydration marker absent but not required",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "temporal.geometry-stable",
+        "viewport": 320
+      }
+    },
+    {
+      "evidence_key": "027ff0ca4ca9e223",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "group.uniform_gap",
+        "layer": "geometry",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "group.uniform_gap",
+        "viewport": 375
+      }
+    },
+    {
+      "evidence_key": "c1b3d9d5f4a38f17",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "global.spacing.scale",
+        "invalid": [],
+        "layer": "geometry",
+        "owner": "GLOBAL",
+        "proof_level": "observed",
+        "sample_count": 38,
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "global.spacing.scale",
+        "viewport": 375
+      }
+    },
+    {
+      "evidence_key": "fe30b1a27d34bcae",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          144.90625,
+          44
+        ],
+        "constraint": "component.button.hit-target",
+        "hit": true,
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "component.button.hit-target",
+        "viewport": 375
+      }
+    },
+    {
+      "evidence_key": "9ca84f1689707586",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "TARGET_OPERABLE",
+        "evidence_bundle": {
+          "hit": true,
+          "size": [
+            144.90625,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "TARGET_OPERABLE",
+        "viewport": 375
+      }
+    },
+    {
+      "evidence_key": "25f741fa4cc13359",
+      "readiness_status": "PASS",
+      "result": {
+        "checks": {
+          "fonts": "loaded",
+          "hydration": "no-marker",
+          "images": "complete",
+          "pendingLayout": "exists",
+          "reason": "rAF 2 frames",
+          "stable": true
+        },
+        "constraint": "temporal.geometry-stable",
+        "layer": "temporal",
+        "note": "hydration marker absent but not required",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "temporal.geometry-stable",
+        "viewport": 375
+      }
+    },
+    {
+      "evidence_key": "e285b073d4ff0345",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "group.uniform_gap",
+        "layer": "geometry",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "group.uniform_gap",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "2516131c9118eff0",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "global.spacing.scale",
+        "invalid": [],
+        "layer": "geometry",
+        "owner": "GLOBAL",
+        "proof_level": "observed",
+        "sample_count": 34,
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "global.spacing.scale",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "2b26862655de579e",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": "rgb(0, 0, 0) on rgb(255, 255, 255)",
+        "constraint": "paint.contrast.text",
+        "expected": 4.5,
+        "layer": "paint",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "ratio": 21.0,
+        "status": "PASS",
+        "wcag": {
+          "applicability": "text normal",
+          "criterion": "1.4.3 Contrast (Minimum)",
+          "expectation": "ratio >=4.5",
+          "finding_status": "PASS",
+          "level": "AA",
+          "rule": "paint.contrast.text",
+          "verification_mode": "automated + manual"
+        }
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "paint.contrast.text",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "ffbfd5f5c3a46b92",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          144.90625,
+          44
+        ],
+        "constraint": "component.button.hit-target",
+        "hit": true,
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "component.button.hit-target",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "7b8129dde16dae69",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "TARGET_OPERABLE",
+        "evidence_bundle": {
+          "hit": true,
+          "size": [
+            144.90625,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "TARGET_OPERABLE",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "a7e6b70694061bb3",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          "open-modal",
+          "btn",
+          "btn"
+        ],
+        "constraint": "accessibility.focus-order",
+        "expected": [
+          "open-modal",
+          "btn",
+          "btn"
+        ],
+        "layer": "accessibility",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS",
+        "wcag": {
+          "applicability": "focusable elements",
+          "criterion": "2.4.3 Focus Order",
+          "expectation": "focus order preserves meaning",
+          "finding_status": "PASS",
+          "level": "A",
+          "rule": "accessibility.focus-order",
+          "verification_mode": "semi-automated"
+        }
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "accessibility.focus-order",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "9de6f1d779a365d3",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "FOCUS_USABLE",
+        "evidence_bundle": {
+          "boxShadow": "none",
+          "focusIndicator": true,
+          "focused": true,
+          "notObscured": true,
+          "outlineStyle": "auto",
+          "outlineWidth": "1px",
+          "size": [
+            144.90625,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "accessibility",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "accessibility",
+          "paint"
+        ],
+        "status": "PASS",
+        "wcag": {
+          "applicability": "focus indicator",
+          "criterion": "2.4.7 Focus Visible + 1.4.11 Non-text",
+          "expectation": "visible + non-occluded",
+          "finding_status": "PASS",
+          "level": "AA",
+          "rule": "FOCUS_USABLE",
+          "verification_mode": "semi-automated"
+        }
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "FOCUS_USABLE",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "b5376451a3c3c151",
+      "readiness_status": "PASS",
+      "result": {
+        "checks": {
+          "fonts": "loaded",
+          "hydration": "no-marker",
+          "images": "complete",
+          "pendingLayout": "exists",
+          "reason": "rAF 2 frames",
+          "stable": true
+        },
+        "constraint": "temporal.geometry-stable",
+        "layer": "temporal",
+        "note": "hydration marker absent but not required",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "temporal.geometry-stable",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "452ed67a1cf498c4",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "group.uniform_gap",
+        "layer": "geometry",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "group.uniform_gap",
+        "viewport": 1024
+      }
+    },
+    {
+      "evidence_key": "bae76546b69917d1",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "global.spacing.scale",
+        "invalid": [],
+        "layer": "geometry",
+        "owner": "GLOBAL",
+        "proof_level": "observed",
+        "sample_count": 34,
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "global.spacing.scale",
+        "viewport": 1024
+      }
+    },
+    {
+      "evidence_key": "a2dba2b43909ac83",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          144.90625,
+          44
+        ],
+        "constraint": "component.button.hit-target",
+        "hit": true,
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "component.button.hit-target",
+        "viewport": 1024
+      }
+    },
+    {
+      "evidence_key": "f6adeab769676d38",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "TARGET_OPERABLE",
+        "evidence_bundle": {
+          "hit": true,
+          "size": [
+            144.90625,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "TARGET_OPERABLE",
+        "viewport": 1024
+      }
+    },
+    {
+      "evidence_key": "b8fd0d6d5d204ecd",
+      "readiness_status": "PASS",
+      "result": {
+        "checks": {
+          "fonts": "loaded",
+          "hydration": "no-marker",
+          "images": "complete",
+          "pendingLayout": "exists",
+          "reason": "rAF 2 frames",
+          "stable": true
+        },
+        "constraint": "temporal.geometry-stable",
+        "layer": "temporal",
+        "note": "hydration marker absent but not required",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "temporal.geometry-stable",
+        "viewport": 1024
+      }
+    },
+    {
+      "evidence_key": "6f410272630eabb7",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "group.uniform_gap",
+        "layer": "geometry",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "group.uniform_gap",
+        "viewport": 1440
+      }
+    },
+    {
+      "evidence_key": "60fb83cad8be82c1",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "global.spacing.scale",
+        "invalid": [],
+        "layer": "geometry",
+        "owner": "GLOBAL",
+        "proof_level": "observed",
+        "sample_count": 34,
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "global.spacing.scale",
+        "viewport": 1440
+      }
+    },
+    {
+      "evidence_key": "5018b03ee1ae66bb",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          144.90625,
+          44
+        ],
+        "constraint": "component.button.hit-target",
+        "hit": true,
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "component.button.hit-target",
+        "viewport": 1440
+      }
+    },
+    {
+      "evidence_key": "f9d5ce726a3d7167",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "TARGET_OPERABLE",
+        "evidence_bundle": {
+          "hit": true,
+          "size": [
+            144.90625,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "TARGET_OPERABLE",
+        "viewport": 1440
+      }
+    },
+    {
+      "evidence_key": "e4e1278d1b60eb40",
+      "readiness_status": "PASS",
+      "result": {
+        "checks": {
+          "fonts": "loaded",
+          "hydration": "no-marker",
+          "images": "complete",
+          "pendingLayout": "exists",
+          "reason": "rAF 2 frames",
+          "stable": true
+        },
+        "constraint": "temporal.geometry-stable",
+        "layer": "temporal",
+        "note": "hydration marker absent but not required",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/settings",
+        "rule": "temporal.geometry-stable",
+        "viewport": 1440
+      }
+    },
+    {
+      "evidence_key": "eb99294634f996c1",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "group.uniform_gap",
+        "layer": "geometry",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "group.uniform_gap",
+        "viewport": 320
+      }
+    },
+    {
+      "evidence_key": "05d642b8c4e316a0",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "global.spacing.scale",
+        "invalid": [],
+        "layer": "geometry",
+        "owner": "GLOBAL",
+        "proof_level": "observed",
+        "sample_count": 54,
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "global.spacing.scale",
+        "viewport": 320
+      }
+    },
+    {
+      "evidence_key": "34989082464f0e25",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          124.90625,
+          44
+        ],
+        "constraint": "component.button.hit-target",
+        "hit": true,
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "component.button.hit-target",
+        "viewport": 320
+      }
+    },
+    {
+      "evidence_key": "5aac233f0bef7b3e",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "TARGET_OPERABLE",
+        "evidence_bundle": {
+          "hit": true,
+          "size": [
+            124.90625,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "TARGET_OPERABLE",
+        "viewport": 320
+      }
+    },
+    {
+      "evidence_key": "f8adff624f7ebf1b",
+      "readiness_status": "PASS",
+      "result": {
+        "checks": {
+          "fonts": "loaded",
+          "hydration": "no-marker",
+          "images": "complete",
+          "pendingLayout": "missing",
+          "reason": "rAF 2 frames",
+          "stable": true
+        },
+        "constraint": "temporal.geometry-stable",
+        "layer": "temporal",
+        "note": "hydration marker absent but not required",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "temporal.geometry-stable",
+        "viewport": 320
+      }
+    },
+    {
+      "evidence_key": "bd64989e0bfdf6da",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "group.uniform_gap",
+        "layer": "geometry",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "group.uniform_gap",
+        "viewport": 375
+      }
+    },
+    {
+      "evidence_key": "3cd6ad6c8ca46711",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "global.spacing.scale",
+        "invalid": [],
+        "layer": "geometry",
+        "owner": "GLOBAL",
+        "proof_level": "observed",
+        "sample_count": 54,
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "global.spacing.scale",
+        "viewport": 375
+      }
+    },
+    {
+      "evidence_key": "b80b8f88efe1dae5",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          124.90625,
+          44
+        ],
+        "constraint": "component.button.hit-target",
+        "hit": true,
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "component.button.hit-target",
+        "viewport": 375
+      }
+    },
+    {
+      "evidence_key": "0acae8f080fee111",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "TARGET_OPERABLE",
+        "evidence_bundle": {
+          "hit": true,
+          "size": [
+            124.90625,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "TARGET_OPERABLE",
+        "viewport": 375
+      }
+    },
+    {
+      "evidence_key": "1798f9968c3009d8",
+      "readiness_status": "PASS",
+      "result": {
+        "checks": {
+          "fonts": "loaded",
+          "hydration": "no-marker",
+          "images": "complete",
+          "pendingLayout": "missing",
+          "reason": "rAF 2 frames",
+          "stable": true
+        },
+        "constraint": "temporal.geometry-stable",
+        "layer": "temporal",
+        "note": "hydration marker absent but not required",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "temporal.geometry-stable",
+        "viewport": 375
+      }
+    },
+    {
+      "evidence_key": "9a91ac4084e12f8c",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "group.uniform_gap",
+        "layer": "geometry",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "group.uniform_gap",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "20e3f9e744a40b5b",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "global.spacing.scale",
+        "invalid": [],
+        "layer": "geometry",
+        "owner": "GLOBAL",
+        "proof_level": "observed",
+        "sample_count": 50,
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "global.spacing.scale",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "5deb94d8d06ace53",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": "rgb(0, 0, 0) on rgb(255, 255, 255)",
+        "constraint": "paint.contrast.text",
+        "expected": 4.5,
+        "layer": "paint",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "ratio": 21.0,
+        "status": "PASS",
+        "wcag": {
+          "applicability": "text normal",
+          "criterion": "1.4.3 Contrast (Minimum)",
+          "expectation": "ratio >=4.5",
+          "finding_status": "PASS",
+          "level": "AA",
+          "rule": "paint.contrast.text",
+          "verification_mode": "automated + manual"
+        }
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "paint.contrast.text",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "b60b4c3887ba253e",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          124.90625,
+          44
+        ],
+        "constraint": "component.button.hit-target",
+        "hit": true,
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "component.button.hit-target",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "9275f55c2948d567",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "TARGET_OPERABLE",
+        "evidence_bundle": {
+          "hit": true,
+          "size": [
+            124.90625,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "TARGET_OPERABLE",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "797c3ebc5d712abb",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          "open-modal",
+          "btn",
+          "btn",
+          "btn",
+          "btn"
+        ],
+        "constraint": "accessibility.focus-order",
+        "expected": [
+          "open-modal",
+          "btn",
+          "btn",
+          "btn",
+          "btn"
+        ],
+        "layer": "accessibility",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS",
+        "wcag": {
+          "applicability": "focusable elements",
+          "criterion": "2.4.3 Focus Order",
+          "expectation": "focus order preserves meaning",
+          "finding_status": "PASS",
+          "level": "A",
+          "rule": "accessibility.focus-order",
+          "verification_mode": "semi-automated"
+        }
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "accessibility.focus-order",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "1aa9197bafd30bf4",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "FOCUS_USABLE",
+        "evidence_bundle": {
+          "boxShadow": "none",
+          "focusIndicator": true,
+          "focused": true,
+          "notObscured": true,
+          "outlineStyle": "auto",
+          "outlineWidth": "1px",
+          "size": [
+            124.90625,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "accessibility",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "accessibility",
+          "paint"
+        ],
+        "status": "PASS",
+        "wcag": {
+          "applicability": "focus indicator",
+          "criterion": "2.4.7 Focus Visible + 1.4.11 Non-text",
+          "expectation": "visible + non-occluded",
+          "finding_status": "PASS",
+          "level": "AA",
+          "rule": "FOCUS_USABLE",
+          "verification_mode": "semi-automated"
+        }
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "FOCUS_USABLE",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "2fd48c09e0063fc7",
+      "readiness_status": "PASS",
+      "result": {
+        "checks": {
+          "fonts": "loaded",
+          "hydration": "no-marker",
+          "images": "complete",
+          "pendingLayout": "missing",
+          "reason": "rAF 2 frames",
+          "stable": true
+        },
+        "constraint": "temporal.geometry-stable",
+        "layer": "temporal",
+        "note": "hydration marker absent but not required",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "temporal.geometry-stable",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "9e486d2573e694cd",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "group.uniform_gap",
+        "layer": "geometry",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "group.uniform_gap",
+        "viewport": 1024
+      }
+    },
+    {
+      "evidence_key": "b6480043a969ecdb",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "global.spacing.scale",
+        "invalid": [],
+        "layer": "geometry",
+        "owner": "GLOBAL",
+        "proof_level": "observed",
+        "sample_count": 50,
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "global.spacing.scale",
+        "viewport": 1024
+      }
+    },
+    {
+      "evidence_key": "204fbcb3a32d4a9d",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          124.90625,
+          44
+        ],
+        "constraint": "component.button.hit-target",
+        "hit": true,
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "component.button.hit-target",
+        "viewport": 1024
+      }
+    },
+    {
+      "evidence_key": "040921a27bc3cdea",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "TARGET_OPERABLE",
+        "evidence_bundle": {
+          "hit": true,
+          "size": [
+            124.90625,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "TARGET_OPERABLE",
+        "viewport": 1024
+      }
+    },
+    {
+      "evidence_key": "3e2e81715f7735e0",
+      "readiness_status": "PASS",
+      "result": {
+        "checks": {
+          "fonts": "loaded",
+          "hydration": "no-marker",
+          "images": "complete",
+          "pendingLayout": "missing",
+          "reason": "rAF 2 frames",
+          "stable": true
+        },
+        "constraint": "temporal.geometry-stable",
+        "layer": "temporal",
+        "note": "hydration marker absent but not required",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "temporal.geometry-stable",
+        "viewport": 1024
+      }
+    },
+    {
+      "evidence_key": "4fcfc05f5b664f86",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "group.uniform_gap",
+        "layer": "geometry",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "group.uniform_gap",
+        "viewport": 1440
+      }
+    },
+    {
+      "evidence_key": "dd6d33dfec2652ab",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "global.spacing.scale",
+        "invalid": [],
+        "layer": "geometry",
+        "owner": "GLOBAL",
+        "proof_level": "observed",
+        "sample_count": 50,
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "global.spacing.scale",
+        "viewport": 1440
+      }
+    },
+    {
+      "evidence_key": "b6a9d9fad1ba57ba",
+      "readiness_status": "PASS",
+      "result": {
+        "actual": [
+          124.90625,
+          44
+        ],
+        "constraint": "component.button.hit-target",
+        "hit": true,
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "component.button.hit-target",
+        "viewport": 1440
+      }
+    },
+    {
+      "evidence_key": "08a8b8f2fd55dd49",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "TARGET_OPERABLE",
+        "evidence_bundle": {
+          "hit": true,
+          "size": [
+            124.90625,
+            44
+          ],
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "COMPONENT",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "TARGET_OPERABLE",
+        "viewport": 1440
+      }
+    },
+    {
+      "evidence_key": "861ab9faf77c0bc8",
+      "readiness_status": "PASS",
+      "result": {
+        "checks": {
+          "fonts": "loaded",
+          "hydration": "no-marker",
+          "images": "complete",
+          "pendingLayout": "missing",
+          "reason": "rAF 2 frames",
+          "stable": true
+        },
+        "constraint": "temporal.geometry-stable",
+        "layer": "temporal",
+        "note": "hydration marker absent but not required",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "status": "PASS"
+      },
+      "scenario": {
+        "route": "/analytics",
+        "rule": "temporal.geometry-stable",
+        "viewport": 1440
+      }
+    },
+    {
+      "evidence_key": "41a614586979f865",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "MODAL_INTEGRITY",
+        "evidence_bundle": {
+          "activeTestId": "close",
+          "ariaModal": true,
+          "backgroundBlocked": true,
+          "centerOwned": true,
+          "fixed": true,
+          "focusInside": true,
+          "isClose": true,
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction",
+          "accessibility"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "model": "settings-modal",
+        "route": "/settings",
+        "rule": "MODAL_INTEGRITY",
+        "state": "modal-open",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "d060d5c520a302ba",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "MODAL_INTEGRITY",
+        "evidence_bundle": {
+          "activeTestId": "close",
+          "ariaModal": true,
+          "backgroundBlocked": true,
+          "centerOwned": true,
+          "fixed": true,
+          "focusInside": true,
+          "isClose": true,
+          "visible": true
+        },
+        "layer": "interaction",
+        "owner": "PAGE",
+        "proof_level": "observed",
+        "requires_layers": [
+          "geometry",
+          "interaction",
+          "accessibility"
+        ],
+        "status": "PASS"
+      },
+      "scenario": {
+        "model": "analytics-drilldown",
+        "route": "/analytics",
+        "rule": "MODAL_INTEGRITY",
+        "state": "modal-open",
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "57723c2f9d930f7c",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "transition:settings-modal",
+        "evidence": {
+          "focusInsideModal": true,
+          "focusReturnedToOpener": false,
+          "modalOpen": true
+        },
+        "proof_level": "observed",
+        "status": "PASS",
+        "transition": {
+          "action": "click:[data-testid='open-modal']",
+          "assertion": "modal-open",
+          "event": "open",
+          "from": "default",
+          "to": "modal-open"
+        }
+      },
+      "scenario": {
+        "model": "settings-modal",
+        "route": "/settings",
+        "rule": "transition:settings-modal",
+        "transition": {
+          "action": "click:[data-testid='open-modal']",
+          "assertion": "modal-open",
+          "event": "open",
+          "from": "default",
+          "to": "modal-open"
+        },
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "e66a3b36b9d232c2",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "transition:settings-modal",
+        "evidence": {
+          "focusInsideModal": false,
+          "focusReturnedToOpener": true,
+          "modalOpen": false
+        },
+        "proof_level": "observed",
+        "status": "PASS",
+        "transition": {
+          "action": "click:[data-testid='close']",
+          "assertion": "modal-closed",
+          "event": "close",
+          "from": "modal-open",
+          "to": "default"
+        }
+      },
+      "scenario": {
+        "model": "settings-modal",
+        "route": "/settings",
+        "rule": "transition:settings-modal",
+        "transition": {
+          "action": "click:[data-testid='close']",
+          "assertion": "modal-closed",
+          "event": "close",
+          "from": "modal-open",
+          "to": "default"
+        },
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "7527baa55c6474c2",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "transition:analytics-drilldown",
+        "evidence": {
+          "focusInsideModal": true,
+          "focusReturnedToOpener": false,
+          "modalOpen": true
+        },
+        "proof_level": "observed",
+        "status": "PASS",
+        "transition": {
+          "action": "click:[data-testid='open-modal']",
+          "assertion": "modal-open",
+          "event": "drill",
+          "from": "default",
+          "to": "modal-open"
+        }
+      },
+      "scenario": {
+        "model": "analytics-drilldown",
+        "route": "/analytics",
+        "rule": "transition:analytics-drilldown",
+        "transition": {
+          "action": "click:[data-testid='open-modal']",
+          "assertion": "modal-open",
+          "event": "drill",
+          "from": "default",
+          "to": "modal-open"
+        },
+        "viewport": 768
+      }
+    },
+    {
+      "evidence_key": "7e29fb675bf5afa5",
+      "readiness_status": "PASS",
+      "result": {
+        "constraint": "transition:analytics-drilldown",
+        "evidence": {
+          "focusInsideModal": false,
+          "focusReturnedToOpener": true,
+          "modalOpen": false
+        },
+        "proof_level": "observed",
+        "status": "PASS",
+        "transition": {
+          "action": "click:[data-testid='close']",
+          "assertion": "modal-closed",
+          "event": "close",
+          "from": "modal-open",
+          "to": "default"
+        }
+      },
+      "scenario": {
+        "model": "analytics-drilldown",
+        "route": "/analytics",
+        "rule": "transition:analytics-drilldown",
+        "transition": {
+          "action": "click:[data-testid='close']",
+          "assertion": "modal-closed",
+          "event": "close",
+          "from": "modal-open",
+          "to": "default"
+        },
+        "viewport": 768
+      }
+    }
+  ],
+  "reproducibility": {
+    "passed": true,
+    "run_a_root": "3de70793411e3277",
+    "run_b_root": "3de70793411e3277"
+  },
+  "source_run_id": "local",
+  "visual_accepted": true,
+  "visual_snapshot_digest": "378a6ab3ceaac21b"
+}

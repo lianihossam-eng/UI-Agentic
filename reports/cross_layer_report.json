@@ -1,84 +1,81 @@
 {
   "checker_digest": "920ae5aaa6401f93",
-  "commit_sha": "5b85528e9fcae15787c00f25a72dae62903d9f34",
+  "commit_sha": "fc360890861457d16445d775d59689e31404e547",
   "complete": true,
-  "environment_manifest_digest": "58466c920ba94cb4",
+  "environment_manifest_digest": "75c094eaf2d4fe91",
   "evidence_bundles": {
     "FOCUS_USABLE": {
-      "boxShadow": "none",
-      "focusIndicator": true,
-      "focused": true,
-      "notObscured": true,
-      "outlineStyle": "auto",
-      "outlineWidth": "1px",
-      "size": [
-        58.96875,
-        44
+      "evidence_keys": [
+        "1857df4395c79e38",
+        "9de6f1d779a365d3",
+        "1aa9197bafd30bf4"
       ],
-      "visible": true
+      "passed": 3,
+      "required": 3,
+      "statuses": [
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "verified": true
     },
     "MODAL_INTEGRITY": {
-      "activeTestId": "close",
-      "ariaModal": true,
-      "backgroundBlocked": true,
-      "centerOwned": true,
-      "fixed": true,
-      "focusInside": true,
-      "isClose": true,
-      "visible": true
+      "evidence_keys": [
+        "41a614586979f865",
+        "d060d5c520a302ba"
+      ],
+      "passed": 2,
+      "required": 2,
+      "statuses": [
+        "PASS",
+        "PASS"
+      ],
+      "verified": true
     },
     "TARGET_OPERABLE": {
-      "hit": true,
-      "size": [
-        58.96875,
-        44
+      "evidence_keys": [
+        "720344366a4f155b",
+        "39f20a259e08f7d1",
+        "b448ecad4db17ebb",
+        "f522753d77ae93ee",
+        "265e84af815db2e4",
+        "84048e9a91b88bcd",
+        "9ca84f1689707586",
+        "7b8129dde16dae69",
+        "f6adeab769676d38",
+        "f9d5ce726a3d7167",
+        "5aac233f0bef7b3e",
+        "0acae8f080fee111",
+        "9275f55c2948d567",
+        "040921a27bc3cdea",
+        "08a8b8f2fd55dd49"
       ],
-      "visible": true
+      "passed": 15,
+      "required": 15,
+      "statuses": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "verified": true
     }
   },
   "evidence_root": "3de70793411e3277",
-  "generated_at": "2026-09-03T08:30:00Z",
-  "invariants": [
-    {
-      "bundle_keys": [
-        "geometry:group.uniform_gap",
-        "interaction:component.button.hit-target"
-      ],
-      "id": "TARGET_OPERABLE",
-      "requires_layers": [
-        "geometry",
-        "interaction"
-      ],
-      "verified": true
-    },
-    {
-      "bundle_keys": [
-        "a11y:focus-visible"
-      ],
-      "id": "FOCUS_USABLE",
-      "requires_layers": [
-        "geometry",
-        "accessibility"
-      ],
-      "verified": true
-    },
-    {
-      "bundle_keys": [
-        "geometry:visible",
-        "interaction:centerOwned+backgroundBlocked",
-        "accessibility:focusInside+ariaModal"
-      ],
-      "evidence_snapshot_required": "same scenario/evidence snapshot",
-      "id": "MODAL_INTEGRITY",
-      "requires_layers": [
-        "geometry",
-        "interaction",
-        "accessibility"
-      ],
-      "verified": true
-    }
-  ],
-  "report_hash": "ffe8c5a1b829a2d5",
+  "generated_at": "2026-09-03T09:41:34.043211Z",
+  "generation_mode": "current-run",
+  "report_hash": "0f40fc8a57cc96c7",
   "report_hash_algo": "sha256:16",
   "rules_digest": "fabd8f3a8bfa1f50",
   "scenario_digest": "5d43a5ee4cc4f8f5",
@@ -88,5 +85,6 @@
     "TARGET_OPERABLE_status": "PASS",
     "all_pass": true
   },
+  "source_run_id": "local",
   "status": "PASS"
 }

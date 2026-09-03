@@ -1,0 +1,145 @@
+{
+  "browser": "chromium@149.0.7827.55",
+  "coverage": {
+    "closed": true,
+    "coverage": 1.0,
+    "failed": 0,
+    "passed": 90,
+    "required": 90,
+    "tested": 90,
+    "unknown": 0
+  },
+  "evidence_root": "3de70793411e3277",
+  "final_gate": {
+    "blocking_gates": [],
+    "checks": {
+      "certificate_validation": true,
+      "compliance_obligations_complete": true,
+      "critical_mutants_zero": true,
+      "cross_layer_invariants_complete": true,
+      "measurement_readiness": true,
+      "parent_contracts_valid": true,
+      "regression_closed": true,
+      "required_proof_levels": true,
+      "requirement_traceability": true,
+      "state_transitions_complete": true,
+      "unstated_assumptions_zero": true,
+      "visual_acceptance": true
+    },
+    "coverage": {
+      "closed": true,
+      "coverage": 1.0,
+      "failed": 0,
+      "passed": 90,
+      "required": 90,
+      "tested": 90,
+      "unknown": 0
+    },
+    "passed": true
+  },
+  "supported_domain": {
+    "browsers_platforms": [
+      "chromium@playwright-managed"
+    ],
+    "compliance_profiles": [],
+    "input_modalities": [
+      "mouse",
+      "keyboard"
+    ],
+    "locales_directions": [
+      "fr-LTR"
+    ],
+    "routes": [
+      "/orders",
+      "/settings",
+      "/analytics"
+    ],
+    "state_transition_models": [
+      {
+        "id": "settings-modal",
+        "initial": "default",
+        "invariants": [
+          "MODAL_INTEGRITY"
+        ],
+        "route": "/settings",
+        "states": [
+          "default",
+          "modal-open"
+        ],
+        "transitions": [
+          {
+            "action": "click:[data-testid='open-modal']",
+            "assertion": "modal-open",
+            "event": "open",
+            "from": "default",
+            "to": "modal-open"
+          },
+          {
+            "action": "click:[data-testid='close']",
+            "assertion": "modal-closed",
+            "event": "close",
+            "from": "modal-open",
+            "to": "default"
+          }
+        ]
+      },
+      {
+        "id": "analytics-drilldown",
+        "initial": "default",
+        "invariants": [
+          "MODAL_INTEGRITY"
+        ],
+        "route": "/analytics",
+        "states": [
+          "default",
+          "modal-open"
+        ],
+        "transitions": [
+          {
+            "action": "click:[data-testid='open-modal']",
+            "assertion": "modal-open",
+            "event": "drill",
+            "from": "default",
+            "to": "modal-open"
+          },
+          {
+            "action": "click:[data-testid='close']",
+            "assertion": "modal-closed",
+            "event": "close",
+            "from": "modal-open",
+            "to": "default"
+          }
+        ]
+      }
+    ],
+    "states_by_route": {
+      "/analytics": [
+        "default",
+        "modal-open"
+      ],
+      "/orders": [
+        "default"
+      ],
+      "/settings": [
+        "default",
+        "modal-open"
+      ]
+    },
+    "temporal_scenarios": [
+      "fonts.ready",
+      "geometry-stable"
+    ],
+    "viewport_height": 900,
+    "viewport_widths": [
+      320,
+      375,
+      768,
+      1024,
+      1440
+    ],
+    "zoom_dpr": [
+      "100%",
+      "DPR 1"
+    ]
+  }
+}

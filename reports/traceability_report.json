@@ -1,649 +1,830 @@
 {
-  "checker": "traceability-checker-v1",
+  "checker": "traceability-current-run-v2",
   "checker_digest": "920ae5aaa6401f93",
-  "commit_sha": "5b85528e9fcae15787c00f25a72dae62903d9f34",
-  "environment_manifest_digest": "58466c920ba94cb4",
+  "commit_sha": "fc360890861457d16445d775d59689e31404e547",
+  "environment_manifest_digest": "75c094eaf2d4fe91",
   "evidence_root": "3de70793411e3277",
-  "generated_at": "2026-09-03T08:30:00Z",
+  "generated_at": "2026-09-03T09:41:34.043211Z",
+  "generation_mode": "current-run",
   "mapping": [
     {
+      "evidence_key": "471d843b58ce6f89",
       "evidence_type": "observed",
       "failure_mode": "FM-group.uniform_gap",
       "requirement": "REQ-/orders-default-group.uniform_gap",
       "rule": "group.uniform_gap",
-      "scenario_id": "/orders@320:group.uniform_gap"
+      "scenario_id": "/orders@320:group.uniform_gap",
+      "status": "PASS"
     },
     {
+      "evidence_key": "bcb7bd5d21fe385d",
       "evidence_type": "observed",
       "failure_mode": "FM-group.uniform_gap",
       "requirement": "REQ-/orders-default-group.uniform_gap",
       "rule": "group.uniform_gap",
-      "scenario_id": "/orders@375:group.uniform_gap"
+      "scenario_id": "/orders@375:group.uniform_gap",
+      "status": "PASS"
     },
     {
+      "evidence_key": "5c8dcef75aa89f52",
       "evidence_type": "observed",
       "failure_mode": "FM-group.uniform_gap",
       "requirement": "REQ-/orders-default-group.uniform_gap",
       "rule": "group.uniform_gap",
-      "scenario_id": "/orders@768:group.uniform_gap"
+      "scenario_id": "/orders@768:group.uniform_gap",
+      "status": "PASS"
     },
     {
+      "evidence_key": "720344366a4f155b",
       "evidence_type": "observed",
       "failure_mode": "FM-group.uniform_gap",
       "requirement": "REQ-/orders-default-group.uniform_gap",
       "rule": "group.uniform_gap",
-      "scenario_id": "/orders@1024:group.uniform_gap"
+      "scenario_id": "/orders@1024:group.uniform_gap",
+      "status": "PASS"
     },
     {
+      "evidence_key": "e8446ff05258f206",
       "evidence_type": "observed",
       "failure_mode": "FM-group.uniform_gap",
       "requirement": "REQ-/orders-default-group.uniform_gap",
       "rule": "group.uniform_gap",
-      "scenario_id": "/orders@1440:group.uniform_gap"
+      "scenario_id": "/orders@1440:group.uniform_gap",
+      "status": "PASS"
     },
     {
+      "evidence_key": "d42997463d2de13d",
       "evidence_type": "observed",
       "failure_mode": "FM-group.uniform_gap",
       "requirement": "REQ-/settings-default-group.uniform_gap",
       "rule": "group.uniform_gap",
-      "scenario_id": "/settings@320:group.uniform_gap"
+      "scenario_id": "/settings@320:group.uniform_gap",
+      "status": "PASS"
     },
     {
+      "evidence_key": "d978be1da6d44bf8",
       "evidence_type": "observed",
       "failure_mode": "FM-group.uniform_gap",
       "requirement": "REQ-/settings-default-group.uniform_gap",
       "rule": "group.uniform_gap",
-      "scenario_id": "/settings@375:group.uniform_gap"
+      "scenario_id": "/settings@375:group.uniform_gap",
+      "status": "PASS"
     },
     {
+      "evidence_key": "47ee3e6e3a503092",
       "evidence_type": "observed",
       "failure_mode": "FM-group.uniform_gap",
       "requirement": "REQ-/settings-default-group.uniform_gap",
       "rule": "group.uniform_gap",
-      "scenario_id": "/settings@768:group.uniform_gap"
+      "scenario_id": "/settings@768:group.uniform_gap",
+      "status": "PASS"
     },
     {
+      "evidence_key": "39f20a259e08f7d1",
       "evidence_type": "observed",
       "failure_mode": "FM-group.uniform_gap",
       "requirement": "REQ-/settings-default-group.uniform_gap",
       "rule": "group.uniform_gap",
-      "scenario_id": "/settings@1024:group.uniform_gap"
+      "scenario_id": "/settings@1024:group.uniform_gap",
+      "status": "PASS"
     },
     {
+      "evidence_key": "5100dd94c61534f8",
       "evidence_type": "observed",
       "failure_mode": "FM-group.uniform_gap",
       "requirement": "REQ-/settings-default-group.uniform_gap",
       "rule": "group.uniform_gap",
-      "scenario_id": "/settings@1440:group.uniform_gap"
+      "scenario_id": "/settings@1440:group.uniform_gap",
+      "status": "PASS"
     },
     {
+      "evidence_key": "0144b11f3e94392a",
       "evidence_type": "observed",
       "failure_mode": "FM-group.uniform_gap",
       "requirement": "REQ-/analytics-default-group.uniform_gap",
       "rule": "group.uniform_gap",
-      "scenario_id": "/analytics@320:group.uniform_gap"
+      "scenario_id": "/analytics@320:group.uniform_gap",
+      "status": "PASS"
     },
     {
+      "evidence_key": "2c45ed01aa58363f",
       "evidence_type": "observed",
       "failure_mode": "FM-group.uniform_gap",
       "requirement": "REQ-/analytics-default-group.uniform_gap",
       "rule": "group.uniform_gap",
-      "scenario_id": "/analytics@375:group.uniform_gap"
+      "scenario_id": "/analytics@375:group.uniform_gap",
+      "status": "PASS"
     },
     {
+      "evidence_key": "d950c61190b0d2d8",
       "evidence_type": "observed",
       "failure_mode": "FM-group.uniform_gap",
       "requirement": "REQ-/analytics-default-group.uniform_gap",
       "rule": "group.uniform_gap",
-      "scenario_id": "/analytics@768:group.uniform_gap"
+      "scenario_id": "/analytics@768:group.uniform_gap",
+      "status": "PASS"
     },
     {
+      "evidence_key": "9a64ec8dda1af08a",
       "evidence_type": "observed",
       "failure_mode": "FM-group.uniform_gap",
       "requirement": "REQ-/analytics-default-group.uniform_gap",
       "rule": "group.uniform_gap",
-      "scenario_id": "/analytics@1024:group.uniform_gap"
+      "scenario_id": "/analytics@1024:group.uniform_gap",
+      "status": "PASS"
     },
     {
+      "evidence_key": "b448ecad4db17ebb",
       "evidence_type": "observed",
       "failure_mode": "FM-group.uniform_gap",
       "requirement": "REQ-/analytics-default-group.uniform_gap",
       "rule": "group.uniform_gap",
-      "scenario_id": "/analytics@1440:group.uniform_gap"
+      "scenario_id": "/analytics@1440:group.uniform_gap",
+      "status": "PASS"
     },
     {
+      "evidence_key": "4ffba1cf17d1b610",
       "evidence_type": "observed",
       "failure_mode": "FM-global.spacing.scale",
       "requirement": "REQ-/orders-default-global.spacing.scale",
       "rule": "global.spacing.scale",
-      "scenario_id": "/orders@320:global.spacing.scale"
+      "scenario_id": "/orders@320:global.spacing.scale",
+      "status": "PASS"
     },
     {
+      "evidence_key": "1857df4395c79e38",
       "evidence_type": "observed",
       "failure_mode": "FM-global.spacing.scale",
       "requirement": "REQ-/orders-default-global.spacing.scale",
       "rule": "global.spacing.scale",
-      "scenario_id": "/orders@375:global.spacing.scale"
+      "scenario_id": "/orders@375:global.spacing.scale",
+      "status": "PASS"
     },
     {
+      "evidence_key": "387c62df98fbf309",
       "evidence_type": "observed",
       "failure_mode": "FM-global.spacing.scale",
       "requirement": "REQ-/orders-default-global.spacing.scale",
       "rule": "global.spacing.scale",
-      "scenario_id": "/orders@768:global.spacing.scale"
+      "scenario_id": "/orders@768:global.spacing.scale",
+      "status": "PASS"
     },
     {
+      "evidence_key": "f66ffff066ff32ef",
       "evidence_type": "observed",
       "failure_mode": "FM-global.spacing.scale",
       "requirement": "REQ-/orders-default-global.spacing.scale",
       "rule": "global.spacing.scale",
-      "scenario_id": "/orders@1024:global.spacing.scale"
+      "scenario_id": "/orders@1024:global.spacing.scale",
+      "status": "PASS"
     },
     {
+      "evidence_key": "dac2582562aaf47c",
       "evidence_type": "observed",
       "failure_mode": "FM-global.spacing.scale",
       "requirement": "REQ-/orders-default-global.spacing.scale",
       "rule": "global.spacing.scale",
-      "scenario_id": "/orders@1440:global.spacing.scale"
+      "scenario_id": "/orders@1440:global.spacing.scale",
+      "status": "PASS"
     },
     {
+      "evidence_key": "c38ecb8f23a6fa53",
       "evidence_type": "observed",
       "failure_mode": "FM-global.spacing.scale",
       "requirement": "REQ-/settings-default-global.spacing.scale",
       "rule": "global.spacing.scale",
-      "scenario_id": "/settings@320:global.spacing.scale"
+      "scenario_id": "/settings@320:global.spacing.scale",
+      "status": "PASS"
     },
     {
+      "evidence_key": "f522753d77ae93ee",
       "evidence_type": "observed",
       "failure_mode": "FM-global.spacing.scale",
       "requirement": "REQ-/settings-default-global.spacing.scale",
       "rule": "global.spacing.scale",
-      "scenario_id": "/settings@375:global.spacing.scale"
+      "scenario_id": "/settings@375:global.spacing.scale",
+      "status": "PASS"
     },
     {
+      "evidence_key": "2c38574e21ab5345",
       "evidence_type": "observed",
       "failure_mode": "FM-global.spacing.scale",
       "requirement": "REQ-/settings-default-global.spacing.scale",
       "rule": "global.spacing.scale",
-      "scenario_id": "/settings@768:global.spacing.scale"
+      "scenario_id": "/settings@768:global.spacing.scale",
+      "status": "PASS"
     },
     {
+      "evidence_key": "458c007059fc226a",
       "evidence_type": "observed",
       "failure_mode": "FM-global.spacing.scale",
       "requirement": "REQ-/settings-default-global.spacing.scale",
       "rule": "global.spacing.scale",
-      "scenario_id": "/settings@1024:global.spacing.scale"
+      "scenario_id": "/settings@1024:global.spacing.scale",
+      "status": "PASS"
     },
     {
+      "evidence_key": "55f80e580f7d1913",
       "evidence_type": "observed",
       "failure_mode": "FM-global.spacing.scale",
       "requirement": "REQ-/settings-default-global.spacing.scale",
       "rule": "global.spacing.scale",
-      "scenario_id": "/settings@1440:global.spacing.scale"
+      "scenario_id": "/settings@1440:global.spacing.scale",
+      "status": "PASS"
     },
     {
+      "evidence_key": "583a31b272b59e83",
       "evidence_type": "observed",
       "failure_mode": "FM-global.spacing.scale",
       "requirement": "REQ-/analytics-default-global.spacing.scale",
       "rule": "global.spacing.scale",
-      "scenario_id": "/analytics@320:global.spacing.scale"
+      "scenario_id": "/analytics@320:global.spacing.scale",
+      "status": "PASS"
     },
     {
+      "evidence_key": "265e84af815db2e4",
       "evidence_type": "observed",
       "failure_mode": "FM-global.spacing.scale",
       "requirement": "REQ-/analytics-default-global.spacing.scale",
       "rule": "global.spacing.scale",
-      "scenario_id": "/analytics@375:global.spacing.scale"
+      "scenario_id": "/analytics@375:global.spacing.scale",
+      "status": "PASS"
     },
     {
+      "evidence_key": "ccb8de7b29a96711",
       "evidence_type": "observed",
       "failure_mode": "FM-global.spacing.scale",
       "requirement": "REQ-/analytics-default-global.spacing.scale",
       "rule": "global.spacing.scale",
-      "scenario_id": "/analytics@768:global.spacing.scale"
+      "scenario_id": "/analytics@768:global.spacing.scale",
+      "status": "PASS"
     },
     {
+      "evidence_key": "db7de009a687af29",
       "evidence_type": "observed",
       "failure_mode": "FM-global.spacing.scale",
       "requirement": "REQ-/analytics-default-global.spacing.scale",
       "rule": "global.spacing.scale",
-      "scenario_id": "/analytics@1024:global.spacing.scale"
+      "scenario_id": "/analytics@1024:global.spacing.scale",
+      "status": "PASS"
     },
     {
+      "evidence_key": "5ef1b9a0f7dd0b05",
       "evidence_type": "observed",
       "failure_mode": "FM-global.spacing.scale",
       "requirement": "REQ-/analytics-default-global.spacing.scale",
       "rule": "global.spacing.scale",
-      "scenario_id": "/analytics@1440:global.spacing.scale"
+      "scenario_id": "/analytics@1440:global.spacing.scale",
+      "status": "PASS"
     },
     {
+      "evidence_key": "14eec813520bb829",
       "evidence_type": "observed",
       "failure_mode": "FM-paint.contrast.text",
       "requirement": "REQ-/orders-default-paint.contrast.text",
       "rule": "paint.contrast.text",
-      "scenario_id": "/orders@768:paint.contrast.text"
+      "scenario_id": "/orders@768:paint.contrast.text",
+      "status": "PASS"
     },
     {
+      "evidence_key": "84048e9a91b88bcd",
       "evidence_type": "observed",
       "failure_mode": "FM-paint.contrast.text",
       "requirement": "REQ-/settings-default-paint.contrast.text",
       "rule": "paint.contrast.text",
-      "scenario_id": "/settings@768:paint.contrast.text"
+      "scenario_id": "/settings@768:paint.contrast.text",
+      "status": "PASS"
     },
     {
+      "evidence_key": "f905c22fbf97164d",
       "evidence_type": "observed",
       "failure_mode": "FM-paint.contrast.text",
       "requirement": "REQ-/analytics-default-paint.contrast.text",
       "rule": "paint.contrast.text",
-      "scenario_id": "/analytics@768:paint.contrast.text"
+      "scenario_id": "/analytics@768:paint.contrast.text",
+      "status": "PASS"
     },
     {
+      "evidence_key": "027ff0ca4ca9e223",
       "evidence_type": "observed",
       "failure_mode": "FM-component.button.hit-target",
       "requirement": "REQ-/orders-default-component.button.hit-target",
       "rule": "component.button.hit-target",
-      "scenario_id": "/orders@320:component.button.hit-target"
+      "scenario_id": "/orders@320:component.button.hit-target",
+      "status": "PASS"
     },
     {
+      "evidence_key": "c1b3d9d5f4a38f17",
       "evidence_type": "observed",
       "failure_mode": "FM-component.button.hit-target",
       "requirement": "REQ-/orders-default-component.button.hit-target",
       "rule": "component.button.hit-target",
-      "scenario_id": "/orders@375:component.button.hit-target"
+      "scenario_id": "/orders@375:component.button.hit-target",
+      "status": "PASS"
     },
     {
+      "evidence_key": "fe30b1a27d34bcae",
       "evidence_type": "observed",
       "failure_mode": "FM-component.button.hit-target",
       "requirement": "REQ-/orders-default-component.button.hit-target",
       "rule": "component.button.hit-target",
-      "scenario_id": "/orders@768:component.button.hit-target"
+      "scenario_id": "/orders@768:component.button.hit-target",
+      "status": "PASS"
     },
     {
+      "evidence_key": "9ca84f1689707586",
       "evidence_type": "observed",
       "failure_mode": "FM-component.button.hit-target",
       "requirement": "REQ-/orders-default-component.button.hit-target",
       "rule": "component.button.hit-target",
-      "scenario_id": "/orders@1024:component.button.hit-target"
+      "scenario_id": "/orders@1024:component.button.hit-target",
+      "status": "PASS"
     },
     {
+      "evidence_key": "25f741fa4cc13359",
       "evidence_type": "observed",
       "failure_mode": "FM-component.button.hit-target",
       "requirement": "REQ-/orders-default-component.button.hit-target",
       "rule": "component.button.hit-target",
-      "scenario_id": "/orders@1440:component.button.hit-target"
+      "scenario_id": "/orders@1440:component.button.hit-target",
+      "status": "PASS"
     },
     {
+      "evidence_key": "e285b073d4ff0345",
       "evidence_type": "observed",
       "failure_mode": "FM-component.button.hit-target",
       "requirement": "REQ-/settings-default-component.button.hit-target",
       "rule": "component.button.hit-target",
-      "scenario_id": "/settings@320:component.button.hit-target"
+      "scenario_id": "/settings@320:component.button.hit-target",
+      "status": "PASS"
     },
     {
+      "evidence_key": "2516131c9118eff0",
       "evidence_type": "observed",
       "failure_mode": "FM-component.button.hit-target",
       "requirement": "REQ-/settings-default-component.button.hit-target",
       "rule": "component.button.hit-target",
-      "scenario_id": "/settings@375:component.button.hit-target"
+      "scenario_id": "/settings@375:component.button.hit-target",
+      "status": "PASS"
     },
     {
+      "evidence_key": "2b26862655de579e",
       "evidence_type": "observed",
       "failure_mode": "FM-component.button.hit-target",
       "requirement": "REQ-/settings-default-component.button.hit-target",
       "rule": "component.button.hit-target",
-      "scenario_id": "/settings@768:component.button.hit-target"
+      "scenario_id": "/settings@768:component.button.hit-target",
+      "status": "PASS"
     },
     {
+      "evidence_key": "ffbfd5f5c3a46b92",
       "evidence_type": "observed",
       "failure_mode": "FM-component.button.hit-target",
       "requirement": "REQ-/settings-default-component.button.hit-target",
       "rule": "component.button.hit-target",
-      "scenario_id": "/settings@1024:component.button.hit-target"
+      "scenario_id": "/settings@1024:component.button.hit-target",
+      "status": "PASS"
     },
     {
+      "evidence_key": "7b8129dde16dae69",
       "evidence_type": "observed",
       "failure_mode": "FM-component.button.hit-target",
       "requirement": "REQ-/settings-default-component.button.hit-target",
       "rule": "component.button.hit-target",
-      "scenario_id": "/settings@1440:component.button.hit-target"
+      "scenario_id": "/settings@1440:component.button.hit-target",
+      "status": "PASS"
     },
     {
+      "evidence_key": "a7e6b70694061bb3",
       "evidence_type": "observed",
       "failure_mode": "FM-component.button.hit-target",
       "requirement": "REQ-/analytics-default-component.button.hit-target",
       "rule": "component.button.hit-target",
-      "scenario_id": "/analytics@320:component.button.hit-target"
+      "scenario_id": "/analytics@320:component.button.hit-target",
+      "status": "PASS"
     },
     {
+      "evidence_key": "9de6f1d779a365d3",
       "evidence_type": "observed",
       "failure_mode": "FM-component.button.hit-target",
       "requirement": "REQ-/analytics-default-component.button.hit-target",
       "rule": "component.button.hit-target",
-      "scenario_id": "/analytics@375:component.button.hit-target"
+      "scenario_id": "/analytics@375:component.button.hit-target",
+      "status": "PASS"
     },
     {
+      "evidence_key": "b5376451a3c3c151",
       "evidence_type": "observed",
       "failure_mode": "FM-component.button.hit-target",
       "requirement": "REQ-/analytics-default-component.button.hit-target",
       "rule": "component.button.hit-target",
-      "scenario_id": "/analytics@768:component.button.hit-target"
+      "scenario_id": "/analytics@768:component.button.hit-target",
+      "status": "PASS"
     },
     {
+      "evidence_key": "452ed67a1cf498c4",
       "evidence_type": "observed",
       "failure_mode": "FM-component.button.hit-target",
       "requirement": "REQ-/analytics-default-component.button.hit-target",
       "rule": "component.button.hit-target",
-      "scenario_id": "/analytics@1024:component.button.hit-target"
+      "scenario_id": "/analytics@1024:component.button.hit-target",
+      "status": "PASS"
     },
     {
+      "evidence_key": "bae76546b69917d1",
       "evidence_type": "observed",
       "failure_mode": "FM-component.button.hit-target",
       "requirement": "REQ-/analytics-default-component.button.hit-target",
       "rule": "component.button.hit-target",
-      "scenario_id": "/analytics@1440:component.button.hit-target"
+      "scenario_id": "/analytics@1440:component.button.hit-target",
+      "status": "PASS"
     },
     {
+      "evidence_key": "a2dba2b43909ac83",
       "evidence_type": "observed",
       "failure_mode": "FM-TARGET_OPERABLE",
       "requirement": "REQ-/orders-default-TARGET_OPERABLE",
       "rule": "TARGET_OPERABLE",
-      "scenario_id": "/orders@320:TARGET_OPERABLE"
+      "scenario_id": "/orders@320:TARGET_OPERABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "f6adeab769676d38",
       "evidence_type": "observed",
       "failure_mode": "FM-TARGET_OPERABLE",
       "requirement": "REQ-/orders-default-TARGET_OPERABLE",
       "rule": "TARGET_OPERABLE",
-      "scenario_id": "/orders@375:TARGET_OPERABLE"
+      "scenario_id": "/orders@375:TARGET_OPERABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "b8fd0d6d5d204ecd",
       "evidence_type": "observed",
       "failure_mode": "FM-TARGET_OPERABLE",
       "requirement": "REQ-/orders-default-TARGET_OPERABLE",
       "rule": "TARGET_OPERABLE",
-      "scenario_id": "/orders@768:TARGET_OPERABLE"
+      "scenario_id": "/orders@768:TARGET_OPERABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "6f410272630eabb7",
       "evidence_type": "observed",
       "failure_mode": "FM-TARGET_OPERABLE",
       "requirement": "REQ-/orders-default-TARGET_OPERABLE",
       "rule": "TARGET_OPERABLE",
-      "scenario_id": "/orders@1024:TARGET_OPERABLE"
+      "scenario_id": "/orders@1024:TARGET_OPERABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "60fb83cad8be82c1",
       "evidence_type": "observed",
       "failure_mode": "FM-TARGET_OPERABLE",
       "requirement": "REQ-/orders-default-TARGET_OPERABLE",
       "rule": "TARGET_OPERABLE",
-      "scenario_id": "/orders@1440:TARGET_OPERABLE"
+      "scenario_id": "/orders@1440:TARGET_OPERABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "5018b03ee1ae66bb",
       "evidence_type": "observed",
       "failure_mode": "FM-TARGET_OPERABLE",
       "requirement": "REQ-/settings-default-TARGET_OPERABLE",
       "rule": "TARGET_OPERABLE",
-      "scenario_id": "/settings@320:TARGET_OPERABLE"
+      "scenario_id": "/settings@320:TARGET_OPERABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "f9d5ce726a3d7167",
       "evidence_type": "observed",
       "failure_mode": "FM-TARGET_OPERABLE",
       "requirement": "REQ-/settings-default-TARGET_OPERABLE",
       "rule": "TARGET_OPERABLE",
-      "scenario_id": "/settings@375:TARGET_OPERABLE"
+      "scenario_id": "/settings@375:TARGET_OPERABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "e4e1278d1b60eb40",
       "evidence_type": "observed",
       "failure_mode": "FM-TARGET_OPERABLE",
       "requirement": "REQ-/settings-default-TARGET_OPERABLE",
       "rule": "TARGET_OPERABLE",
-      "scenario_id": "/settings@768:TARGET_OPERABLE"
+      "scenario_id": "/settings@768:TARGET_OPERABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "eb99294634f996c1",
       "evidence_type": "observed",
       "failure_mode": "FM-TARGET_OPERABLE",
       "requirement": "REQ-/settings-default-TARGET_OPERABLE",
       "rule": "TARGET_OPERABLE",
-      "scenario_id": "/settings@1024:TARGET_OPERABLE"
+      "scenario_id": "/settings@1024:TARGET_OPERABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "05d642b8c4e316a0",
       "evidence_type": "observed",
       "failure_mode": "FM-TARGET_OPERABLE",
       "requirement": "REQ-/settings-default-TARGET_OPERABLE",
       "rule": "TARGET_OPERABLE",
-      "scenario_id": "/settings@1440:TARGET_OPERABLE"
+      "scenario_id": "/settings@1440:TARGET_OPERABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "34989082464f0e25",
       "evidence_type": "observed",
       "failure_mode": "FM-TARGET_OPERABLE",
       "requirement": "REQ-/analytics-default-TARGET_OPERABLE",
       "rule": "TARGET_OPERABLE",
-      "scenario_id": "/analytics@320:TARGET_OPERABLE"
+      "scenario_id": "/analytics@320:TARGET_OPERABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "5aac233f0bef7b3e",
       "evidence_type": "observed",
       "failure_mode": "FM-TARGET_OPERABLE",
       "requirement": "REQ-/analytics-default-TARGET_OPERABLE",
       "rule": "TARGET_OPERABLE",
-      "scenario_id": "/analytics@375:TARGET_OPERABLE"
+      "scenario_id": "/analytics@375:TARGET_OPERABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "f8adff624f7ebf1b",
       "evidence_type": "observed",
       "failure_mode": "FM-TARGET_OPERABLE",
       "requirement": "REQ-/analytics-default-TARGET_OPERABLE",
       "rule": "TARGET_OPERABLE",
-      "scenario_id": "/analytics@768:TARGET_OPERABLE"
+      "scenario_id": "/analytics@768:TARGET_OPERABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "bd64989e0bfdf6da",
       "evidence_type": "observed",
       "failure_mode": "FM-TARGET_OPERABLE",
       "requirement": "REQ-/analytics-default-TARGET_OPERABLE",
       "rule": "TARGET_OPERABLE",
-      "scenario_id": "/analytics@1024:TARGET_OPERABLE"
+      "scenario_id": "/analytics@1024:TARGET_OPERABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "3cd6ad6c8ca46711",
       "evidence_type": "observed",
       "failure_mode": "FM-TARGET_OPERABLE",
       "requirement": "REQ-/analytics-default-TARGET_OPERABLE",
       "rule": "TARGET_OPERABLE",
-      "scenario_id": "/analytics@1440:TARGET_OPERABLE"
+      "scenario_id": "/analytics@1440:TARGET_OPERABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "b80b8f88efe1dae5",
       "evidence_type": "observed",
       "failure_mode": "FM-accessibility.focus-order",
       "requirement": "REQ-/orders-default-accessibility.focus-order",
       "rule": "accessibility.focus-order",
-      "scenario_id": "/orders@768:accessibility.focus-order"
+      "scenario_id": "/orders@768:accessibility.focus-order",
+      "status": "PASS"
     },
     {
+      "evidence_key": "0acae8f080fee111",
       "evidence_type": "observed",
       "failure_mode": "FM-accessibility.focus-order",
       "requirement": "REQ-/settings-default-accessibility.focus-order",
       "rule": "accessibility.focus-order",
-      "scenario_id": "/settings@768:accessibility.focus-order"
+      "scenario_id": "/settings@768:accessibility.focus-order",
+      "status": "PASS"
     },
     {
+      "evidence_key": "1798f9968c3009d8",
       "evidence_type": "observed",
       "failure_mode": "FM-accessibility.focus-order",
       "requirement": "REQ-/analytics-default-accessibility.focus-order",
       "rule": "accessibility.focus-order",
-      "scenario_id": "/analytics@768:accessibility.focus-order"
+      "scenario_id": "/analytics@768:accessibility.focus-order",
+      "status": "PASS"
     },
     {
+      "evidence_key": "9a91ac4084e12f8c",
       "evidence_type": "observed",
       "failure_mode": "FM-FOCUS_USABLE",
       "requirement": "REQ-/orders-default-FOCUS_USABLE",
       "rule": "FOCUS_USABLE",
-      "scenario_id": "/orders@768:FOCUS_USABLE"
+      "scenario_id": "/orders@768:FOCUS_USABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "20e3f9e744a40b5b",
       "evidence_type": "observed",
       "failure_mode": "FM-FOCUS_USABLE",
       "requirement": "REQ-/settings-default-FOCUS_USABLE",
       "rule": "FOCUS_USABLE",
-      "scenario_id": "/settings@768:FOCUS_USABLE"
+      "scenario_id": "/settings@768:FOCUS_USABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "5deb94d8d06ace53",
       "evidence_type": "observed",
       "failure_mode": "FM-FOCUS_USABLE",
       "requirement": "REQ-/analytics-default-FOCUS_USABLE",
       "rule": "FOCUS_USABLE",
-      "scenario_id": "/analytics@768:FOCUS_USABLE"
+      "scenario_id": "/analytics@768:FOCUS_USABLE",
+      "status": "PASS"
     },
     {
+      "evidence_key": "b60b4c3887ba253e",
       "evidence_type": "observed",
       "failure_mode": "FM-temporal.geometry-stable",
       "requirement": "REQ-/orders-default-temporal.geometry-stable",
       "rule": "temporal.geometry-stable",
-      "scenario_id": "/orders@320:temporal.geometry-stable"
+      "scenario_id": "/orders@320:temporal.geometry-stable",
+      "status": "PASS"
     },
     {
+      "evidence_key": "9275f55c2948d567",
       "evidence_type": "observed",
       "failure_mode": "FM-temporal.geometry-stable",
       "requirement": "REQ-/orders-default-temporal.geometry-stable",
       "rule": "temporal.geometry-stable",
-      "scenario_id": "/orders@375:temporal.geometry-stable"
+      "scenario_id": "/orders@375:temporal.geometry-stable",
+      "status": "PASS"
     },
     {
+      "evidence_key": "797c3ebc5d712abb",
       "evidence_type": "observed",
       "failure_mode": "FM-temporal.geometry-stable",
       "requirement": "REQ-/orders-default-temporal.geometry-stable",
       "rule": "temporal.geometry-stable",
-      "scenario_id": "/orders@768:temporal.geometry-stable"
+      "scenario_id": "/orders@768:temporal.geometry-stable",
+      "status": "PASS"
     },
     {
+      "evidence_key": "1aa9197bafd30bf4",
       "evidence_type": "observed",
       "failure_mode": "FM-temporal.geometry-stable",
       "requirement": "REQ-/orders-default-temporal.geometry-stable",
       "rule": "temporal.geometry-stable",
-      "scenario_id": "/orders@1024:temporal.geometry-stable"
+      "scenario_id": "/orders@1024:temporal.geometry-stable",
+      "status": "PASS"
     },
     {
+      "evidence_key": "2fd48c09e0063fc7",
       "evidence_type": "observed",
       "failure_mode": "FM-temporal.geometry-stable",
       "requirement": "REQ-/orders-default-temporal.geometry-stable",
       "rule": "temporal.geometry-stable",
-      "scenario_id": "/orders@1440:temporal.geometry-stable"
+      "scenario_id": "/orders@1440:temporal.geometry-stable",
+      "status": "PASS"
     },
     {
+      "evidence_key": "9e486d2573e694cd",
       "evidence_type": "observed",
       "failure_mode": "FM-temporal.geometry-stable",
       "requirement": "REQ-/settings-default-temporal.geometry-stable",
       "rule": "temporal.geometry-stable",
-      "scenario_id": "/settings@320:temporal.geometry-stable"
+      "scenario_id": "/settings@320:temporal.geometry-stable",
+      "status": "PASS"
     },
     {
+      "evidence_key": "b6480043a969ecdb",
       "evidence_type": "observed",
       "failure_mode": "FM-temporal.geometry-stable",
       "requirement": "REQ-/settings-default-temporal.geometry-stable",
       "rule": "temporal.geometry-stable",
-      "scenario_id": "/settings@375:temporal.geometry-stable"
+      "scenario_id": "/settings@375:temporal.geometry-stable",
+      "status": "PASS"
     },
     {
+      "evidence_key": "204fbcb3a32d4a9d",
       "evidence_type": "observed",
       "failure_mode": "FM-temporal.geometry-stable",
       "requirement": "REQ-/settings-default-temporal.geometry-stable",
       "rule": "temporal.geometry-stable",
-      "scenario_id": "/settings@768:temporal.geometry-stable"
+      "scenario_id": "/settings@768:temporal.geometry-stable",
+      "status": "PASS"
     },
     {
+      "evidence_key": "040921a27bc3cdea",
       "evidence_type": "observed",
       "failure_mode": "FM-temporal.geometry-stable",
       "requirement": "REQ-/settings-default-temporal.geometry-stable",
       "rule": "temporal.geometry-stable",
-      "scenario_id": "/settings@1024:temporal.geometry-stable"
+      "scenario_id": "/settings@1024:temporal.geometry-stable",
+      "status": "PASS"
     },
     {
+      "evidence_key": "3e2e81715f7735e0",
       "evidence_type": "observed",
       "failure_mode": "FM-temporal.geometry-stable",
       "requirement": "REQ-/settings-default-temporal.geometry-stable",
       "rule": "temporal.geometry-stable",
-      "scenario_id": "/settings@1440:temporal.geometry-stable"
+      "scenario_id": "/settings@1440:temporal.geometry-stable",
+      "status": "PASS"
     },
     {
+      "evidence_key": "4fcfc05f5b664f86",
       "evidence_type": "observed",
       "failure_mode": "FM-temporal.geometry-stable",
       "requirement": "REQ-/analytics-default-temporal.geometry-stable",
       "rule": "temporal.geometry-stable",
-      "scenario_id": "/analytics@320:temporal.geometry-stable"
+      "scenario_id": "/analytics@320:temporal.geometry-stable",
+      "status": "PASS"
     },
     {
+      "evidence_key": "dd6d33dfec2652ab",
       "evidence_type": "observed",
       "failure_mode": "FM-temporal.geometry-stable",
       "requirement": "REQ-/analytics-default-temporal.geometry-stable",
       "rule": "temporal.geometry-stable",
-      "scenario_id": "/analytics@375:temporal.geometry-stable"
+      "scenario_id": "/analytics@375:temporal.geometry-stable",
+      "status": "PASS"
     },
     {
+      "evidence_key": "b6a9d9fad1ba57ba",
       "evidence_type": "observed",
       "failure_mode": "FM-temporal.geometry-stable",
       "requirement": "REQ-/analytics-default-temporal.geometry-stable",
       "rule": "temporal.geometry-stable",
-      "scenario_id": "/analytics@768:temporal.geometry-stable"
+      "scenario_id": "/analytics@768:temporal.geometry-stable",
+      "status": "PASS"
     },
     {
+      "evidence_key": "08a8b8f2fd55dd49",
       "evidence_type": "observed",
       "failure_mode": "FM-temporal.geometry-stable",
       "requirement": "REQ-/analytics-default-temporal.geometry-stable",
       "rule": "temporal.geometry-stable",
-      "scenario_id": "/analytics@1024:temporal.geometry-stable"
+      "scenario_id": "/analytics@1024:temporal.geometry-stable",
+      "status": "PASS"
     },
     {
+      "evidence_key": "861ab9faf77c0bc8",
       "evidence_type": "observed",
       "failure_mode": "FM-temporal.geometry-stable",
       "requirement": "REQ-/analytics-default-temporal.geometry-stable",
       "rule": "temporal.geometry-stable",
-      "scenario_id": "/analytics@1440:temporal.geometry-stable"
+      "scenario_id": "/analytics@1440:temporal.geometry-stable",
+      "status": "PASS"
     },
     {
+      "evidence_key": "41a614586979f865",
       "evidence_type": "observed",
       "failure_mode": "FM-transition:settings-modal",
       "requirement": "REQ-/settings-default-transition:settings-modal",
       "rule": "transition:settings-modal",
-      "scenario_id": "/settings@768:transition:settings-modal"
+      "scenario_id": "/settings@768:transition:settings-modal",
+      "status": "PASS"
     },
     {
+      "evidence_key": "d060d5c520a302ba",
       "evidence_type": "observed",
       "failure_mode": "FM-transition:settings-modal",
       "requirement": "REQ-/settings-default-transition:settings-modal",
       "rule": "transition:settings-modal",
-      "scenario_id": "/settings@768:transition:settings-modal"
+      "scenario_id": "/settings@768:transition:settings-modal",
+      "status": "PASS"
     },
     {
+      "evidence_key": "57723c2f9d930f7c",
       "evidence_type": "observed",
       "failure_mode": "FM-MODAL_INTEGRITY",
       "requirement": "REQ-/settings-modal-open-MODAL_INTEGRITY",
       "rule": "MODAL_INTEGRITY",
-      "scenario_id": "/settings@768:MODAL_INTEGRITY"
+      "scenario_id": "/settings@768:MODAL_INTEGRITY",
+      "status": "PASS"
     },
     {
+      "evidence_key": "e66a3b36b9d232c2",
       "evidence_type": "observed",
       "failure_mode": "FM-transition:analytics-drilldown",
       "requirement": "REQ-/analytics-default-transition:analytics-drilldown",
       "rule": "transition:analytics-drilldown",
-      "scenario_id": "/analytics@768:transition:analytics-drilldown"
+      "scenario_id": "/analytics@768:transition:analytics-drilldown",
+      "status": "PASS"
     },
     {
+      "evidence_key": "7527baa55c6474c2",
       "evidence_type": "observed",
       "failure_mode": "FM-transition:analytics-drilldown",
       "requirement": "REQ-/analytics-default-transition:analytics-drilldown",
       "rule": "transition:analytics-drilldown",
-      "scenario_id": "/analytics@768:transition:analytics-drilldown"
+      "scenario_id": "/analytics@768:transition:analytics-drilldown",
+      "status": "PASS"
     },
     {
+      "evidence_key": "7e29fb675bf5afa5",
       "evidence_type": "observed",
       "failure_mode": "FM-MODAL_INTEGRITY",
       "requirement": "REQ-/analytics-modal-open-MODAL_INTEGRITY",
       "rule": "MODAL_INTEGRITY",
-      "scenario_id": "/analytics@768:MODAL_INTEGRITY"
+      "scenario_id": "/analytics@768:MODAL_INTEGRITY",
+      "status": "PASS"
     }
   ],
-  "percentage": 100.0,
-  "report_hash": "fa756b1163ab803a",
+  "percentage": 100,
+  "report_hash": "3ff940038cdf3b07",
   "report_hash_algo": "sha256:16",
   "required_obligations": 90,
   "rules_digest": "fabd8f3a8bfa1f50",
   "scenario_digest": "5d43a5ee4cc4f8f5",
+  "source_run_id": "local",
   "status": "PASS",
-  "supported_domain_digest": "46e883a2bc336d1b",
   "traced_obligations": 90
 }
