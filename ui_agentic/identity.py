@@ -25,21 +25,40 @@ def contract_digest(config: dict) -> str:
     )
 
 
+def _package_roots(package_name: str) -> list[pathlib.Path]:
+    module = __import__(package_name)
+    roots: list[pathlib.Path] = []
+    module_paths = getattr(module, "__path__", None)
+    if module_paths is not None:
+        roots.extend(pathlib.Path(item).resolve() for item in module_paths)
+    else:
+        module_file = getattr(module, "__file__", None)
+        if module_file:
+            roots.append(pathlib.Path(module_file).resolve().parent)
+    unique = sorted({root for root in roots if root.exists() and root.is_dir()})
+    if not unique:
+        raise RuntimeError(f"cannot resolve verifier package roots for {package_name}")
+    return unique
+
+
 def verifier_source_manifest() -> dict[str, str]:
     """Hash installed verifier Python sources independent of checkout location."""
-    roots: list[tuple[str, pathlib.Path]] = []
-    for package_name in ("ui_agentic", "core", "gvh"):
-        module = __import__(package_name)
-        module_file = pathlib.Path(module.__file__).resolve()
-        roots.append((package_name, module_file.parent))
-
     manifest: dict[str, str] = {}
-    for package_name, root in roots:
-        for path in sorted(root.rglob("*.py")):
-            if "__pycache__" in path.parts:
-                continue
-            rel = f"{package_name}/{path.relative_to(root).as_posix()}"
-            manifest[rel] = hashlib.sha256(path.read_bytes()).hexdigest()
+    for package_name in ("ui_agentic", "core", "gvh"):
+        package_roots = _package_roots(package_name)
+        for root_index, root in enumerate(package_roots):
+            prefix = package_name if len(package_roots) == 1 else f"{package_name}@{root_index}"
+            for path in sorted(root.rglob("*.py")):
+                if "__pycache__" in path.parts:
+                    continue
+                rel = f"{prefix}/{path.relative_to(root).as_posix()}"
+                digest = hashlib.sha256(path.read_bytes()).hexdigest()
+                existing = manifest.get(rel)
+                if existing is not None and existing != digest:
+                    raise RuntimeError(f"verifier source manifest collision for {rel}")
+                manifest[rel] = digest
+    if not manifest:
+        raise RuntimeError("verifier source manifest is empty")
     return manifest
 
 
