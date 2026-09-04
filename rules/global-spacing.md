@@ -6,5 +6,5 @@ detect: static
 required_proof: observed
 proof_source: execution
 severity: high
-scope: spacing valeurs autorisées [4,8,16,24,32,48]
-pass_condition: tout spacing déclaré ∈ scale sinon FAIL
+scope: allowed spacing values [4,8,16,24,32,48]
+pass_condition: every declared spacing value belongs to the allowed scale; otherwise FAIL
