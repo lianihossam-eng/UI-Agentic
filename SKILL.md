@@ -9,6 +9,8 @@ This file is the primary routing surface for an agent using UI-Agentic.
 
 It must **route to the smallest applicable references and rules** rather than duplicating the full architecture in one prompt.
 
+For a human-readable introduction, start with `README.md` and `docs/00-project-guide.md`.
+
 ## Canonical workflow
 
 ```text
@@ -158,8 +160,13 @@ When a structured violation/certificate format is applicable, follow the public 
 ## Canonical public documentation
 
 - `README.md` — public overview and entry point.
+- `docs/00-project-guide.md` — complete A-to-Z mental model and workflow.
+- `docs/GLOSSARY.md` — precise public terminology.
 - `docs/01-pyramidal-stabilization.md` — stabilization method and ownership.
 - `docs/02-agent-architecture-and-verification.md` — orchestration and verification model.
 - `docs/03-geometric-visual-harness.md` — geometry engine.
 - `docs/04-proof-evidence-attestation.md` — proof, provenance, and lock semantics.
 - `docs/05-project-status-and-roadmap.md` — implemented vs planned capabilities.
+- `docs/06-using-ui-agentic.md` — stable external-project CLI workflow.
+- `references/README.md` — operational reference index.
+- `rules/README.md` — verification-rule model and contribution guidance.
