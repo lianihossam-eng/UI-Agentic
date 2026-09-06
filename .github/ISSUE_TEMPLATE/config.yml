@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/lianihossam-eng/UI-Agentic/tree/main/docs
+    about: Read the project guide, implementation status, CLI guide, internals, and FAQ before opening a question as an issue.
+  - name: Security vulnerability
+    url: https://github.com/lianihossam-eng/UI-Agentic/blob/main/SECURITY.md
+    about: Do not report security vulnerabilities through public issues.

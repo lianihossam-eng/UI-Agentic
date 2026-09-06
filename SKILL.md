@@ -157,6 +157,15 @@ Do not replace `UNKNOWN` with inferred confidence.
 
 When a structured violation/certificate format is applicable, follow the public rule schema and the formats documented in `docs/` and `references/`.
 
+## Maintainer routing
+
+When the task is not UI repair but modification of UI-Agentic itself:
+
+- read `docs/07-codebase-and-runtime-flow.md` to locate the responsible subsystem;
+- read `docs/08-extending-ui-agentic.md` before adding rules, states, adapters, proof methods, visual-equivalence logic, evidence-key inputs, or final gates;
+- use `docs/09-faq.md` to resolve common public-claim ambiguities;
+- update `docs/05-project-status-and-roadmap.md` whenever implementation status changes.
+
 ## Canonical public documentation
 
 - `README.md` — public overview and entry point.
@@ -168,5 +177,9 @@ When a structured violation/certificate format is applicable, follow the public 
 - `docs/04-proof-evidence-attestation.md` — proof, provenance, and lock semantics.
 - `docs/05-project-status-and-roadmap.md` — implemented vs planned capabilities.
 - `docs/06-using-ui-agentic.md` — stable external-project CLI workflow.
+- `docs/07-codebase-and-runtime-flow.md` — source layout and end-to-end runtime path.
+- `docs/08-extending-ui-agentic.md` — safe extension and verifier-contribution requirements.
+- `docs/09-faq.md` — common questions and claim-boundary clarifications.
 - `references/README.md` — operational reference index.
 - `rules/README.md` — verification-rule model and contribution guidance.
+- `CHANGELOG.md` — public milestones and user-visible changes.
