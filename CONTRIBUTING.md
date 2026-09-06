@@ -2,17 +2,25 @@
 
 Thank you for considering a contribution to UI-Agentic.
 
-UI-Agentic is an evidence-driven verification project. Contributions are welcome, but changes to verification logic must preserve the project's fail-closed behavior and explicit proof model.
+UI-Agentic is an evidence-driven UI stabilization and verification project. Contributions are welcome, but changes to verification logic must preserve the project's fail-closed behavior, explicit ownership model, and proof discipline.
 
 ## Before you start
 
-Please read:
+If you are new to the project, read:
 
-- `README.md`
+1. `README.md`
+2. `docs/00-project-guide.md`
+3. `docs/GLOSSARY.md`
+4. `docs/05-project-status-and-roadmap.md`
+
+For architecture or verifier work, also read:
+
 - `docs/01-pyramidal-stabilization.md`
 - `docs/02-agent-architecture-and-verification.md`
+- `docs/03-geometric-visual-harness.md` when geometry is involved
 - `docs/04-proof-evidence-attestation.md`
-- `docs/05-project-status-and-roadmap.md`
+
+For external CLI work, read `docs/06-using-ui-agentic.md`.
 
 For agent-oriented changes, also read `SKILL.md`.
 
@@ -49,7 +57,7 @@ For ordinary documentation or maintenance changes, keep the pull request focused
 
 For verifier, rule, compiler, evidence, provenance, or attestation changes, include the following where applicable:
 
-- affected requirement/failure mode;
+- affected requirement or failure mode;
 - affected rule IDs;
 - affected Supported Domain factors;
 - positive-path tests;
@@ -75,7 +83,7 @@ finding
 
 ## Proof discipline
 
-Use the proof model honestly:
+Use the proof model precisely:
 
 ```text
 OBSERVED  — direct measurement of a rendered case
@@ -87,7 +95,7 @@ Rules:
 
 - repeated sampling does not become `BOUNDED` by repetition alone;
 - a missing checker cannot produce `CERTIFIED`;
-- missing/invalid evidence should produce `UNKNOWN`;
+- missing or invalid evidence should produce `UNKNOWN`;
 - a required `UNKNOWN` blocks confirmation;
 - aggregate scores must never mask hard failures.
 
@@ -139,15 +147,19 @@ The GitHub Actions workflow performs additional mutation, provenance, visual, ru
 
 ## Documentation style
 
-Public documentation must be written in clear English.
+All public documentation must be written in clear English.
 
 Prefer:
 
 - explicit terms over internal shorthand;
+- one defined meaning per project term;
 - stable architectural concepts over temporary CI numbers;
 - exact capability boundaries over broad marketing claims;
 - links to canonical documentation instead of duplicated explanations;
-- `UNKNOWN` over unsupported certainty.
+- `UNKNOWN` over unsupported certainty;
+- short operational references over giant all-purpose prompts.
+
+When introducing a new project-specific term, define it in `docs/GLOSSARY.md` if a public reader would otherwise have to infer its meaning.
 
 ## Commit and pull request scope
 
@@ -166,11 +178,29 @@ Reviewers should prioritize:
 
 1. correctness of the verification claim;
 2. fail-closed behavior;
-3. proof/provenance integrity;
+3. proof and provenance integrity;
 4. contract and ownership consistency;
 5. regression safety;
 6. clarity and maintainability;
 7. performance only after the above remain intact.
+
+## Public source-of-truth discipline
+
+For a specific commit or release:
+
+```text
+executable code and CI behavior
+        ↓
+current contracts, rules, and Supported Domain
+        ↓
+core architecture documentation
+        ↓
+focused operational references
+        ↓
+historical archive material
+```
+
+If an implementation change makes a public claim inaccurate, update the relevant documentation in the same contribution.
 
 ## License
 
