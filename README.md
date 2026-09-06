@@ -1,146 +1,10 @@
 # UI-Agentic
 
-UI-Agentic is an evidence-driven system for designing, stabilizing, verifying, and controlling changes to user interfaces.
+**Evidence-driven UI stabilization and verification for browser applications.**
 
-It combines a **pyramidal stabilization method**, a **browser-based verification architecture**, and a **Geometric Visual Harness (GVH)** under one canonical workflow.
+UI-Agentic is an open-source system for reasoning about interface quality as a set of explicit contracts, measurable obligations, and reproducible evidence.
 
-The core idea is simple:
-
-```text
-GLOBAL → FAMILY → PAGE → SECTION → COMPONENT → STATE → DETAIL
-```
-
-A lower level must never solve a local problem by silently destabilizing a higher-level contract.
-
-UI-Agentic is not a visual-score generator, a screenshot linter, or a single design prompt. It is a stateful verification system built around explicit support contracts, deterministic evidence, fail-closed gates, controlled regression, and snapshot-bound attestations.
-
----
-
-## Why UI-Agentic exists
-
-UI work often fails in one of two ways:
-
-1. teams optimize isolated screens while the global system drifts; or
-2. automated checks produce reassuring scores without proving that the declared product surface is actually covered.
-
-UI-Agentic addresses both problems.
-
-It first defines **what the product claims to support**, then compiles that contract into required verification obligations. It stabilizes the interface from the top of the hierarchy downward, measures rendered behavior in the browser, records evidence, revalidates the exact rule that triggered a change, and invalidates only the proofs affected by later changes.
-
-The result is a workflow where a final `LOCKED` verdict means:
-
-> This identified UI snapshot satisfied the declared support contract, required verification obligations, proof requirements, regression gates, and visual acceptance contract under the attested environment.
-
-It never means “this UI is correct in every imaginable environment.”
-
----
-
-## The three core specifications
-
-The project is organized around three independent responsibilities.
-
-| Specification | Responsibility |
-| --- | --- |
-| [01 — Pyramidal UI Stabilization System](docs/01-pyramidal-stabilization.md) | Work order, ownership, stabilization states, change boundaries, escalation, and regression. |
-| [02 — UI Agent Architecture & Verification](docs/02-agent-architecture-and-verification.md) | Orchestration, Supported Domain, Scenario Compiler, proof model, evidence, gates, and verification layers. |
-| [03 — Geometric Visual Harness](docs/03-geometric-visual-harness.md) | Objective geometry extraction, spatial constraints, responsive boundaries, occlusion, stability margins, and geometric regression. |
-
-Additional public documentation:
-
-- [Proof, Evidence, and Attestation Model](docs/04-proof-evidence-attestation.md)
-- [Current Implementation Status and Roadmap](docs/05-project-status-and-roadmap.md)
-
----
-
-## Canonical workflow: A to Z
-
-```text
-0. DECLARE SUPPORTED DOMAIN
-   ↓
-1. DISCOVER PRODUCT
-   ↓
-2. ESTABLISH / EXTRACT GLOBAL DESIGN CONTRACT
-   ↓
-3. STABILIZE GLOBAL
-   ↓
-4. STABILIZE FAMILIES
-   ↓
-5. STABILIZE PAGE STRUCTURES
-   ↓
-6. STABILIZE SECTIONS / COMPONENTS / STATES
-   ↓
-7. RUN FIVE-LAYER VERIFICATION
-   ↓
-8. CLASSIFY FINDINGS + OWNER + EVIDENCE
-   ↓
-9. DIAGNOSE ROOT CAUSE
-   ↓
-10. FIX AT LOWEST VALID OWNER
-   ↓
-11. REVALIDATE THE SAME RULE
-   ↓
-12. RUN DEPENDENCY-AWARE REGRESSION
-   ↓
-13. CLOSE COVERAGE
-   ↓
-14. RUN VISUAL ACCEPTANCE REVIEW
-   ↓
-15. FINAL CONFIRMATION GATE
-   ↓
-16. EMIT VERIFICATION ATTESTATION
-   ↓
-17. LOCK
-```
-
-The order matters. UI-Agentic intentionally prevents detail-level polish from bypassing structural instability, failed interactions, accessibility blockers, or missing evidence.
-
----
-
-## Supported Domain
-
-UI-Agentic does not define `100%` as an unbounded claim.
-
-Before final verification, the project declares a Supported Domain:
-
-```text
-Dₛ = Routes
-   × Viewports
-   × Containers
-   × Content
-   × States
-   × Inputs
-   × Locales
-   × Environments
-   × Time
-```
-
-That domain is compiled into a Required Scenario Set:
-
-```text
-R = Compile(
-  Dₛ,
-  rules,
-  dependency hypergraph,
-  contracts,
-  boundaries
-)
-```
-
-The compiler does not blindly brute-force the full Cartesian product. Each rule is evaluated over the factors that can actually affect it. Declared independence must be justified; unknown interactions remain part of robustness discovery and may block stronger proof claims.
-
-Therefore:
-
-> **100% confirmed = 100% of the required obligations derived from the declared Supported Domain, with every required proof level satisfied.**
-
-Anything outside that contract is outside the claim.
-
-See [Supported Domain reference](references/supported-domain.md).
-
----
-
-## Pyramidal stabilization
-
-The ownership hierarchy is:
+Instead of treating a UI as a collection of isolated screenshots, UI-Agentic treats it as a hierarchy of dependent design decisions and runtime states:
 
 ```text
 GLOBAL
@@ -158,81 +22,209 @@ STATE
 DETAIL
 ```
 
-Examples of ownership:
+Its central rule is simple:
 
-| Level | Typical ownership |
-| --- | --- |
-| Global | typography scale, semantic colors, spacing scale, radii, elevation, responsive philosophy |
-| Family | application shell, navigation, shared headers, common containers |
-| Page | macro layout, information hierarchy, page-specific density, page state architecture |
-| Section | internal grid, toolbar structure, relationships between blocks |
-| Component | anatomy, internal spacing, variants, control dimensions |
-| State | loading, empty, error, selected, disabled, modal-open, transition behavior |
-| Detail | optical alignment, micro-spacing, fine visual polish |
+> A lower-level fix must not silently destabilize a higher-level contract.
 
-### Fundamental invariant
+UI-Agentic combines three ideas:
 
-> Constraints flow downward. Change requests escalate upward. Regression flows downward again.
+1. **Pyramidal stabilization** — establish shared design constraints before polishing local details.
+2. **Browser verification** — execute explicit obligations against the rendered application rather than relying on source inspection alone.
+3. **Evidence and attestation** — bind results to the exact subject, contract, verifier, environment, and visual review inputs that produced them.
 
-A component should not invent a local breakpoint to compensate for a page-level layout problem. A page should not redefine the global spacing system to repair one section. Every fix must be applied at the **lowest valid owner** that can solve the root cause without violating its parent contract.
+The project is intentionally conservative about claims. A `PASS` means that a specific rule produced valid positive evidence. A required case with missing or invalid evidence becomes `UNKNOWN`. A final `LOCKED` verdict is allowed only when the declared verification contract is fully closed for the attested snapshot.
 
 ---
 
-## Stabilization states
+## What problem does UI-Agentic solve?
 
-UI-Agentic models progress explicitly:
+Interface work tends to fail in two different ways.
+
+### 1. Local fixes create global drift
+
+A developer changes a component to solve one screen. Another screen inherits the change and breaks. A page adds a custom breakpoint because the family layout is weak. A section introduces a new spacing value because the global spacing system does not quite fit.
+
+Over time, the interface still "works", but the design system becomes an accumulation of exceptions.
+
+UI-Agentic addresses this with explicit ownership:
 
 ```text
-UNEXPLORED
-→ DRAFT
-→ STRUCTURED
-→ STABLE
-→ VERIFIED
-→ LOCKED
+Global contract
+   ↓
+Family contract
+   ↓
+Page contract
+   ↓
+Section / component contracts
+   ↓
+State and detail rules
 ```
 
-- **STRUCTURED** — architecture is defined but still freely changeable.
-- **STABLE** — reliable enough to allow work to proceed to the next lower level.
-- **VERIFIED** — applicable verification obligations have passed with required evidence.
-- **LOCKED** — the state is attested; further changes require impact analysis and controlled revalidation.
+Every important property belongs to a level. Fixes are applied at the **lowest valid owner** that can solve the root cause without violating its parent.
 
-`LOCKED` means **controlled change**, not immutability.
+### 2. Automated UI checks can overstate confidence
+
+A few screenshots can look clean while keyboard focus is wrong. An accessibility tree can look correct while a target is visually occluded. A page can pass at three widths while failing at an untested responsive boundary. A test suite can report green even though required states were never exercised.
+
+UI-Agentic therefore begins with a **Supported Domain**: an explicit statement of what the product claims to support.
+
+Conceptually:
+
+```text
+Dₛ = Routes
+   × Viewports
+   × Containers
+   × Content
+   × States
+   × Inputs
+   × Locales
+   × Environments
+   × Time
+```
+
+That domain is compiled into the set of required verification obligations. The final claim is bounded by that contract.
+
+> **100% confirmed means 100% of the required obligations derived from the declared Supported Domain, with every required proof level satisfied.**
+
+It does not mean "correct in every imaginable environment."
+
+---
+
+## The project in one diagram
+
+```text
+                          ┌──────────────────────────┐
+                          │     SUPPORTED DOMAIN     │
+                          │ routes · states · inputs │
+                          │ viewports · locale · time│
+                          └────────────┬─────────────┘
+                                       │
+                                       ▼
+                          ┌──────────────────────────┐
+                          │    SCENARIO COMPILER     │
+                          │ dependency-aware required│
+                          │ verification obligations │
+                          └────────────┬─────────────┘
+                                       │
+                 ┌─────────────────────┼─────────────────────┐
+                 │                     │                     │
+                 ▼                     ▼                     ▼
+        ┌────────────────┐    ┌────────────────┐    ┌────────────────┐
+        │   GEOMETRY     │    │ INTERACTION /  │    │ PAINT / A11Y / │
+        │      GVH       │    │    STATES      │    │ TEMPORAL LAYERS│
+        └───────┬────────┘    └───────┬────────┘    └───────┬────────┘
+                └─────────────────────┼─────────────────────┘
+                                      │
+                                      ▼
+                          ┌──────────────────────────┐
+                          │      EVIDENCE DAG        │
+                          │ content-addressed proof  │
+                          └────────────┬─────────────┘
+                                       │
+                  ┌────────────────────┼────────────────────┐
+                  │                    │                    │
+                  ▼                    ▼                    ▼
+          Coverage Ledger      Visual Acceptance     Mutation / tamper
+          & traceability          Contract               gates
+                  └────────────────────┼────────────────────┘
+                                       │
+                                       ▼
+                          ┌──────────────────────────┐
+                          │ FINAL CONFIRMATION GATE  │
+                          └────────────┬─────────────┘
+                                       │
+                              PASS only if closed
+                                       │
+                                       ▼
+                          ┌──────────────────────────┐
+                          │ VERIFICATION ATTESTATION │
+                          │         LOCKED           │
+                          └──────────────────────────┘
+```
+
+---
+
+## The A-to-Z workflow
+
+The complete method is intentionally ordered. Structural work comes before local polish, and evidence comes before confidence claims.
+
+```text
+0.  Declare the Supported Domain
+1.  Discover the product
+2.  Establish or extract the global design contract
+3.  Stabilize the global design system
+4.  Stabilize page families
+5.  Stabilize page structures
+6.  Stabilize sections, components, states, and transitions
+7.  Run five-layer verification
+8.  Classify findings with owner and evidence
+9.  Diagnose the root cause
+10. Fix at the lowest valid owner
+11. Re-run the same triggering rule
+12. Run dependency-aware regression
+13. Close required coverage
+14. Perform visual acceptance review
+15. Run the final confirmation gate
+16. Emit a verification attestation
+17. Lock the verified snapshot
+```
+
+A lower step cannot compensate for a failure above it. Visual polish cannot hide broken interaction, missing coverage, invalid geometry, or an unresolved `UNKNOWN`.
+
+For the full walkthrough, read **[Project Guide: UI-Agentic from A to Z](docs/00-project-guide.md)**.
+
+---
+
+## The three core specifications
+
+UI-Agentic separates the architecture into three independent responsibilities.
+
+| Specification | Purpose |
+| --- | --- |
+| **[01 — Pyramidal UI Stabilization System](docs/01-pyramidal-stabilization.md)** | Defines hierarchy, ownership, stabilization states, change boundaries, escalation, and regression. |
+| **[02 — UI Agent Architecture & Verification](docs/02-agent-architecture-and-verification.md)** | Defines orchestration, Supported Domain compilation, verification layers, evidence, proof requirements, gates, and ledgers. |
+| **[03 — Geometric Visual Harness](docs/03-geometric-visual-harness.md)** | Defines objective geometry extraction, spatial constraints, responsive analysis, clipping, layering, occlusion, and geometric regression. |
+
+Two additional documents describe the trust model and current implementation boundary:
+
+- **[04 — Proof, Evidence, and Attestation Model](docs/04-proof-evidence-attestation.md)**
+- **[05 — Implementation Status and Roadmap](docs/05-project-status-and-roadmap.md)**
+
+A project-wide vocabulary is available in **[Glossary](docs/GLOSSARY.md)**.
 
 ---
 
 ## Five verification layers
 
-UI-Agentic keeps verification concerns separate so that one kind of success cannot hide another kind of failure.
+UI-Agentic keeps different verification concerns separate because one kind of success cannot prove another.
 
-| Layer | What it verifies |
+| Layer | Verifies |
 | --- | --- |
-| **Geometry** | position, dimensions, grouping, spacing, containment, clipping, responsive boundaries, layering, occlusion |
-| **Paint** | rendered typography, color, contrast, borders, shadows, opacity, masks, raster fidelity |
+| **Geometry** | position, size, containment, alignment, gaps, clipping, responsive structure, layers, occlusion |
+| **Paint** | rendered typography, colors, contrast, borders, shadows, opacity, masks, raster fidelity |
 | **Interaction** | hit testing, pointer/touch behavior, keyboard behavior, focus, scrolling, state transitions |
-| **Accessibility / Semantics** | roles, names, reading order, focus order, ARIA/state semantics, reduced motion |
-| **Temporal / Environmental** | fonts, images, hydration, async states, virtualization, time, browser/environment identity, layout stability |
+| **Accessibility / Semantics** | roles, accessible names, reading order, focus order, state semantics, reduced-motion behavior |
+| **Temporal / Environmental** | fonts, assets, hydration, async state, animation, browser/runtime identity, layout stability |
 
-The GVH owns the geometry layer. The UI-Agentic orchestrator coordinates all five.
+The **Geometric Visual Harness (GVH)** owns geometry. The UI-Agentic orchestrator coordinates all five layers.
 
-### Cross-layer invariants
-
-Some failures cannot be validated correctly by one layer in isolation. UI-Agentic therefore supports composite contracts such as:
+Some properties cross multiple layers. These are checked as composite invariants rather than pretending that a single layer is enough. Examples include:
 
 ```text
-FOCUS_USABLE
 TARGET_OPERABLE
+FOCUS_USABLE
 MODAL_INTEGRITY
 VISUAL_SEMANTIC_ORDER
 ASYNC_STABILITY
 ```
 
-For example, a button can have a valid DOM role and acceptable size but still be unusable because another element intercepts the hit test. A modal can be visually centered while keyboard focus escapes into the background. Composite invariants require one atomic evidence bundle across the relevant layers.
+For example, a control can have the correct semantic role and still be unusable because another element intercepts pointer events. A modal can be visually centered and still fail because keyboard focus escapes into the page behind it.
 
 ---
 
-## Proof levels
+## Proof model
 
-Every verification rule declares a minimum proof level:
+UI-Agentic distinguishes three proof levels.
 
 ```text
 OBSERVED
@@ -246,26 +238,26 @@ CERTIFIED
   certification method and independently checked.
 ```
 
-A collection of samples does not automatically become a bound. A screenshot matrix does not automatically become a certificate.
+These levels are not interchangeable.
 
-The system fails closed:
+A large number of samples is still sampling. It does not automatically become a mathematical bound. A screenshot matrix does not automatically become a certificate.
+
+The verdict model is fail-closed:
 
 ```text
-real positive evidence       → PASS
-real negative evidence       → FAIL
-missing/invalid evidence     → UNKNOWN
-required UNKNOWN             → blocks confirmation
+valid positive evidence    → PASS
+valid negative evidence    → FAIL
+missing or invalid evidence→ UNKNOWN
+required UNKNOWN           → blocks confirmation
 ```
 
 ---
 
-## Trusted Verification Kernel
+## Evidence, provenance, and trust
 
-Evidence generators are not trusted simply because they produced a result.
+The system treats evidence producers as potentially fallible. An agent, solver, search procedure, or fuzzer does not become trusted merely because it produced a result.
 
-Agents, solvers, search procedures, fuzzers, and numerical methods are treated as untrusted evidence producers by default. Strong proof claims must be independently checkable.
-
-The intended trust bundle is:
+The intended strong-proof trust bundle is:
 
 ```text
 contract
@@ -274,182 +266,78 @@ contract
 + explicit assumptions
 ```
 
-A certificate that cannot be independently checked is not accepted as `CERTIFIED`.
-
----
-
-## Measurement readiness
-
-Rendered verification is meaningful only when the UI is ready to be measured.
-
-The Measurement Readiness Gate can include:
-
-- deterministic fixtures and network state;
-- expected application state reached;
-- fonts resolved;
-- required assets resolved or intentionally failed;
-- hydration and async work completed as declared;
-- controlled time, locale, randomness, and environment when relevant;
-- geometry stable for the declared observation window;
-- animations completed, neutralized, or explicitly tested.
-
-A fixed sleep is not evidence of readiness.
-
-If readiness cannot be established, rendered obligations become `UNKNOWN` rather than receiving a synthetic pass.
-
----
-
-## Evidence DAG and targeted regression
-
-Verification evidence is content-addressed.
-
-Conceptually, an evidence key binds:
+Evidence is content-addressed. Conceptually, an evidence key binds the relevant inputs:
 
 ```text
 hash(
-  code / subject identity
+  subject / code identity
 + contract
 + rule
 + scenario
 + browser and platform
 + fonts and assets
 + locale and DPR
-+ verifier/checker identity
++ verifier / checker identity
 )
 ```
 
-When an input changes, only dependent evidence becomes stale. This enables targeted regression instead of unconditional full reruns while still preventing stale proofs from being reused across incompatible snapshots.
+If one of those inputs changes, dependent evidence becomes stale and must be revalidated.
+
+This is the basis of **dependency-aware regression**: re-run what became invalid, not everything blindly, while never reusing proof across incompatible snapshots.
 
 ---
 
-## Visual acceptance
+## What `LOCKED` means
 
-Not every quality criterion can be converted into a formal geometric or semantic rule.
+`LOCKED` is not a permanent boolean and it does not mean the UI can never change.
 
-UI-Agentic therefore keeps subjective visual judgment explicit through a **Visual Acceptance Contract**. The review can cover:
+A `LOCKED` result means that an identified snapshot satisfied the declared confirmation contract and that the verdict is bound to the evidence and environment that justified it.
 
-- hierarchy;
-- composition;
-- perceived typography;
-- density and whitespace;
-- coherence;
-- brand and imagery;
-- comparison against accepted references or exemplars;
-- named disqualifiers.
-
-The verdict is:
+An authoritative attestation can bind:
 
 ```text
-ACCEPTED | REJECTED | UNKNOWN
-```
-
-Visual acceptance is rubric evidence. It is never promoted to a formal certificate.
-
----
-
-## Final confirmation gate
-
-A UI snapshot may be confirmed only when the required closure conditions are satisfied, including:
-
-```text
-Coverage = 100% of required obligations
-Requirement/failure-mode traceability = complete
-Required proof levels = satisfied
-Certificate/checker validation = complete where required
-Measurement readiness = satisfied
-Critical verification mutants survived = 0
-Unstated proof assumptions = 0
-Hard FAIL = 0
-Required UNKNOWN = 0
-Open regression = 0
-Unrevalidated fixes = 0
-Parent contract violations = 0
-Required state/transition obligations = complete
-Required cross-layer invariants = complete
-Declared compliance obligations = complete
-Critical geometry/paint failures = 0
-Critical temporal/environmental instability = 0
-Visual Acceptance Contract = ACCEPTED
-```
-
-No aggregate quality score is allowed to mask a hard failure.
-
----
-
-## Verification attestation and `LOCKED`
-
-`LOCKED` is not a permanent boolean stored independently of its evidence.
-
-The authoritative result is a **Verification Attestation** bound to the exact verified snapshot. The attestation can include digests for:
-
-```text
-subject/build
-contract
-scenario set
-rules/checkers
+subject / build identity
+contract identity
+compiled scenario set
+rules and checkers
 measurement kernel
 trusted verification kernel
 environment manifest
 runtime identity
-evidence DAG root
+Evidence DAG root
 report root
 visual evidence root
 final gate
 ```
 
-Any relevant input change makes the affected evidence stale and requires impact analysis and revalidation before another `LOCKED` attestation can be issued.
+When a relevant input changes, the corresponding proof becomes stale. The correct response is impact analysis and revalidation, not silent reuse of the old verdict.
 
-See [Proof, Evidence, and Attestation Model](docs/04-proof-evidence-attestation.md).
-
----
-
-## Repository structure
-
-```text
-UI-Agentic/
-├── README.md                     # public entry point
-├── SKILL.md                      # agent routing contract
-├── supported-domain.yaml         # executable reference Supported Domain
-├── ui_agentic/                   # external-project CLI and adapters
-├── core/                         # scenario, coverage, evidence, replay, trust
-├── gvh/                          # geometric extraction and verification
-├── rules/                        # rule definitions
-├── references/                   # focused operational references
-├── docs/                         # complete public architecture documentation
-├── scripts/                      # proof and CI verification gates
-├── assets/templates/             # reference vertical-slice pages
-├── evaluations/                  # evaluation fixtures
-├── tests/                        # verifier tests
-├── reports/                      # checked-in review inputs/reference data only
-├── archive/                      # historical experiments; not normative
-└── .github/workflows/            # fail-closed proof pipeline
-```
-
-### Normative vs historical content
-
-The current public source of truth is:
-
-```text
-README.md
-+ docs/
-+ SKILL.md
-+ references/
-+ rules/
-+ supported-domain.yaml
-+ executable verifier code
-```
-
-Files under `archive/` are historical experiments retained for traceability. They are **not** part of the current architecture or public API.
+> **Locked means controlled change, never immutability.**
 
 ---
 
-## Quick start: reference implementation
+## Current implementation status
+
+The repository contains two related things:
+
+1. a **general architecture** for evidence-driven UI stabilization and verification; and
+2. a **working reference implementation** that proves increasingly large parts of that architecture in executable browser runs.
+
+The bundled reference path includes Playwright/Chromium replay, scenario compilation, coverage tracking, measurement readiness, cross-layer checks, mutation/fault injection, provenance checks, visual acceptance, and a strict CI attestation path.
+
+The external-project CLI is intentionally more conservative. In the stable public version it can initialize a contract, discover declared routes, execute browser verification, and report results, but the external `lock` path remains fail-closed until all required external subject, contract, verifier, evidence, visual-review, and runtime provenance are bound by the same authoritative attestation model.
+
+See **[Implementation Status and Roadmap](docs/05-project-status-and-roadmap.md)** before interpreting an architectural concept as a universal current capability.
+
+---
+
+## Quick start
 
 ### Requirements
 
 - Python 3.10+
 - Playwright
-- Chromium managed by Playwright
+- Chromium installed through Playwright
 
 ### Install for local development
 
@@ -460,7 +348,7 @@ python -m pip install -e .
 playwright install chromium
 ```
 
-On Windows PowerShell, activate the virtual environment with the appropriate Windows activation command instead of `source`.
+On Windows, use the appropriate virtual-environment activation command for your shell.
 
 ### Run the bundled reference verifier
 
@@ -468,21 +356,17 @@ On Windows PowerShell, activate the virtual environment with the appropriate Win
 python run_goal_verify.py
 ```
 
-The repository CI performs substantially more than this single command. The authoritative reference attestation is produced only by the complete fail-closed GitHub Actions proof pipeline.
+This command is useful for local inspection. The repository's complete GitHub Actions workflow performs additional mutation, provenance, runtime, visual, and attestation gates.
 
----
+### Use UI-Agentic against a running local application
 
-## Using UI-Agentic against another local application
-
-The public CLI introduced in the current productization work is intentionally conservative.
-
-Initialize a contract:
+Initialize a project contract:
 
 ```bash
 ui-agentic init --project . --base-url http://127.0.0.1:3000
 ```
 
-Inspect declared routes:
+Probe the declared routes:
 
 ```bash
 ui-agentic discover --project .
@@ -500,112 +384,120 @@ Read the latest summary:
 ui-agentic report --project .
 ```
 
-Attempt the lock gate:
+Attempt the external lock gate:
 
 ```bash
 ui-agentic lock --project .
 ```
 
-### Important status note
+The current stable external lock path is deliberately fail-closed rather than issuing a stronger claim than the evidence model can support.
 
-External-project verification is being generalized incrementally. The current public CLI can execute browser obligations against an HTTP application, but **external-project `LOCKED` attestation is intentionally fail-closed until the external subject, contract, verifier, evidence DAG, visual review, and runtime provenance are all bound by the same authoritative model**.
+---
 
-The bundled reference implementation has a stricter CI attestation path than the current external-project CLI.
+## Repository map
 
-For an exact capability matrix, see [Current Implementation Status and Roadmap](docs/05-project-status-and-roadmap.md).
+```text
+UI-Agentic/
+├── README.md                    Public entry point
+├── SKILL.md                     Agent routing and workflow contract
+├── supported-domain.yaml        Reference Supported Domain
+│
+├── ui_agentic/                  External-project CLI and adapters
+├── core/                        Scenario, coverage, evidence, replay, trust
+├── gvh/                         Geometry extraction and verification
+│
+├── docs/                        Public architecture documentation
+├── references/                  Focused operational references
+├── rules/                       Verification rule definitions
+│
+├── scripts/                     CI and proof-gate tooling
+├── evaluations/                 Evaluation fixtures
+├── tests/                       Verifier tests
+├── assets/templates/            Bundled reference application surfaces
+├── reports/                     Review inputs / reference proof artifacts
+│
+├── archive/                     Historical experiments; non-normative
+└── .github/workflows/           Fail-closed proof pipeline
+```
+
+### Source-of-truth rule
+
+For a specific release or commit:
+
+- architecture documents explain the intended system;
+- the status document says what is implemented versus planned;
+- executable code and CI are the auditable source for actual behavior;
+- `archive/` is historical and must not be treated as normative architecture.
+
+---
+
+## Documentation paths
+
+### If you are new to the project
+
+1. Read this README.
+2. Read **[Project Guide: UI-Agentic from A to Z](docs/00-project-guide.md)**.
+3. Use **[Glossary](docs/GLOSSARY.md)** when a project term is unfamiliar.
+4. Read **[Implementation Status and Roadmap](docs/05-project-status-and-roadmap.md)**.
+
+### If you are implementing or modifying UI-Agentic
+
+1. **[Pyramidal Stabilization](docs/01-pyramidal-stabilization.md)**
+2. **[Agent Architecture & Verification](docs/02-agent-architecture-and-verification.md)**
+3. **[Proof, Evidence, and Attestation](docs/04-proof-evidence-attestation.md)**
+4. **[Contributing Guide](CONTRIBUTING.md)**
+
+### If you are working on geometry
+
+Read **[Geometric Visual Harness](docs/03-geometric-visual-harness.md)** and the focused references under `references/`.
+
+The full documentation index is in **[docs/README.md](docs/README.md)**.
 
 ---
 
 ## What UI-Agentic does not claim
 
-UI-Agentic does **not** currently claim:
+The project does not claim:
 
-- universal correctness for arbitrary UIs;
-- complete WCAG 2.2 AA conformance for every application;
+- universal correctness for arbitrary interfaces;
+- complete WCAG conformance for arbitrary products;
 - complete ACT Rules coverage;
 - multi-browser certification by default;
-- continuous responsive-domain certification for every rule;
-- internal geometry certification for opaque canvas/WebGL/cross-origin surfaces without instrumentation;
-- automatic proof that subjective design intent is “good.”
+- universal continuous responsive certification for every rule;
+- internal geometry certification for opaque canvas, WebGL, video, or inaccessible cross-origin internals without instrumentation;
+- automatic proof that subjective design intent is aesthetically good;
+- authoritative external-project `LOCKED` status before the full external attestation chain is implemented and closed.
 
-Every claim must remain bounded by the declared contract and available proof.
-
----
-
-## Current reference implementation
-
-The repository includes a deliberately narrow executable vertical slice used to test the verification architecture itself. It exercises multiple routes, responsive widths, modal states and transitions, cross-layer rules, mutation/fault injection, provenance tamper checks, visual review, and attestation generation.
-
-The exact obligation count, mutation set, browser identity, evidence roots, and attestation digest are runtime facts produced by CI rather than permanent marketing claims in this README.
-
-This prevents documentation from becoming stale whenever the compiler or verifier evolves.
+Every confidence claim must remain inside the declared contract and available proof.
 
 ---
 
-## Development principles
+## Project principles
 
-The project follows these non-negotiable rules:
+The project follows a small set of non-negotiable principles:
 
-1. Top-down constraints.
-2. Breadth before depth.
-3. Lowest valid owner.
-4. Upward escalation only when necessary.
-5. Downward regression after parent changes.
-6. Evidence before `FAIL`.
-7. Required `UNKNOWN` blocks confirmation.
-8. A fix must revalidate the same triggering rule.
-9. Geometry, paint, interaction, semantics, and time remain distinct verification concerns.
-10. No silent local patching.
-11. No aggregate score may mask hard failures.
-12. Sampling alone never becomes a stronger proof level by repetition.
-13. Cached evidence is reusable only when its declared inputs remain compatible.
-14. Significant interactive flows are verified as transitions, not only isolated states.
-15. Visual quality is accepted against an explicit visual contract.
-16. `LOCKED` always refers to an identified snapshot and evidence bundle.
+1. **Top-down constraints.**
+2. **Breadth before depth.**
+3. **Fix at the lowest valid owner.**
+4. **Escalate upward only when necessary.**
+5. **Regress downward after parent changes.**
+6. **Evidence before failure claims.**
+7. **Required `UNKNOWN` blocks confirmation.**
+8. **A fix must revalidate the same triggering rule.**
+9. **Geometry, paint, interaction, semantics, and time remain distinct concerns.**
+10. **No silent local patching.**
+11. **No aggregate score may hide a hard failure.**
+12. **`100%` always means 100% of the required scenario set derived from the declared Supported Domain.**
+13. **`LOCKED` always refers to an identified attested snapshot.**
 
 ---
 
-## Documentation map
+## Contributing and security
 
-Start here depending on what you want to understand:
+Contributions are welcome, especially when they improve measurable verification coverage without weakening fail-closed behavior.
 
-| Goal | Document |
-| --- | --- |
-| Understand the project in five minutes | `README.md` |
-| Understand stabilization order and ownership | [`docs/01-pyramidal-stabilization.md`](docs/01-pyramidal-stabilization.md) |
-| Understand orchestration and verification architecture | [`docs/02-agent-architecture-and-verification.md`](docs/02-agent-architecture-and-verification.md) |
-| Understand the geometry engine | [`docs/03-geometric-visual-harness.md`](docs/03-geometric-visual-harness.md) |
-| Understand proofs, evidence, gates, and lock semantics | [`docs/04-proof-evidence-attestation.md`](docs/04-proof-evidence-attestation.md) |
-| Understand what is implemented today | [`docs/05-project-status-and-roadmap.md`](docs/05-project-status-and-roadmap.md) |
-| Use UI-Agentic as an agent skill | [`SKILL.md`](SKILL.md) |
-| Contribute | [`CONTRIBUTING.md`](CONTRIBUTING.md) |
-| Report a security issue | [`SECURITY.md`](SECURITY.md) |
+- Read **[CONTRIBUTING.md](CONTRIBUTING.md)** before submitting architectural or verifier changes.
+- Read **[SECURITY.md](SECURITY.md)** for vulnerability reporting.
+- Community behavior is governed by **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**.
 
----
-
-## Contributing
-
-Contributions are welcome when they preserve the verification model and fail-closed behavior.
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
-
-For significant verifier changes, include:
-
-- the affected Supported Domain or contract;
-- the rule/failure mode being changed;
-- tests for the positive path;
-- at least one relevant negative or mutation case when applicable;
-- evidence that the exact triggering rule is revalidated;
-- regression impact notes.
-
----
-
-## Security
-
-Please do not disclose vulnerabilities through a public issue. Follow the process in [SECURITY.md](SECURITY.md).
-
----
-
-## License
-
-UI-Agentic is released under the [MIT License](LICENSE).
+UI-Agentic is released under the **MIT License**.
