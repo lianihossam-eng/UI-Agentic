@@ -1,0 +1,45 @@
+name: Feature request
+description: Propose a new capability, integration, or product improvement.
+title: "feature: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: Describe the user or verifier problem before proposing the implementation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed capability
+      description: What should UI-Agentic do differently?
+    validations:
+      required: true
+
+  - type: textarea
+    id: contract
+    attributes:
+      label: Contract impact
+      description: Does this expand the Supported Domain, proof model, CLI surface, verification layers, or attestation semantics?
+
+  - type: textarea
+    id: trust
+    attributes:
+      label: Trust / fail-closed impact
+      description: Could this change PASS/FAIL/UNKNOWN behavior, evidence reuse, readiness, trusted-kernel code, or final gates?
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This request does not assume an architectural target is already an implemented capability.
+          required: true

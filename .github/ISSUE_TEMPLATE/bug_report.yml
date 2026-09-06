@@ -1,0 +1,84 @@
+name: Bug report
+description: Report incorrect behavior in UI-Agentic itself.
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. For verifier defects, include enough evidence to distinguish an application failure from a verifier failure.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - CLI / external app adapter
+        - Scenario compiler
+        - Browser replay / readiness
+        - Geometry / GVH
+        - Paint verification
+        - Interaction verification
+        - Accessibility / semantics
+        - Temporal / environmental verification
+        - Evidence / traceability
+        - Mutation / fault injection
+        - Visual acceptance
+        - Provenance / attestation
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Problem summary
+      description: What is wrong, in precise terms?
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include commands, route/state/viewport, and the smallest reproducible example when possible.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Relevant logs, report excerpts, scenario IDs, rule IDs, screenshots, or artifact references.
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: UI-Agentic version/commit, Python, Playwright/browser, OS, and relevant project/runtime details.
+
+  - type: checkboxes
+    id: claim
+    attributes:
+      label: Verification claim check
+      options:
+        - label: I have not converted missing evidence into a PASS in this report.
+          required: true
+        - label: I checked whether this is a verifier defect rather than only an application defect.
+          required: true

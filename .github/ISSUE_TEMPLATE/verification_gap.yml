@@ -1,0 +1,85 @@
+name: Verification gap
+description: Report a required UI property or failure mode that the verifier does not currently detect.
+title: "verification-gap: "
+labels: ["verification-gap"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template when the application can violate an important property while UI-Agentic still reports PASS or never compiles the required obligation.
+
+  - type: textarea
+    id: requirement
+    attributes:
+      label: Requirement or failure mode
+      description: Describe the property that must hold or the failure that must be detected.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: layer
+    attributes:
+      label: Primary verification layer
+      options:
+        - Geometry
+        - Paint
+        - Interaction
+        - Accessibility / semantics
+        - Temporal / environmental
+        - Cross-layer
+        - Scenario compilation / coverage
+        - Proof / provenance
+    validations:
+      required: true
+
+  - type: dropdown
+    id: owner
+    attributes:
+      label: Likely hierarchy owner
+      options:
+        - GLOBAL
+        - FAMILY
+        - PAGE
+        - SECTION
+        - COMPONENT
+        - STATE
+        - DETAIL
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: domain
+    attributes:
+      label: Supported Domain factors
+      description: Which routes, states, viewports, inputs, locales, environments, or temporal conditions affect this requirement?
+    validations:
+      required: true
+
+  - type: textarea
+    id: counterexample
+    attributes:
+      label: Minimal counterexample
+      description: Show the smallest application state where the verifier misses the problem.
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_result
+    attributes:
+      label: Current verifier result
+      description: Include current rule/scenario output, if any, and explain why it is insufficient.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_proof
+    attributes:
+      label: Expected proof requirement
+      description: If known, state whether OBSERVED, BOUNDED, or CERTIFIED evidence is appropriate and why.
+
+  - type: textarea
+    id: mutant
+    attributes:
+      label: Suggested negative-path or mutant
+      description: Describe a targeted injected defect that should be killed when this gap is fixed.
